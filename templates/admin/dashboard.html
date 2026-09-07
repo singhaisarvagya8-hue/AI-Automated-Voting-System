@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- AI Command Center Header -->
+<!-- Top AI Command Center Header -->
 <div class="glass-card p-4 mb-4" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(18, 24, 39, 0.85) 100%);">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
@@ -9,167 +9,378 @@
                     <i class="bi bi-terminal-fill me-1"></i>Admin Command Center
                 </span>
                 <span class="badge badge-tech-emerald py-1 px-2">
-                    <span class="pulse-dot me-1"></span>Live Telemetry
+                    <span class="pulse-dot me-1"></span>Telemetry Active
                 </span>
+                {% if simulating %}
+                    <span class="badge badge-tech-amber py-1 px-2 text-warning border-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Burst Test Active
+                    </span>
+                {% endif %}
             </div>
-            <h2 class="fw-bold text-white mb-1">Election Intelligence & Security</h2>
-            <p class="text-muted mb-0 small">Real-time vote aggregation, machine learning turnout forecast, and velocity threat monitoring.</p>
+            <h2 class="fw-bold text-white mb-1">Election Intelligence & Control</h2>
+            <p class="text-light text-opacity-75 mb-0 small">Real-time vote aggregation, machine learning turnout forecast, and velocity threat monitoring.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <span class="badge py-2 px-3 text-white" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle);">
-                <i class="bi bi-clock-history text-info me-1"></i>Updated: Just now
-            </span>
+            <a href="{{ url_for('admin.export_results') }}" class="btn btn-sm btn-gradient-cyan d-flex align-items-center gap-1">
+                <i class="bi bi-download"></i>
+                <span>Export Results</span>
+            </a>
         </div>
     </div>
 </div>
 
-<!-- 4 KPI Metric Cards (High Visibility) -->
-<div class="row g-3 mb-4">
-    <!-- Active Elections -->
-    <div class="col-sm-6 col-xl-3">
-        <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-indigo);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Active Elections</span>
-                <div class="p-2 rounded-3" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4);">
-                    <i class="bi bi-calendar-event fs-5"></i>
-                </div>
-            </div>
-            <h2 class="display-6 fw-bold text-white mb-2">{{ active_elections }}</h2>
-            <span class="badge badge-tech-indigo fw-semibold px-2 py-1">Ongoing Ballots</span>
-        </div>
-    </div>
-
-    <!-- Total Voters -->
-    <div class="col-sm-6 col-xl-3">
-        <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-cyan);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Eligible Voters</span>
-                <div class="p-2 rounded-3" style="background: rgba(6, 182, 212, 0.25); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4);">
-                    <i class="bi bi-people-fill fs-5"></i>
-                </div>
-            </div>
-            <h2 class="display-6 fw-bold text-white mb-2">{{ total_voters }}</h2>
-            <span class="badge badge-tech-cyan fw-semibold px-2 py-1">Verified Accounts</span>
-        </div>
-    </div>
-
-    <!-- Votes Cast -->
-    <div class="col-sm-6 col-xl-3">
-        <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-emerald);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Ballots Cast</span>
-                <div class="p-2 rounded-3" style="background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">
-                    <i class="bi bi-inbox-fill fs-5"></i>
-                </div>
-            </div>
-            <h2 class="display-6 fw-bold text-white mb-2">{{ total_votes }}</h2>
-            <span class="badge badge-tech-emerald fw-semibold px-2 py-1">Ledger Sealed</span>
-        </div>
-    </div>
-
-    <!-- Current Turnout -->
-    <div class="col-sm-6 col-xl-3">
-        <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-amber);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Live Turnout</span>
-                <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.25); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4);">
-                    <i class="bi bi-pie-chart-fill fs-5"></i>
-                </div>
-            </div>
-            <h2 class="display-6 fw-bold text-white mb-2">{{ current_turnout }}%</h2>
-            <div class="progress mt-2" style="height: 8px; background: rgba(255, 255, 255, 0.12); border-radius: 4px;">
-                <div class="progress-bar" style="width: {{ current_turnout }}%; background: linear-gradient(90deg, #6366f1, #06b6d4); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Two Column AI Intelligence Section (Panel on Left Side) -->
+<!-- Main Dashboard Layout with Left Command Panel -->
 <div class="row g-4">
-    <!-- LEFT SIDE: Security & Velocity Anomaly Detection Panel -->
-    <div class="col-lg-5">
-        <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-cyan);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-shaded text-info"></i>
-                        <span>Velocity Guard Panel</span>
-                    </h5>
-                    <p class="text-light text-opacity-75 small mb-0">Isolation Forest anomaly detector</p>
+    <!-- LEFT SIDEBAR COMMAND PANEL (col-lg-3) -->
+    <div class="col-lg-3">
+        <div class="glass-card p-3 p-xl-4 sticky-top" style="top: 85px;">
+            <!-- Admin Profile Summary -->
+            <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+                <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold" style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #06b6d4); box-shadow: 0 0 14px rgba(99,102,241,0.4);">
+                    <i class="bi bi-person-fill-gear fs-5"></i>
                 </div>
-                <span class="badge badge-tech-emerald py-1 px-2">Active</span>
+                <div>
+                    <div class="text-white fw-bold small text-truncate" style="max-width: 140px;">{{ session.get('name', 'Admin') }}</div>
+                    <span class="badge badge-tech-cyan small py-0 px-2">Superadmin</span>
+                </div>
             </div>
 
-            {% if anomalies %}
-                {% for anomaly in anomalies %}
-                    <div class="alert alert-tech-danger p-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 fw-bold mb-1">
-                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
-                            <span>{{ anomaly.status }}</span>
-                        </div>
-                        <p class="small mb-2 text-light">{{ anomaly.reason }}</p>
-                        <div class="p-2 rounded small" style="background: rgba(0, 0, 0, 0.25);">
-                            <span class="text-warning fw-semibold">Action Required:</span> {{ anomaly.action }}
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="p-4 rounded text-center mb-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
-                    <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background: rgba(16, 185, 129, 0.15);">
-                        <i class="bi bi-shield-check text-success fs-2"></i>
-                    </div>
-                    <h6 class="text-white fw-bold mb-1">Normal Velocity Activity</h6>
-                    <p class="text-light text-opacity-75 small mb-0">All ballot submissions are within nominal Gaussian rates. Zero bot burst patterns detected.</p>
+            <!-- Quick Navigation Menu -->
+            <div class="mb-4">
+                <div class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem; letter-spacing: 0.08em;">Navigation</div>
+                <div class="list-group list-group-flush bg-transparent">
+                    <a href="#kpi-section" class="list-group-item list-group-item-action bg-transparent text-light border-0 px-2 py-2 rounded d-flex align-items-center gap-2 sidebar-nav-item">
+                        <i class="bi bi-speedometer2 text-info"></i>
+                        <span class="small fw-medium">Overview Metrics</span>
+                    </a>
+                    <a href="#standings-section" class="list-group-item list-group-item-action bg-transparent text-light border-0 px-2 py-2 rounded d-flex align-items-center gap-2 sidebar-nav-item">
+                        <i class="bi bi-trophy-fill text-warning"></i>
+                        <span class="small fw-medium">Live Standings</span>
+                    </a>
+                    <a href="#forecast-section" class="list-group-item list-group-item-action bg-transparent text-light border-0 px-2 py-2 rounded d-flex align-items-center gap-2 sidebar-nav-item">
+                        <i class="bi bi-graph-up-arrow text-primary"></i>
+                        <span class="small fw-medium">AI Turnout Forecast</span>
+                    </a>
+                    <a href="#security-section" class="list-group-item list-group-item-action bg-transparent text-light border-0 px-2 py-2 rounded d-flex align-items-center gap-2 sidebar-nav-item">
+                        <i class="bi bi-shield-shaded text-cyan"></i>
+                        <span class="small fw-medium">Velocity Guard</span>
+                    </a>
+                    <a href="#audit-section" class="list-group-item list-group-item-action bg-transparent text-light border-0 px-2 py-2 rounded d-flex align-items-center gap-2 sidebar-nav-item">
+                        <i class="bi bi-journal-code text-success"></i>
+                        <span class="small fw-medium">Audit Ledger</span>
+                    </a>
                 </div>
-            {% endif %}
+            </div>
 
-            <!-- Real-time Security Metrics Checklist -->
-            <div class="space-y-2 small">
-                <div class="d-flex justify-content-between align-items-center p-2 rounded mb-2" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
-                    <span class="text-light"><i class="bi bi-broadcast text-info me-2"></i>Submission Rate:</span>
-                    <span class="text-white fw-semibold">Nominal (&lt; 5 / min)</span>
+            <!-- System Diagnostics Widget -->
+            <div class="mb-4 p-3 rounded" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-subtle);">
+                <div class="text-white small fw-bold mb-2 d-flex align-items-center gap-2">
+                    <i class="bi bi-cpu text-info"></i>
+                    <span>Engine Telemetry</span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center p-2 rounded mb-2" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
-                    <span class="text-light"><i class="bi bi-fingerprint text-primary me-2"></i>Identity Decoupling:</span>
-                    <span class="text-success fw-semibold">100% Enforced</span>
+                <div class="small text-light mb-1 d-flex justify-content-between">
+                    <span class="text-muted">MySQL DB:</span>
+                    <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i>Connected</span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
-                    <span class="text-light"><i class="bi bi-database-check text-warning me-2"></i>Audit Log Integrity:</span>
-                    <span class="text-white fw-semibold">Synchronized</span>
+                <div class="small text-light mb-1 d-flex justify-content-between">
+                    <span class="text-muted">Turnout Model:</span>
+                    <span class="text-info fw-semibold">RandomForest</span>
                 </div>
+                <div class="small text-light mb-1 d-flex justify-content-between">
+                    <span class="text-muted">Anomaly Guard:</span>
+                    <span class="text-info fw-semibold">IsolationForest</span>
+                </div>
+                <div class="small text-light d-flex justify-content-between">
+                    <span class="text-muted">Port / TLS:</span>
+                    <span class="text-white font-monospace">5001 / 256b</span>
+                </div>
+            </div>
+
+            <!-- Quick Export Tools -->
+            <div class="mb-4">
+                <div class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem; letter-spacing: 0.08em;">Data Exports</div>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.export_results') }}" class="btn btn-sm btn-outline-tech d-flex align-items-center justify-content-start gap-2 py-2">
+                        <i class="bi bi-file-earmark-spreadsheet text-success fs-6"></i>
+                        <span class="small">Export Results (.csv)</span>
+                    </a>
+                    <a href="{{ url_for('admin.export_audit') }}" class="btn btn-sm btn-outline-tech d-flex align-items-center justify-content-start gap-2 py-2">
+                        <i class="bi bi-journal-text text-info fs-6"></i>
+                        <span class="small">Export Audit Ledger (.csv)</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AI Stress Test Tool -->
+            <div class="pt-3 border-top border-secondary border-opacity-25">
+                <div class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem; letter-spacing: 0.08em;">AI Diagnostics Tool</div>
+                <form method="POST" action="{{ url_for('admin.toggle_simulation') }}">
+                    {% if simulating %}
+                        <button type="submit" class="btn btn-sm btn-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                            <i class="bi bi-stop-circle-fill"></i>
+                            <span>Stop Burst Test</span>
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-sm btn-outline-tech text-warning w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                            <i class="bi bi-lightning-charge"></i>
+                            <span>Simulate Vote Burst</span>
+                        </button>
+                    {% endif %}
+                </form>
+                <div class="text-muted small mt-1 text-center" style="font-size: 0.7rem;">Injects simulated burst to test AI detector</div>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT SIDE: ML Turnout Forecasting -->
-    <div class="col-lg-7">
-        <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-indigo);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
-                        <i class="bi bi-graph-up-arrow text-primary" style="color: var(--accent-cyan) !important;"></i>
-                        <span>AI Turnout Prediction Model</span>
-                    </h5>
-                    <p class="text-light text-opacity-75 small mb-0">Random Forest Regressor projected participation</p>
+    <!-- MAIN DASHBOARD CONTENT AREA (col-lg-9) -->
+    <div class="col-lg-9">
+        <!-- 4 KPI Metric Cards (High Visibility) -->
+        <div class="row g-3 mb-4" id="kpi-section">
+            <!-- Active Elections -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-indigo);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Active Elections</span>
+                        <div class="p-2 rounded-3" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4);">
+                            <i class="bi bi-calendar-event fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-2">{{ active_elections }}</h2>
+                    <span class="badge badge-tech-indigo fw-semibold px-2 py-1">Ongoing Ballots</span>
                 </div>
-                <span class="badge badge-tech-indigo py-1 px-3">
-                    Projected: {{ predicted_turnout }}%
-                </span>
             </div>
 
-            <!-- Chart Canvas -->
-            <div style="position: relative; height: 260px;">
-                <canvas id="turnoutChart"></canvas>
+            <!-- Total Voters -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-cyan);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Eligible Voters</span>
+                        <div class="p-2 rounded-3" style="background: rgba(6, 182, 212, 0.25); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4);">
+                            <i class="bi bi-people-fill fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-2">{{ total_voters }}</h2>
+                    <span class="badge badge-tech-cyan fw-semibold px-2 py-1">Verified Accounts</span>
+                </div>
             </div>
 
-            <!-- Model Metrics Footnote -->
-            <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex flex-wrap align-items-center justify-content-between gap-2 small text-light text-opacity-75">
-                <span><i class="bi bi-check-circle-fill text-success me-1"></i>Trained on 500 historical elections</span>
-                <span>Features: eligible, past turnout, candidate ratio</span>
+            <!-- Votes Cast -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-emerald);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Ballots Cast</span>
+                        <div class="p-2 rounded-3" style="background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">
+                            <i class="bi bi-inbox-fill fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-2">{{ total_votes }}</h2>
+                    <span class="badge badge-tech-emerald fw-semibold px-2 py-1">Ledger Sealed</span>
+                </div>
+            </div>
+
+            <!-- Current Turnout -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="glass-card glass-card-hover p-4 h-100" style="border-top: 3px solid var(--accent-amber);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white fw-bold small text-uppercase" style="letter-spacing: 0.05em;">Live Turnout</span>
+                        <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.25); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4);">
+                            <i class="bi bi-pie-chart-fill fs-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-2">{{ current_turnout }}%</h2>
+                    <div class="progress mt-2" style="height: 8px; background: rgba(255, 255, 255, 0.12); border-radius: 4px;">
+                        <div class="progress-bar" style="width: {{ current_turnout }}%; background: linear-gradient(90deg, #6366f1, #06b6d4); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Row: Velocity Guard (Left) & Candidate Standings (Right) -->
+        <div class="row g-4 mb-4">
+            <!-- Velocity Guard Panel -->
+            <div class="col-lg-6" id="security-section">
+                <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-cyan);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-shaded text-info"></i>
+                                <span>Velocity Guard Panel</span>
+                            </h5>
+                            <p class="text-light text-opacity-75 small mb-0">Isolation Forest anomaly detector</p>
+                        </div>
+                        <span class="badge badge-tech-emerald py-1 px-2">Active</span>
+                    </div>
+
+                    {% if anomalies %}
+                        {% for anomaly in anomalies %}
+                            <div class="alert alert-tech-danger p-3 mb-3">
+                                <div class="d-flex align-items-center gap-2 fw-bold mb-1">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                                    <span>{{ anomaly.status }}</span>
+                                </div>
+                                <p class="small mb-2 text-light">{{ anomaly.reason }}</p>
+                                <div class="p-2 rounded small" style="background: rgba(0, 0, 0, 0.25);">
+                                    <span class="text-warning fw-semibold">Action Required:</span> {{ anomaly.action }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 rounded text-center mb-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background: rgba(16, 185, 129, 0.15);">
+                                <i class="bi bi-shield-check text-success fs-2"></i>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Normal Velocity Activity</h6>
+                            <p class="text-light text-opacity-75 small mb-0">All ballot submissions are within nominal Gaussian rates. Zero bot burst patterns detected.</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Real-time Security Metrics Checklist -->
+                    <div class="space-y-2 small">
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded mb-2" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
+                            <span class="text-light"><i class="bi bi-broadcast text-info me-2"></i>Submission Rate:</span>
+                            <span class="text-white fw-semibold">{% if simulating %}<span class="text-danger">Elevated (28/min)</span>{% else %}Nominal (&lt; 5/min){% endif %}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded mb-2" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
+                            <span class="text-light"><i class="bi bi-fingerprint text-primary me-2"></i>Identity Decoupling:</span>
+                            <span class="text-success fw-semibold">100% Enforced</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);">
+                            <span class="text-light"><i class="bi bi-database-check text-warning me-2"></i>Audit Log Integrity:</span>
+                            <span class="text-white fw-semibold">Synchronized</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Candidate Standings & Leaderboard -->
+            <div class="col-lg-6" id="standings-section">
+                <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-emerald);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-trophy-fill text-warning"></i>
+                                <span>Live Candidate Standings</span>
+                            </h5>
+                            <p class="text-light text-opacity-75 small mb-0">Real-time vote count and share</p>
+                        </div>
+                        <span class="badge badge-tech-emerald py-1 px-2">Live Tally</span>
+                    </div>
+
+                    {% if candidate_standings %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for item in candidate_standings %}
+                                <div class="p-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold small" style="width: 32px; height: 32px; background: linear-gradient(135deg, {% if loop.first %}#10b981, #06b6d4{% else %}#6366f1, #4f46e5{% endif %});">
+                                                {{ item.candidate.name[:2]|upper }}
+                                            </div>
+                                            <div>
+                                                <div class="text-white fw-bold small">{{ item.candidate.name }}</div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">{{ item.candidate.position }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="text-white fw-bold">{{ item.votes }} votes</span>
+                                            <span class="badge badge-tech-cyan ms-1 small">{{ item.percentage }}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.08);">
+                                        <div class="progress-bar" style="width: {{ item.percentage }}%; background: {% if loop.first %}linear-gradient(90deg, #10b981, #06b6d4){% else %}linear-gradient(90deg, #6366f1, #818cf8){% endif %};"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            No candidate votes recorded yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Lower Row: AI Turnout Forecast (Left) & Audit Ledger (Right) -->
+        <div class="row g-4">
+            <!-- ML Turnout Forecasting Chart -->
+            <div class="col-lg-7" id="forecast-section">
+                <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-indigo);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-graph-up-arrow text-primary" style="color: var(--accent-cyan) !important;"></i>
+                                <span>AI Turnout Prediction Model</span>
+                            </h5>
+                            <p class="text-light text-opacity-75 small mb-0">Random Forest Regressor projected participation</p>
+                        </div>
+                        <span class="badge badge-tech-indigo py-1 px-3">
+                            Projected: {{ predicted_turnout }}%
+                        </span>
+                    </div>
+
+                    <!-- Chart Canvas -->
+                    <div style="position: relative; height: 260px;">
+                        <canvas id="turnoutChart"></canvas>
+                    </div>
+
+                    <!-- Model Metrics Footnote -->
+                    <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex flex-wrap align-items-center justify-content-between gap-2 small text-light text-opacity-75">
+                        <span><i class="bi bi-check-circle-fill text-success me-1"></i>Trained on 500 historical elections</span>
+                        <span>Features: eligible, past turnout, candidate ratio</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Ledger Activity Feed -->
+            <div class="col-lg-5" id="audit-section">
+                <div class="glass-card p-4 h-100" style="border-left: 3px solid var(--accent-amber);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-journal-code text-warning"></i>
+                                <span>Audit Trail Ledger</span>
+                            </h5>
+                            <p class="text-light text-opacity-75 small mb-0">Immutable cryptographic event log</p>
+                        </div>
+                        <a href="{{ url_for('admin.export_audit') }}" class="btn btn-sm btn-outline-tech py-0 px-2 small" title="Export Ledger">
+                            <i class="bi bi-download"></i>
+                        </a>
+                    </div>
+
+                    {% if audit_logs %}
+                        <div class="d-flex flex-column gap-2" style="max-height: 275px; overflow-y: auto;">
+                            {% for log in audit_logs %}
+                                <div class="p-2 rounded d-flex align-items-center justify-content-between small" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-shield-check text-success"></i>
+                                        <div>
+                                            <div class="text-white fw-semibold" style="font-size: 0.8rem;">{{ log.action }}</div>
+                                            <span class="text-muted font-monospace" style="font-size: 0.7rem;">Block #{{ log.id }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted" style="font-size: 0.72rem;">{{ log.timestamp.strftime('%H:%M:%S') }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-journal-text fs-2 d-block mb-2"></i>
+                            No audit log events recorded yet.
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .sidebar-nav-item:hover {
+        background: rgba(99, 102, 241, 0.15) !important;
+        color: white !important;
+    }
+</style>
 
 <!-- Turnout Chart Script with Modern Theme -->
 <script>
