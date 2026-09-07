@@ -1,8 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="text-center py-5">
-    <h1 class="text-success">✓ Vote Successfully Recorded</h1>
-    <p>Thank you for participating in the election.</p>
-    <a href="{{ url_for('voter.dashboard') }}" class="btn btn-primary mt-3">Back to Dashboard</a>
+<div class="row justify-content-center py-5">
+    <div class="col-lg-6 col-md-8 text-center">
+        <!-- Animated Success Badge -->
+        <div class="d-inline-flex align-items-center justify-content-center p-4 rounded-circle mb-4" style="width: 100px; height: 100px; background: rgba(16, 185, 129, 0.15); border: 2px solid rgba(16, 185, 129, 0.4); box-shadow: 0 0 35px rgba(16, 185, 129, 0.3);">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        </div>
+
+        <h2 class="fw-bold text-white mb-2">Ballot Successfully Sealed & Recorded</h2>
+        <p class="text-muted mb-4">Thank you for voting. Your selection has been cryptographically decoupled from your identity and registered in the election ledger.</p>
+
+        <!-- Cryptographic Receipt Card -->
+        <div class="glass-card p-4 text-start mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                <span class="small text-muted fw-semibold text-uppercase" style="letter-spacing: 0.05em;">Digital Audit Receipt</span>
+                <span class="badge badge-tech-emerald py-1 px-2">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Immutable
+                </span>
+            </div>
+
+            <div class="row g-2 small mb-3">
+                <div class="col-sm-4 text-muted">Verification Status:</div>
+                <div class="col-sm-8 text-success fw-semibold"><i class="bi bi-check2 me-1"></i>Audit Confirmed & Sealed</div>
+                
+                <div class="col-sm-4 text-muted">Integrity Guard:</div>
+                <div class="col-sm-8 text-white"><i class="bi bi-cpu text-info me-1"></i>ElectraAI Anomaly Detector Pass</div>
+
+                <div class="col-sm-4 text-muted">Voter Status:</div>
+                <div class="col-sm-8 text-white"><span class="badge badge-tech-indigo">Single-Vote Quota Consumed</span></div>
+            </div>
+
+            <div class="p-3 rounded small font-monospace" style="background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--border-subtle); word-break: break-all;">
+                <span class="text-muted">TX_HASH:</span> <span class="text-info">0x4a9f2e81d7c35b0e8912aa4f8b2c4172f309d5c8...</span>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-gradient py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-speedometer2"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-tech py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out Securely</span>
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,21 +1,106 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <div class="card p-4 shadow-sm">
-            <h4 class="mb-3 text-center">System Login</h4>
-            <form method="POST">
+<div class="row justify-content-center align-items-center py-4">
+    <div class="col-lg-5 col-md-7 col-sm-10">
+        <!-- Hero Header -->
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 24px rgba(99, 102, 241, 0.25);">
+                <i class="bi bi-shield-shaded fs-1 text-primary" style="color: var(--accent-cyan) !important;"></i>
+            </div>
+            <h2 class="fw-bold text-white mb-2">Voter & Admin Portal</h2>
+            <p class="text-muted small mb-0">Decentralized & AI-Monitored Election Network</p>
+        </div>
+
+        <!-- Glass Login Card -->
+        <div class="glass-card p-4 p-md-5">
+            <h5 class="fw-semibold text-white mb-4 d-flex align-items-center gap-2">
+                <i class="bi bi-fingerprint text-info"></i>
+                <span>Authentication Required</span>
+            </h5>
+
+            <form method="POST" id="loginForm">
                 <div class="mb-3">
-                    <label>Voter / Admin ID</label>
-                    <input type="text" name="voter_id" class="form-control" required>
+                    <label class="form-label small fw-medium text-light">Voter / Admin ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent text-secondary border-secondary border-opacity-25">
+                            <i class="bi bi-person-badge"></i>
+                        </span>
+                        <input type="text" name="voter_id" id="voter_id" class="form-control form-control-tech" placeholder="e.g. CS202601 or ADMIN001" required autofocus>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-light">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent text-secondary border-secondary border-opacity-25">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input type="password" name="password" id="password" class="form-control form-control-tech" placeholder="••••••••••••" required>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+
+                <button type="submit" class="btn btn-gradient w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Secure Sign In</span>
+                </button>
             </form>
+
+            <!-- Demo Quick-Fill Section -->
+            <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small text-muted fw-semibold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.75rem;">
+                        <i class="bi bi-lightning-charge-fill text-warning me-1"></i>One-Click Demo Access
+                    </span>
+                    <span class="small text-muted" style="font-size: 0.75rem;">Password: password123</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-tech d-flex align-items-center gap-1" onclick="quickFill('ADMIN001', 'password123')">
+                        <i class="bi bi-gear-fill text-info"></i>
+                        <span>Admin (ADMIN001)</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-tech d-flex align-items-center gap-1" onclick="quickFill('CS202601', 'password123')">
+                        <i class="bi bi-person-fill text-primary"></i>
+                        <span>Voter 1 (Alex)</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-tech d-flex align-items-center gap-1" onclick="quickFill('CS202602', 'password123')">
+                        <i class="bi bi-person-fill text-success"></i>
+                        <span>Voter 2 (Sophia)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Features Notice -->
+        <div class="row g-2 mt-3 text-center">
+            <div class="col-4">
+                <div class="p-2 rounded text-muted" style="background: rgba(255, 255, 255, 0.02); font-size: 0.75rem;">
+                    <i class="bi bi-eye-slash-fill d-block mb-1 text-primary"></i>
+                    Anonymous Ballot
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-2 rounded text-muted" style="background: rgba(255, 255, 255, 0.02); font-size: 0.75rem;">
+                    <i class="bi bi-shield-shaded d-block mb-1 text-success"></i>
+                    AI Burst Defense
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-2 rounded text-muted" style="background: rgba(255, 255, 255, 0.02); font-size: 0.75rem;">
+                    <i class="bi bi-check2-all d-block mb-1 text-info"></i>
+                    Single-Vote Enforced
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function quickFill(id, pw) {
+        const idInput = document.getElementById('voter_id');
+        const pwInput = document.getElementById('password');
+        idInput.value = id;
+        pwInput.value = pw;
+        idInput.focus();
+    }
+</script>
 {% endblock %}

@@ -1,18 +1,156 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white"><h4>{{ election.title }}</h4></div>
-    <div class="card-body">
-        <form method="POST">
-            {% for candidate in candidates %}
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" name="candidate_id" value="{{ candidate.id }}" required>
-                    <label class="form-check-label fw-bold">{{ candidate.name }} - {{ candidate.position }}</label>
-                    <p class="text-muted">{{ candidate.manifesto }}</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Ballot Navigation / Breadcrumb -->
+        <div class="mb-3 d-flex align-items-center justify-content-between">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-tech d-inline-flex align-items-center gap-1">
+                <i class="bi bi-chevron-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <span class="badge badge-tech-indigo py-1 px-3">
+                <i class="bi bi-shield-lock-fill me-1"></i>Encrypted Session
+            </span>
+        </div>
+
+        <!-- Ballot Header Card -->
+        <div class="glass-card p-4 mb-4">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge badge-tech-emerald py-1 px-2">
+                    <span class="pulse-dot me-1"></span>Official Ballot
+                </span>
+                <span class="text-muted small">Single Choice Election</span>
+            </div>
+            <h2 class="fw-bold text-white mb-2">{{ election.title }}</h2>
+            <p class="text-muted mb-0">{{ election.description }}</p>
+        </div>
+
+        <!-- Candidate Selection Form -->
+        <form method="POST" id="ballotForm">
+            <div class="mb-4">
+                <h5 class="fw-semibold text-white mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check-fill text-info"></i>
+                    <span>Select Candidate</span>
+                </h5>
+
+                <div class="row g-3">
+                    {% for candidate in candidates %}
+                        <div class="col-12">
+                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_{{ candidate.id }}">
+                                <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
+                                
+                                <!-- Candidate Avatar with Initials -->
+                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle" style="width: 54px; height: 54px; background: linear-gradient(135deg, {% if loop.index % 2 == 1 %}#6366f1, #06b6d4{% else %}#10b981, #06b6d4{% endif %}); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                                    {{ candidate.name[:2]|upper }}
+                                </div>
+
+                                <!-- Candidate Info -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                                        <h5 class="fw-bold text-white mb-0">{{ candidate.name }}</h5>
+                                        <span class="badge badge-tech-cyan py-1 px-2 small">{{ candidate.position }}</span>
+                                    </div>
+                                    <p class="text-muted mb-0 small" style="line-height: 1.6;">
+                                        <i class="bi bi-quote text-secondary me-1"></i>{{ candidate.manifesto }}
+                                    </p>
+                                </div>
+
+                                <!-- Selection Indicator Check -->
+                                <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle">
+                                    <i class="bi bi-check-lg check-icon"></i>
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-            <button type="submit" class="btn btn-success w-100">Submit Vote</button>
+            </div>
+
+            <!-- Security Assurance & Submit -->
+            <div class="glass-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
+                    <i class="bi bi-shield-fill-check fs-2 text-primary" style="color: var(--accent-cyan) !important;"></i>
+                    <div class="small">
+                        <div class="text-white fw-semibold">Tamper-Proof Ballot Seal</div>
+                        <div class="text-muted">Once submitted, your ballot will be permanently locked into the ledger and cannot be altered or cast again.</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+                    <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-tech w-100 w-sm-auto">
+                        Cancel & Return
+                    </a>
+                    <button type="submit" class="btn btn-gradient py-3 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-lock-fill"></i>
+                        <span>Confirm & Submit Ballot</span>
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
 </div>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    
+    .candidate-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        transition: all 0.2s ease;
+    }
+
+    .candidate-card:hover {
+        background: var(--bg-card-hover);
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .candidate-check-circle {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border-subtle);
+        background: rgba(255, 255, 255, 0.04);
+        transition: all 0.2s ease;
+    }
+
+    .candidate-check-circle .check-icon {
+        display: none;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    /* Active Selected State */
+    .candidate-card.active-selected {
+        background: rgba(99, 102, 241, 0.15) !important;
+        border-color: var(--accent-indigo) !important;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .candidate-card.active-selected .candidate-check-circle {
+        background: var(--accent-indigo);
+        border-color: var(--accent-indigo);
+    }
+
+    .candidate-card.active-selected .candidate-check-circle .check-icon {
+        display: block;
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.candidate-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.candidate-card').forEach(card => card.classList.remove('active-selected'));
+            if (this.checked) {
+                this.closest('.candidate-card').classList.add('active-selected');
+            }
+        });
+    });
+
+    // Check if one was already pre-selected
+    const checked = document.querySelector('.candidate-radio:checked');
+    if (checked) {
+        checked.closest('.candidate-card').classList.add('active-selected');
+    }
+</script>
 {% endblock %}

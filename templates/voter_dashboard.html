@@ -1,21 +1,116 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Active Elections</h2>
-<div class="list-group mt-3">
-    {% for election in elections %}
-        <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <h5>{{ election.title }}</h5>
-                <p class="mb-0 text-muted">{{ election.description }}</p>
+<!-- Voter Welcome Hero -->
+<div class="glass-card p-4 mb-4" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(18, 24, 39, 0.85) 100%);">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge badge-tech-indigo py-1 px-2">
+                    <i class="bi bi-shield-check text-info me-1"></i>Voter Portal
+                </span>
+                <span class="badge badge-tech-emerald py-1 px-2">
+                    <span class="pulse-dot me-1"></span>Eligible & Authenticated
+                </span>
             </div>
-            {% if status_map.get(election.id) %}
-                <span class="badge bg-secondary">Already Voted</span>
-            {% else %}
-                <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-success">Cast Vote</a>
-            {% endif %}
+            <h2 class="fw-bold text-white mb-1">Welcome, {{ session.get('name', 'Student Voter') }}</h2>
+            <p class="text-muted mb-0 small">Review active campus elections below and cast your cryptographically secured vote.</p>
+        </div>
+        <div class="text-md-end">
+            <span class="text-muted small d-block">Academic Year 2026</span>
+            <span class="text-white fw-semibold small"><i class="bi bi-cpu text-info me-1"></i>AI Integrity Monitor: <span class="text-success">Active</span></span>
+        </div>
+    </div>
+</div>
+
+<!-- Active Elections Section -->
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="fw-bold text-white mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-card-checklist text-primary" style="color: var(--accent-cyan) !important;"></i>
+            <span>Current Elections</span>
+        </h4>
+        <p class="text-muted small mb-0">Elections you are registered and authorized to participate in.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    {% for election in elections %}
+        <div class="col-12">
+            <div class="glass-card glass-card-hover p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge badge-tech-emerald py-1 px-2">
+                                <span class="pulse-dot me-1"></span>Voting Open
+                            </span>
+                            <span class="text-muted small">
+                                <i class="bi bi-clock-history me-1"></i>Annual Student Ballot
+                            </span>
+                        </div>
+                        <h4 class="fw-bold text-white mb-2">{{ election.title }}</h4>
+                        <p class="text-muted mb-3" style="max-width: 750px;">{{ election.description }}</p>
+                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                            <span><i class="bi bi-people-fill text-info me-1"></i>{{ election.candidates|length }} Registered Candidates</span>
+                            <span><i class="bi bi-lock-fill text-warning me-1"></i>Double-Voting Guard Enforced</span>
+                        </div>
+                    </div>
+
+                    <div class="text-md-end flex-shrink-0">
+                        {% if status_map.get(election.id) %}
+                            <div class="d-inline-flex flex-column align-items-md-end">
+                                <div class="badge badge-tech-emerald py-2 px-3 fs-6 d-flex align-items-center gap-2 mb-1">
+                                    <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                                    <span>Vote Recorded</span>
+                                </div>
+                                <span class="small text-muted">Ballot sealed & verified</span>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-gradient py-2 px-4 d-flex align-items-center gap-2">
+                                <i class="bi bi-box2-heart-fill"></i>
+                                <span>Cast Your Ballot</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     {% else %}
-        <p>No active elections available.</p>
+        <div class="col-12">
+            <div class="glass-card p-5 text-center">
+                <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                <h5 class="text-white fw-bold">No Active Elections Found</h5>
+                <p class="text-muted mb-0">You currently have no ballots pending your vote. Check back when the next voting cycle opens.</p>
+            </div>
+        </div>
     {% endfor %}
+</div>
+
+<!-- 3-Step Voting Security Workflow -->
+<div class="glass-card p-4">
+    <h5 class="fw-semibold text-white mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-shield-lock text-info"></i>
+        <span>Voting Integrity Safeguards</span>
+    </h5>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="p-3 rounded h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle);">
+                <div class="fw-bold text-white mb-1"><span class="text-primary me-2">01.</span>Verified Eligibility</div>
+                <p class="text-muted small mb-0">Only authenticated students with active department enrollment can access and unlock ballots.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle);">
+                <div class="fw-bold text-white mb-1"><span class="text-info me-2">02.</span>Encrypted Ledger</div>
+                <p class="text-muted small mb-0">Your vote choice is cryptographically separated from your identity to guarantee complete ballot secrecy.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle);">
+                <div class="fw-bold text-white mb-1"><span class="text-success me-2">03.</span>AI Anomaly Shield</div>
+                <p class="text-muted small mb-0">Machine learning algorithms audit voting velocity in real time to prevent automated burst manipulation.</p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
