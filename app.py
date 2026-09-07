@@ -26,6 +26,20 @@ def index():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+    
+    # Auto-train ML models if missing
+    models_dir = os.path.join(os.path.dirname(__file__), 'ml', 'models')
+    turnout_path = os.path.join(models_dir, 'turnout_model.pkl')
+    anomaly_path = os.path.join(models_dir, 'anomaly_model.pkl')
+    if not os.path.exists(turnout_path) or not os.path.exists(anomaly_path):
+        try:
+            from ml.train_models import train_turnout_model, train_anomaly_model
+            train_turnout_model()
+            train_anomaly_model()
+            print(" * Initialized ML models successfully.")
+        except Exception as e:
+            print(f" * Warning: ML model auto-init skipped: {e}")
+
     port = int(os.environ.get('PORT', 5001))
     print(f"\n==========================================")
     print(f" * Voting System running at: http://127.0.0.1:{port}")

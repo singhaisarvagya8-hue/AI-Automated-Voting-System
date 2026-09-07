@@ -6,3 +6,5 @@ python-dotenv
 Werkzeug
 numpy
 scikit-learn
+joblib
+pandas
