@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white"><h4>{{ election.title }}</h4></div>
+    <div class="card-body">
+        <form method="POST">
+            {% for candidate in candidates %}
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="candidate_id" value="{{ candidate.id }}" required>
+                    <label class="form-check-label fw-bold">{{ candidate.name }} - {{ candidate.position }}</label>
+                    <p class="text-muted">{{ candidate.manifesto }}</p>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success w-100">Submit Vote</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

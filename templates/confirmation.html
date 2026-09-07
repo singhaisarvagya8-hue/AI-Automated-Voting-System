@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="text-success">✓ Vote Successfully Recorded</h1>
+    <p>Thank you for participating in the election.</p>
+    <a href="{{ url_for('voter.dashboard') }}" class="btn btn-primary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

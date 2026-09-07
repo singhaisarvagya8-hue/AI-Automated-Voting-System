@@ -1,0 +1,8 @@
+Flask
+Flask-SQLAlchemy
+mysql-connector-python
+PyMySQL
+python-dotenv
+Werkzeug
+numpy
+scikit-learn

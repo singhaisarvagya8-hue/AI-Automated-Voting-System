@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<div class="row text-center my-4">
+    <div class="col"><div class="card p-3 shadow-sm"><h6>Active Elections</h6><h3>{{ active_elections }}</h3></div></div>
+    <div class="col"><div class="card p-3 shadow-sm"><h6>Total Voters</h6><h3>{{ total_voters }}</h3></div></div>
+    <div class="col"><div class="card p-3 shadow-sm"><h6>Votes Cast</h6><h3>{{ total_votes }}</h3></div></div>
+    <div class="col"><div class="card p-3 shadow-sm"><h6>Current Turnout</h6><h3>{{ current_turnout }}%</h3></div></div>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Turnout Prediction</h5>
+            <p class="text-muted mb-2">ML-estimated overall turnout</p>
+            <p>Predicted Turnout: <strong>{{ predicted_turnout }}%</strong></p>
+            <canvas id="turnoutChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Security & Anomaly Monitoring</h5>
+            <p class="text-muted mb-2">AI-driven voting velocity analysis</p>
+            {% if anomalies %}
+                {% for anomaly in anomalies %}
+                    <div class="alert alert-danger mb-2">
+                        <strong>{{ anomaly.status }}</strong>: {{ anomaly.reason }}<br>
+                        <small>{{ anomaly.action }}</small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-success mb-0">
+                    <strong>Normal Activity</strong>: No voting velocity anomalies detected. System is running securely.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    new Chart(document.getElementById('turnoutChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Current Turnout', 'Predicted Turnout'],
+            datasets: [{ label: '%', data: [{{ current_turnout }}, {{ predicted_turnout }}], backgroundColor: ['#0d6efd', '#0dcaf0'] }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+</script>
+{% endblock %}
