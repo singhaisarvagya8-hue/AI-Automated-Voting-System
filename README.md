@@ -156,6 +156,15 @@ All test accounts are pre-configured in `seed_data.sql` with password: **`passwo
         └── dashboard.html     # Interactive Admin Command Center with tab navigation
 ```
 
+## 🚢 Cloud & Container Deployment
+
+Votex.ai includes ready-to-use production deployment configurations:
+- **Docker Compose**: `docker compose up -d --build` (spins up MySQL 8.0 + Votex.ai Web Server).
+- **Railway.app / Render**: Native `Procfile` and Gunicorn configuration included.
+- **Ubuntu Linux VPS**: Nginx reverse proxy + Systemd Gunicorn service + Let's Encrypt SSL.
+
+For step-by-step instructions, see the complete guide in [**`DEPLOYMENT.md`**](DEPLOYMENT.md).
+
 ---
 
 ## 📜 License

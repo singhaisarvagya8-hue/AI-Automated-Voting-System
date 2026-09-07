@@ -23,9 +23,12 @@ def index():
         return redirect(url_for('voter.dashboard'))
     return redirect(url_for('auth.login'))
 
-if __name__ == '__main__':
+def init_app_state():
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f" * Database init note: {e}")
     
     # Auto-train ML models if missing
     models_dir = os.path.join(os.path.dirname(__file__), 'ml', 'models')
@@ -40,8 +43,12 @@ if __name__ == '__main__':
         except Exception as e:
             print(f" * Warning: ML model auto-init skipped: {e}")
 
+# Run initialization for both direct and WSGI (Gunicorn) execution
+init_app_state()
+
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     print(f"\n==========================================")
-    print(f" * Voting System running at: http://127.0.0.1:{port}")
+    print(f" * Votex.ai running at: http://127.0.0.1:{port}")
     print(f"==========================================\n")
     app.run(debug=True, port=port)

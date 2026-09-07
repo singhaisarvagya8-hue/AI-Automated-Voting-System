@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: votex_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: voting_system_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./seed_data.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    container_name: votex_web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/voting_system_db
+      SECRET_KEY: votex-production-secret-key-2026
+      PORT: 5001
+    ports:
+      - "5001:5001"
+
+volumes:
+  mysql_data:
