@@ -102,5 +102,12 @@
         pwInput.value = pw;
         idInput.focus();
     }
+
+    document.getElementById('loginForm').addEventListener('submit', function() {
+        const v = document.getElementById('voter_id');
+        const p = document.getElementById('password');
+        if (v) v.value = v.value.trim();
+        if (p) p.value = p.value.trim();
+    });
 </script>
 {% endblock %}
