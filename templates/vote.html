@@ -14,40 +14,40 @@
         </div>
 
         <!-- Ballot Header Card -->
-        <div class="glass-card p-4 mb-4">
+        <div class="classic-card p-4 mb-4 bg-white">
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="badge badge-tech-emerald py-1 px-2">
                     <span class="pulse-dot me-1"></span>Official Ballot
                 </span>
                 <span class="text-muted small">Single Choice Election</span>
             </div>
-            <h2 class="fw-bold text-white mb-2">{{ election.title }}</h2>
+            <h2 class="fw-bold text-dark mb-2">{{ election.title }}</h2>
             <p class="text-muted mb-0">{{ election.description }}</p>
         </div>
 
         <!-- Candidate Selection Form -->
         <form method="POST" id="ballotForm">
             <div class="mb-4">
-                <h5 class="fw-semibold text-white mb-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-person-check-fill text-info"></i>
-                    <span>Select Candidate</span>
+                <h5 class="fw-semibold text-dark mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check-fill text-primary"></i>
+                    <span>Select a Candidate</span>
                 </h5>
 
                 <div class="row g-3">
                     {% for candidate in candidates %}
                         <div class="col-12">
-                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_{{ candidate.id }}">
+                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer bg-white" for="cand_{{ candidate.id }}">
                                 <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
                                 
                                 <!-- Candidate Avatar with Initials -->
-                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle" style="width: 54px; height: 54px; background: linear-gradient(135deg, {% if loop.index % 2 == 1 %}#6366f1, #06b6d4{% else %}#10b981, #06b6d4{% endif %}); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle" style="width: 48px; height: 48px; background: {% if loop.index % 2 == 1 %}#2563eb{% else %}#0284c7{% endif %}; font-size: 1.1rem;">
                                     {{ candidate.name[:2]|upper }}
                                 </div>
 
                                 <!-- Candidate Info -->
                                 <div class="flex-grow-1">
                                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
-                                        <h5 class="fw-bold text-white mb-0">{{ candidate.name }}</h5>
+                                        <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
                                         <span class="badge badge-tech-cyan py-1 px-2 small">{{ candidate.position }}</span>
                                     </div>
                                     <p class="text-muted mb-0 small" style="line-height: 1.6;">
@@ -56,7 +56,7 @@
                                 </div>
 
                                 <!-- Selection Indicator Check -->
-                                <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle">
+                                <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border">
                                     <i class="bi bi-check-lg check-icon"></i>
                                 </div>
                             </label>
@@ -66,11 +66,11 @@
             </div>
 
             <!-- Security Assurance & Submit -->
-            <div class="glass-card p-4">
-                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
-                    <i class="bi bi-shield-fill-check fs-2 text-primary" style="color: var(--accent-cyan) !important;"></i>
+            <div class="classic-card p-4 bg-white">
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                    <i class="bi bi-shield-check fs-2 text-primary"></i>
                     <div class="small">
-                        <div class="text-white fw-semibold">Tamper-Proof Ballot Seal</div>
+                        <div class="text-dark fw-semibold">Tamper-Proof Ballot Seal</div>
                         <div class="text-muted">Once submitted, your ballot will be permanently locked into the ledger and cannot be altered or cast again.</div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                     <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-tech w-100 w-sm-auto">
                         Cancel & Return
                     </a>
-                    <button type="submit" class="btn btn-gradient py-3 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
+                    <button type="submit" class="btn btn-gradient py-2.5 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
                         <i class="bi bi-lock-fill"></i>
                         <span>Confirm & Submit Ballot</span>
                     </button>
@@ -95,41 +95,41 @@
     }
     
     .candidate-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-subtle);
-        transition: all 0.2s ease;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.15s ease;
     }
 
     .candidate-card:hover {
-        background: var(--bg-card-hover);
-        border-color: rgba(99, 102, 241, 0.4);
-        transform: translateY(-2px);
+        border-color: #94a3b8;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .candidate-check-circle {
-        width: 32px;
-        height: 32px;
-        border: 2px solid var(--border-subtle);
-        background: rgba(255, 255, 255, 0.04);
-        transition: all 0.2s ease;
+        width: 28px;
+        height: 28px;
+        border: 2px solid #cbd5e1;
+        background: #f8fafc;
+        transition: all 0.15s ease;
     }
 
     .candidate-check-circle .check-icon {
         display: none;
         color: white;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     /* Active Selected State */
     .candidate-card.active-selected {
-        background: rgba(99, 102, 241, 0.15) !important;
-        border-color: var(--accent-indigo) !important;
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        background: #eff6ff !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
     }
 
     .candidate-card.active-selected .candidate-check-circle {
-        background: var(--accent-indigo);
-        border-color: var(--accent-indigo);
+        background: #2563eb;
+        border-color: #2563eb;
     }
 
     .candidate-card.active-selected .candidate-check-circle .check-icon {
