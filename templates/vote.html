@@ -3,27 +3,65 @@
 <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10">
         <!-- Ballot Navigation / Breadcrumb -->
-        <div class="mb-3 d-flex align-items-center justify-content-between">
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-tech d-inline-flex align-items-center gap-1">
+        <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
                 <i class="bi bi-chevron-left"></i>
                 <span>Back to Dashboard</span>
             </a>
-            <span class="badge badge-tech-indigo py-1 px-3">
-                <i class="bi bi-shield-lock-fill me-1"></i>Encrypted Session
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span>View Live Results Section</span>
+                </a>
+                <span class="badge bg-light text-primary border py-1.5 px-3">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Encrypted Session
+                </span>
+            </div>
         </div>
 
         <!-- Ballot Header Card -->
         <div class="classic-card p-4 mb-4 bg-white">
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge badge-tech-emerald py-1 px-2">
-                    <span class="pulse-dot me-1"></span>Official Ballot
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2">
+                    <i class="bi bi-box2-heart-fill me-1"></i>Official Voting Section
                 </span>
-                <span class="text-muted small">Single Choice Election</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; vertical-align: middle;"></i>Single-Choice Ballot
+                </span>
             </div>
-            <h2 class="fw-bold text-dark mb-2">{{ election.title }}</h2>
+            <h2 class="fw-bold text-dark mb-2">Vote Between Candidate Representatives</h2>
             <p class="text-muted mb-0">{{ election.description }}</p>
         </div>
+
+        {% if already_voted %}
+            <!-- Already Voted Notice -->
+            <div class="classic-card p-4 mb-4 bg-white" style="border-left: 4px solid #16a34a;">
+                <div class="d-flex align-items-center gap-2 text-success fw-bold fs-5 mb-2">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>Your Ballot Has Already Been Cast & Sealed</span>
+                </div>
+                <p class="text-muted small mb-3">
+                    You have successfully exercised your voting quota for this election. To preserve democratic integrity, 
+                    ballots cannot be modified once recorded in the ledger.
+                    Receipt Hash: <span class="font-monospace text-primary fw-semibold">{{ receipt_hash[:20] }}...</span>
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        <span>View Results Section</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+                        <i class="bi bi-award"></i>
+                        <span>Download Official Certificate</span>
+                    </a>
+                    <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Verify in Ledger</span>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
 
         <!-- Candidate Selection Form -->
         <form method="POST" id="ballotForm">
@@ -31,7 +69,7 @@
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
                     <h5 class="fw-semibold text-dark mb-0 d-flex align-items-center gap-2">
                         <i class="bi bi-person-check-fill text-primary"></i>
-                        <span>Select a Candidate</span>
+                        <span>Candidate Representatives</span>
                     </h5>
                     <div class="d-flex align-items-center gap-2">
                         <input type="text" id="candidateSearchInput" class="form-control form-control-sm" placeholder="Filter candidates..." style="max-width: 200px;">
@@ -45,8 +83,8 @@
                 <div class="row g-3" id="candidatesList">
                     {% for candidate in candidates %}
                         <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
-                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer bg-white" for="cand_{{ candidate.id }}">
-                                <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
+                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative {% if not already_voted %}cursor-pointer{% endif %} bg-white" for="cand_{{ candidate.id }}">
+                                <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" {% if already_voted %}disabled{% else %}required{% endif %}>
                                 
                                 <!-- Candidate Avatar with Initials -->
                                 <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle" style="width: 48px; height: 48px; background: {% if loop.index % 2 == 1 %}#2563eb{% else %}#0284c7{% endif %}; font-size: 1.1rem;">
@@ -73,36 +111,49 @@
                                     </div>
                                 </div>
 
-                                <!-- Selection Indicator Check -->
-                                <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border">
-                                    <i class="bi bi-check-lg check-icon"></i>
-                                </div>
+                                {% if not already_voted %}
+                                    <!-- Selection Indicator Check -->
+                                    <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border">
+                                        <i class="bi bi-check-lg check-icon"></i>
+                                    </div>
+                                {% endif %}
                             </label>
                         </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Security Assurance & Submit -->
-            <div class="classic-card p-4 bg-white">
-                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
-                    <i class="bi bi-shield-check fs-2 text-primary"></i>
-                    <div class="small">
-                        <div class="text-dark fw-semibold">Tamper-Proof Ballot Seal</div>
-                        <div class="text-muted">Once submitted, your ballot will be permanently locked into the ledger and cannot be altered or cast again.</div>
+            {% if not already_voted %}
+                <!-- Security Assurance & Submit -->
+                <div class="classic-card p-4 bg-white">
+                    <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                        <i class="bi bi-shield-check fs-2 text-primary"></i>
+                        <div class="small">
+                            <div class="text-dark fw-semibold">Tamper-Proof Ballot Seal</div>
+                            <div class="text-muted">Once submitted, your ballot will be permanently locked into the ledger and cannot be altered or cast again.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+                        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary w-100 w-sm-auto">
+                            Cancel & Return
+                        </a>
+                        <button type="submit" class="btn btn-primary py-2.5 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-box2-heart-fill"></i>
+                            <span>Confirm & Cast Vote for Selected Representative</span>
+                        </button>
                     </div>
                 </div>
-
-                <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
-                    <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-tech w-100 w-sm-auto">
-                        Cancel & Return
+            {% else %}
+                <div class="classic-card p-4 bg-white text-center">
+                    <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">Ballot Quota Consumed</h5>
+                    <p class="text-muted small mb-3">Your vote is sealed in this election. View the current live standings in the Results section.</p>
+                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary px-4 py-2">
+                        <i class="bi bi-bar-chart-line-fill me-1"></i> Open Results Section &rarr;
                     </a>
-                    <button type="submit" class="btn btn-gradient py-2.5 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
-                        <i class="bi bi-lock-fill"></i>
-                        <span>Confirm & Submit Ballot</span>
-                    </button>
                 </div>
-            </div>
+            {% endif %}
         </form>
     </div>
 </div>

@@ -27,6 +27,11 @@ def index():
 def public_verify():
     return redirect(url_for('auth.verify_ballot'))
 
+@app.route('/results')
+@app.route('/results/<int:election_id>')
+def public_results(election_id=None):
+    return redirect(url_for('voter.results_view', election_id=election_id))
+
 def init_app_state():
     with app.app_context():
         try:

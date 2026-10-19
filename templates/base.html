@@ -233,26 +233,48 @@
                 <span class="fs-5">Votex<span style="color: #2563eb;">.ai</span></span>
                 <span class="badge bg-light text-secondary border ms-1 px-2 py-1 small">v2.4</span>
             </a>
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.verify_ballot') }}">
+            <div class="d-none d-md-flex align-items-center gap-1 ms-3">
+                {% if session.get('role') == 'voter' %}
+                    <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('voter.vote_index') }}">
+                        <i class="bi bi-box2-heart text-primary"></i>
+                        <span>Vote</span>
+                    </a>
+                {% elif session.get('role') == 'admin' %}
+                    <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2 text-primary"></i>
+                        <span>Admin Console</span>
+                    </a>
+                {% endif %}
+                <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('voter.results_view') }}">
+                    <i class="bi bi-bar-chart-line text-primary"></i>
+                    <span>Results</span>
+                </a>
+                <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('auth.verify_ballot') }}">
                     <i class="bi bi-shield-check text-primary"></i>
                     <span>Verify Ballot</span>
                 </a>
+            </div>
+
+            <div class="ms-auto d-flex align-items-center gap-2">
                 {% if session.get('user_id') %}
-                    <div class="d-none d-sm-flex align-items-center gap-2">
+                    <div class="d-none d-sm-flex align-items-center gap-2 me-1">
                         <span class="pulse-dot"></span>
                         <span class="text-secondary small fw-medium">{{ session.get('name', 'User') }}</span>
                         {% if session.get('role') == 'admin' %}
                             <span class="badge badge-tech-cyan">Admin</span>
                         {% else %}
-                            <span class="badge badge-tech-indigo">Verified Voter</span>
+                            <span class="badge badge-tech-indigo">Voter</span>
                         {% endif %}
                     </div>
-                    <a class="btn btn-sm btn-outline-tech d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
+                    <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
                     </a>
                 {% else %}
+                    <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 me-1" href="{{ url_for('voter.results_view') }}">
+                        <i class="bi bi-bar-chart-line text-primary"></i>
+                        <span>Results</span>
+                    </a>
                     <a class="btn btn-sm btn-primary d-flex align-items-center gap-1" href="{{ url_for('auth.login') }}">
                         <i class="bi bi-box-arrow-in-right"></i>
                         <span>Sign In</span>

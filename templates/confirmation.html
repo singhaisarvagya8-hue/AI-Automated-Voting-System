@@ -61,14 +61,19 @@
         </div>
 
         <!-- Action Links -->
-        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-primary py-2 px-4 d-flex align-items-center justify-content-center gap-2">
-                <i class="bi bi-speedometer2"></i>
-                <span>Back to Voter Dashboard</span>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+            <a href="{{ url_for('voter.results_view', election_id=election.id if election else None) }}" class="btn btn-primary py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span>View Results Section</span>
+                <i class="bi bi-arrow-right"></i>
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary py-2 px-3 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary py-2 px-3 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out Securely</span>
+                <span>Sign Out</span>
             </a>
         </div>
     </div>

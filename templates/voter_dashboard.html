@@ -22,12 +22,75 @@
     </div>
 </div>
 
+<!-- 3-Section Modular Navigation Hub -->
+<div class="row g-3 mb-4">
+    <!-- Section 1: Voting Room -->
+    <div class="col-md-4">
+        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #2563eb;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="p-2 rounded bg-primary-subtle text-primary">
+                    <i class="bi bi-box2-heart fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-0">1. Voting Section</h6>
+                    <span class="text-muted small">Choose Representatives</span>
+                </div>
+            </div>
+            <p class="text-muted small mb-3">Directly access active ballots to cast your vote between candidate representatives.</p>
+            <a href="{{ url_for('voter.vote_index') }}" class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
+                <span>Enter Voting Room</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Section 2: Results Section -->
+    <div class="col-md-4">
+        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #16a34a;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="p-2 rounded bg-success-subtle text-success">
+                    <i class="bi bi-bar-chart-line fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-0">2. Results Section</h6>
+                    <span class="text-muted small">Live Tally & Standings</span>
+                </div>
+            </div>
+            <p class="text-muted small mb-3">View certified vote tallies, percentage shares, leading candidates, and final winners.</p>
+            <a href="{{ url_for('voter.results_view') }}" class="btn btn-sm btn-outline-success w-100 d-flex align-items-center justify-content-center gap-1">
+                <span>View Results Section</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Section 3: Verification & Certificate -->
+    <div class="col-md-4">
+        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #0284c7;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="p-2 rounded bg-info-subtle text-info-emphasis">
+                    <i class="bi bi-shield-check fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-0">3. Ledger Audit</h6>
+                    <span class="text-muted small">Verify & Certificate</span>
+                </div>
+            </div>
+            <p class="text-muted small mb-3">Audit your cryptographic receipt in the public ledger and download your certificate.</p>
+            <a href="{{ url_for('auth.verify_ballot') }}" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1">
+                <span>Public Audit Portal</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
 <!-- Active Elections Section -->
 <div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
         <h4 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
             <i class="bi bi-card-checklist text-primary"></i>
-            <span>Current Elections</span>
+            <span>Current Registered Ballots</span>
         </h4>
         <p class="text-muted small mb-0">Elections you are registered and authorized to participate in.</p>
     </div>
@@ -73,6 +136,10 @@
                                         Receipt: <span class="text-primary fw-bold">{{ receipt_map.get(election.id)[:14] }}...</span>
                                     </div>
                                     <div class="d-flex gap-2">
+                                        <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                            <i class="bi bi-bar-chart-line"></i>
+                                            <span>Results</span>
+                                        </a>
                                         <a href="{{ url_for('auth.verify_ballot', hash=receipt_map.get(election.id)) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
                                             <i class="bi bi-shield-check"></i>
                                             <span>Verify</span>
@@ -85,14 +152,26 @@
                                 {% endif %}
                             </div>
                         {% elif election.status == 'active' %}
-                            <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-primary py-2.5 px-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-box2-heart-fill"></i>
-                                <span>Cast Your Ballot</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </a>
+                            <div class="d-flex flex-column align-items-md-end gap-2">
+                                <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-primary py-2 px-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-box2-heart-fill"></i>
+                                    <span>Vote Representatives</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="text-decoration-none small text-primary d-flex align-items-center gap-1">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                    <span>View Current Results &rarr;</span>
+                                </a>
+                            </div>
                         {% else %}
-                            <div class="badge bg-light text-muted border py-2 px-3">
-                                <i class="bi bi-lock me-1"></i>Voting Closed
+                            <div class="d-flex flex-column align-items-md-end gap-2">
+                                <div class="badge bg-light text-muted border py-1.5 px-3">
+                                    <i class="bi bi-lock me-1"></i>Voting Closed
+                                </div>
+                                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                    <span>View Final Results</span>
+                                </a>
                             </div>
                         {% endif %}
                     </div>
