@@ -234,6 +234,10 @@
                 <span class="badge bg-light text-secondary border ms-1 px-2 py-1 small">v2.4</span>
             </a>
             <div class="ms-auto d-flex align-items-center gap-3">
+                <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.verify_ballot') }}">
+                    <i class="bi bi-shield-check text-primary"></i>
+                    <span>Verify Ballot</span>
+                </a>
                 {% if session.get('user_id') %}
                     <div class="d-none d-sm-flex align-items-center gap-2">
                         <span class="pulse-dot"></span>
@@ -247,6 +251,11 @@
                     <a class="btn btn-sm btn-outline-tech d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Logout</span>
+                    </a>
+                {% else %}
+                    <a class="btn btn-sm btn-primary d-flex align-items-center gap-1" href="{{ url_for('auth.login') }}">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span>Sign In</span>
                     </a>
                 {% endif %}
             </div>

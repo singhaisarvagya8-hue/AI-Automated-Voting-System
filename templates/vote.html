@@ -28,14 +28,23 @@
         <!-- Candidate Selection Form -->
         <form method="POST" id="ballotForm">
             <div class="mb-4">
-                <h5 class="fw-semibold text-dark mb-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-person-check-fill text-primary"></i>
-                    <span>Select a Candidate</span>
-                </h5>
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+                    <h5 class="fw-semibold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-check-fill text-primary"></i>
+                        <span>Select a Candidate</span>
+                    </h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="text" id="candidateSearchInput" class="form-control form-control-sm" placeholder="Filter candidates..." style="max-width: 200px;">
+                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
+                            <i class="bi bi-columns-gap"></i>
+                            <span>Compare Candidates</span>
+                        </button>
+                    </div>
+                </div>
 
-                <div class="row g-3">
+                <div class="row g-3" id="candidatesList">
                     {% for candidate in candidates %}
-                        <div class="col-12">
+                        <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
                             <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer bg-white" for="cand_{{ candidate.id }}">
                                 <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
                                 
@@ -48,11 +57,20 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
                                         <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
-                                        <span class="badge badge-tech-cyan py-1 px-2 small">{{ candidate.position }}</span>
+                                        <span class="badge bg-light text-primary border small">{{ candidate.position }}</span>
                                     </div>
-                                    <p class="text-muted mb-0 small" style="line-height: 1.6;">
+                                    <p class="text-muted mb-2 small" style="line-height: 1.6;">
                                         <i class="bi bi-quote text-secondary me-1"></i>{{ candidate.manifesto }}
                                     </p>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if 'funding' in candidate.manifesto|lower or 'career' in candidate.manifesto|lower %}
+                                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#StudentOpportunities</span>
+                                        {% endif %}
+                                        {% if 'wi-fi' in candidate.manifesto|lower or 'green' in candidate.manifesto|lower %}
+                                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#CampusInitiatives</span>
+                                        {% endif %}
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#OfficialNominee</span>
+                                    </div>
                                 </div>
 
                                 <!-- Selection Indicator Check -->
@@ -137,6 +155,56 @@
     }
 </style>
 
+<!-- Candidate Comparison Modal -->
+<div class="modal fade" id="candidateCompareModal" tabindex="-1" aria-labelledby="candidateCompareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark" id="candidateCompareModalLabel">
+                        <i class="bi bi-columns-gap text-primary me-2"></i>Candidate Comparison View
+                    </h5>
+                    <p class="text-muted small mb-0">Side-by-side platform and manifesto evaluation</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    {% for candidate in candidates %}
+                        <div class="col-md-{{ (12 / candidates|length)|round|int if candidates|length <= 3 else 6 }}">
+                            <div class="p-3 rounded border h-100 bg-light d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 40px; height: 40px; background: {% if loop.index % 2 == 1 %}#2563eb{% else %}#0284c7{% endif %};">
+                                            {{ candidate.name[:2]|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ candidate.name }}</div>
+                                            <span class="badge bg-white text-primary border small">{{ candidate.position }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="text-muted small fw-semibold mb-1">Key Manifesto & Vision:</div>
+                                        <p class="small text-dark mb-0 bg-white p-2.5 rounded border" style="line-height: 1.6;">
+                                            "{{ candidate.manifesto }}"
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2" onclick="selectCandidateFromModal('cand_{{ candidate.id }}')">
+                                    <i class="bi bi-check2-circle me-1"></i>Select This Candidate
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-light">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close Comparison</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.querySelectorAll('.candidate-radio').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -151,6 +219,39 @@
     const checked = document.querySelector('.candidate-radio:checked');
     if (checked) {
         checked.closest('.candidate-card').classList.add('active-selected');
+    }
+
+    // Modal Selection Helper
+    function selectCandidateFromModal(radioId) {
+        const targetRadio = document.getElementById(radioId);
+        if (targetRadio) {
+            targetRadio.checked = true;
+            targetRadio.dispatchEvent(new Event('change'));
+            
+            // Close modal
+            const modalEl = document.getElementById('candidateCompareModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        }
+    }
+
+    // Instant Candidate Search / Filter
+    const searchInput = document.getElementById('candidateSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            document.querySelectorAll('.candidate-item-wrapper').forEach(item => {
+                const name = item.getAttribute('data-name') || '';
+                const manifesto = item.getAttribute('data-manifesto') || '';
+                if (!query || name.includes(query) || manifesto.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
     }
 </script>
 {% endblock %}

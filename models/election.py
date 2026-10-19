@@ -33,6 +33,8 @@ class VoterEligibility(db.Model):
     election_id = db.Column(db.Integer, db.ForeignKey('elections.id'), nullable=False)
     voter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     has_voted = db.Column(db.Boolean, default=False, nullable=False)
+    receipt_hash = db.Column(db.String(66), nullable=True)
+    voted_at = db.Column(db.DateTime, nullable=True)
 
     __table_args__ = (
         db.UniqueConstraint('election_id', 'voter_id', name='unique_voter_per_election'),

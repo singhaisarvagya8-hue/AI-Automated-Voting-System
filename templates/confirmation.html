@@ -1,51 +1,92 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row justify-content-center py-5">
-    <div class="col-lg-6 col-md-8 text-center">
+    <div class="col-lg-7 col-md-9 text-center">
         <!-- Success Badge -->
-        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-4 bg-light border border-success text-success" style="width: 80px; height: 80px;">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 2.5rem;"></i>
+        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-4 bg-success-subtle text-success border border-success-subtle" style="width: 80px; height: 80px;">
+            <i class="bi bi-check-circle-fill" style="font-size: 2.5rem;"></i>
         </div>
 
         <h2 class="fw-bold text-dark mb-2">Ballot Successfully Sealed & Recorded</h2>
-        <p class="text-muted mb-4">Thank you for voting. Your selection has been cryptographically decoupled from your identity and registered in the election ledger.</p>
+        <p class="text-muted mb-4">
+            Thank you for participating in <strong>{{ election.title if election else 'the election' }}</strong>. 
+            Your selection has been cryptographically decoupled from your identity and permanently registered in the election ledger.
+        </p>
 
         <!-- Cryptographic Receipt Card -->
         <div class="classic-card p-4 text-start mb-4 bg-white">
             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                 <span class="small text-secondary fw-semibold text-uppercase" style="letter-spacing: 0.05em;">Digital Audit Receipt</span>
-                <span class="badge badge-tech-emerald py-1 px-2">
-                    <i class="bi bi-shield-lock-fill me-1"></i>Immutable
+                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Immutable SHA-256
                 </span>
             </div>
 
             <div class="row g-2 small mb-3">
                 <div class="col-sm-4 text-muted">Verification Status:</div>
-                <div class="col-sm-8 text-success fw-semibold"><i class="bi bi-check2 me-1"></i>Audit Confirmed & Sealed</div>
+                <div class="col-sm-8 text-success fw-semibold"><i class="bi bi-check2-circle me-1"></i>Audit Confirmed & Sealed</div>
                 
                 <div class="col-sm-4 text-muted">Integrity Guard:</div>
-                <div class="col-sm-8 text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Votex.ai Anomaly Detector Pass</div>
+                <div class="col-sm-8 text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Velocity Guard Passed Nominal Baseline</div>
 
                 <div class="col-sm-4 text-muted">Voter Status:</div>
-                <div class="col-sm-8 text-dark"><span class="badge badge-tech-indigo">Single-Vote Quota Consumed</span></div>
+                <div class="col-sm-8 text-dark"><span class="badge bg-primary-subtle text-primary border border-primary-subtle">Single-Vote Quota Consumed</span></div>
             </div>
 
-            <div class="p-3 rounded small font-monospace bg-light border" style="word-break: break-all;">
-                <span class="text-muted">TX_HASH:</span> <span class="text-primary font-monospace">0x4a9f2e81d7c35b0e8912aa4f8b2c4172f309d5c8...</span>
+            <!-- Real Hash Box -->
+            <div class="p-3 rounded bg-light border mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted small fw-semibold">TRANSACTION RECEIPT HASH</span>
+                    <button class="btn btn-sm btn-link text-primary text-decoration-none p-0 small" onclick="copyReceiptHash(this)">
+                        <i class="bi bi-clipboard me-1"></i><span>Copy Hash</span>
+                    </button>
+                </div>
+                <div id="receiptHashText" class="font-monospace text-primary small fw-semibold" style="word-break: break-all;">
+                    {{ receipt_hash }}
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Verify on Public Ledger</span>
+                </a>
+                {% if election %}
+                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+                        <i class="bi bi-award"></i>
+                        <span>Download Digital Certificate</span>
+                    </a>
+                {% endif %}
             </div>
         </div>
 
         <!-- Action Links -->
         <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-gradient py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-primary py-2 px-4 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-speedometer2"></i>
-                <span>Back to Dashboard</span>
+                <span>Back to Voter Dashboard</span>
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-tech py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary py-2 px-4 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out Securely</span>
             </a>
         </div>
     </div>
 </div>
+
+<script>
+    function copyReceiptHash(btn) {
+        const text = document.getElementById('receiptHashText').innerText.trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const span = btn.querySelector('span');
+            const originalText = span.innerText;
+            span.innerText = 'Copied!';
+            btn.classList.add('text-success');
+            setTimeout(() => {
+                span.innerText = originalText;
+                btn.classList.remove('text-success');
+            }, 2000);
+        });
+    }
+</script>
 {% endblock %}

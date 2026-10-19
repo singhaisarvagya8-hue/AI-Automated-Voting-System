@@ -92,6 +92,14 @@
                         </div>
                         <span class="badge bg-light text-muted border small px-2">{{ audit_logs|length }} logs</span>
                     </button>
+
+                    <button class="nav-link sidebar-tab-btn text-start py-2 px-3 rounded d-flex align-items-center justify-content-between" onclick="switchTab('tab-elections', this)">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-sliders text-primary"></i>
+                            <span class="small fw-medium">Election Manager</span>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle small px-2">{{ all_elections|length }}</span>
+                    </button>
                 </div>
             </div>
 
@@ -271,6 +279,42 @@
                             </div>
                         {% endif %}
                     </div>
+                </div>
+            </div>
+
+            <!-- Departmental Participation Breakdown -->
+            <div class="classic-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                            <i class="bi bi-bar-chart-line-fill text-primary"></i>
+                            <span>Departmental Participation Analytics</span>
+                        </h5>
+                        <p class="text-muted small mb-0">Demographic voter turnout rate across academic faculties</p>
+                    </div>
+                    <span class="badge bg-light text-muted border small">{{ dept_stats|length }} Faculties</span>
+                </div>
+
+                <div class="row g-3">
+                    {% for dept in dept_stats %}
+                        <div class="col-md-6 col-lg-{{ (12 / dept_stats|length)|round|int if dept_stats|length <= 3 else 6 }}">
+                            <div class="p-3 bg-light rounded border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-dark small">{{ dept.department }}</span>
+                                    <span class="fw-bold text-primary small">{{ dept.percentage }}%</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 6px; background: #e2e8f0;">
+                                    <div class="progress-bar bg-primary" style="width: {{ dept.percentage }}%;"></div>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
+                                    <span>Voted: {{ dept.voted }}</span>
+                                    <span>Enrolled: {{ dept.total }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="col-12 text-muted small">No departmental data available.</div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -484,32 +528,43 @@
                         <h3 class="fw-bold text-dark mb-1">Cryptographic System Audit Trail</h3>
                         <p class="text-muted mb-0 small">Every system event, vote submission, and admin action is permanently stamped.</p>
                     </div>
-                    <div>
-                        <a href="{{ url_for('admin.export_audit') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="text" id="auditSearchInput" class="form-control form-control-sm" placeholder="Filter ledger records..." style="width: 200px;">
+                        <a href="{{ url_for('admin.export_audit') }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
                             <i class="bi bi-download"></i>
-                            <span>Export Audit CSV</span>
+                            <span>Export CSV</span>
                         </a>
                     </div>
                 </div>
 
                 {% if audit_logs %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="auditLedgerTable">
                             <thead class="table-light">
                                 <tr class="text-muted small text-uppercase" style="border-bottom: 1px solid #e2e8f0;">
                                     <th scope="col">Block ID</th>
                                     <th scope="col">Election</th>
                                     <th scope="col">Action Performed</th>
+                                    <th scope="col">Receipt Hash</th>
                                     <th scope="col">Timestamp (UTC)</th>
                                     <th scope="col" class="text-end">Verification</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for log in audit_logs %}
-                                    <tr>
+                                    <tr class="audit-row" data-search="{{ log.id }} {{ log.election_id or '' }} {{ log.action|lower }} {{ log.receipt_hash or '' }}">
                                         <td class="font-monospace text-primary fw-medium">#{{ log.id }}</td>
                                         <td class="text-dark">{{ log.election_id or 'System' }}</td>
                                         <td class="text-dark fw-medium">{{ log.action }}</td>
+                                        <td class="font-monospace small">
+                                            {% if log.receipt_hash %}
+                                                <a href="{{ url_for('auth.verify_ballot', hash=log.receipt_hash) }}" target="_blank" class="badge bg-light text-primary border text-decoration-none font-monospace">
+                                                    {{ log.receipt_hash[:12] }}...
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
                                         <td class="text-muted small font-monospace">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp and log.timestamp.strftime is defined else (log.timestamp or 'N/A') }}</td>
                                         <td class="text-end">
                                             <span class="badge bg-success-subtle text-success border border-success-subtle small"><i class="bi bi-check2 me-1"></i>Verified</span>
@@ -529,6 +584,182 @@
             </div>
         </div>
 
+        <!-- ================= TAB 6: ELECTION MANAGEMENT ================= -->
+        <div id="tab-elections" class="tab-pane">
+            <div class="classic-card p-4 mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+                    <div>
+                        <div class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2 mb-2">
+                            <i class="bi bi-sliders me-1"></i>Lifecycle & Configuration
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Election Management Console</h3>
+                        <p class="text-muted mb-0 small">Create new elections, enroll student rosters, register candidates, and manage voting states.</p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createElectionModal">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create New Election</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    {% for el in all_elections %}
+                        <div class="col-12">
+                            <div class="p-4 rounded border bg-white">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-3">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <h4 class="fw-bold text-dark mb-0">{{ el.title }}</h4>
+                                            {% if el.status == 'active' %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; vertical-align: middle;"></i>Active & Open
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary border">
+                                                    <i class="bi bi-lock-fill me-1"></i>Concluded / Closed
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-muted small mb-2">{{ el.description }}</p>
+                                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                                            <span><i class="bi bi-calendar3 me-1"></i>Created: {{ el.created_at.strftime('%Y-%m-%d %H:%M') if el.created_at and el.created_at.strftime is defined else 'N/A' }}</span>
+                                            <span><i class="bi bi-people me-1"></i>{{ el.candidates|length }} Candidates</span>
+                                            <span><i class="bi bi-inbox me-1"></i>{{ el.votes|length }} Ballots Cast</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <form method="POST" action="{{ url_for('admin.toggle_election_status', election_id=el.id) }}" class="d-inline">
+                                            {% if el.status == 'active' %}
+                                                <button type="submit" class="btn btn-sm btn-outline-warning text-dark border-warning d-flex align-items-center gap-1">
+                                                    <i class="bi bi-stop-circle text-warning"></i>
+                                                    <span>Close Election</span>
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                                    <i class="bi bi-play-circle text-success"></i>
+                                                    <span>Re-Open Election</span>
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addCandidateModal_{{ el.id }}">
+                                            <i class="bi bi-person-plus"></i>
+                                            <span>Add Candidate</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Candidates Roster Preview -->
+                                <div class="p-3 bg-light rounded border">
+                                    <div class="fw-semibold text-dark small mb-2 d-flex justify-content-between align-items-center">
+                                        <span>Registered Candidates ({{ el.candidates|length }})</span>
+                                    </div>
+                                    {% if el.candidates %}
+                                        <div class="row g-2">
+                                            {% for cand in el.candidates %}
+                                                <div class="col-md-6">
+                                                    <div class="p-2.5 bg-white rounded border d-flex align-items-start gap-2">
+                                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold small flex-shrink-0" style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #bfdbfe;">
+                                                            {{ cand.name[:2]|upper }}
+                                                        </div>
+                                                        <div class="flex-grow-1 overflow-hidden">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="fw-bold text-dark small text-truncate">{{ cand.name }}</span>
+                                                                <span class="badge bg-light text-primary border" style="font-size: 0.7rem;">{{ cand.position }}</span>
+                                                            </div>
+                                                            <p class="text-muted small mb-0 text-truncate" style="font-size: 0.75rem;">"{{ cand.manifesto }}"</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-muted small py-2 text-center">No candidates registered yet. Click "Add Candidate" above.</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Candidate Modal for this election -->
+                        <div class="modal fade" id="addCandidateModal_{{ el.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <form method="POST" action="{{ url_for('admin.add_candidate', election_id=el.id) }}">
+                                        <div class="modal-header border-bottom">
+                                            <h5 class="modal-title fw-bold text-dark">
+                                                <i class="bi bi-person-plus text-primary me-2"></i>Register Candidate for {{ el.title }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-semibold small">Candidate Full Name</label>
+                                                <input type="text" name="name" class="form-control" placeholder="e.g. Jordan Lee" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-semibold small">Running Position</label>
+                                                <input type="text" name="position" class="form-control" placeholder="e.g. President, Vice President" value="President" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-semibold small">Manifesto & Platform Summary</label>
+                                                <textarea name="manifesto" class="form-control" rows="3" placeholder="Core vision, planned initiatives, funding priorities..." required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-top bg-light">
+                                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Save Candidate</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Create New Election Modal -->
+<div class="modal fade" id="createElectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="{{ url_for('admin.create_election') }}">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-dark">
+                        <i class="bi bi-plus-circle text-primary me-2"></i>Create New Campus Election
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Election Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Department Council Election 2026" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Description & Purpose</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Provide background, eligibility scope, and ballot timeline..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Initial Status</label>
+                        <select name="status" class="form-select">
+                            <option value="active" selected>Active & Open for Voting Immediately</option>
+                            <option value="draft">Draft (Hidden from Voters)</option>
+                        </select>
+                    </div>
+                    <div class="p-3 bg-light rounded border text-muted small">
+                        <i class="bi bi-info-circle text-primary me-1"></i>
+                        All currently registered student voters will automatically be enrolled with single-vote quotas for this ballot.
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Create & Enroll Voters</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -677,6 +908,22 @@
             if (targetBtn) {
                 switchTab(tabName, targetBtn);
             }
+        }
+
+        // Live Audit Ledger Filter
+        const auditSearch = document.getElementById('auditSearchInput');
+        if (auditSearch) {
+            auditSearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                document.querySelectorAll('.audit-row').forEach(row => {
+                    const searchData = (row.getAttribute('data-search') || '').toLowerCase();
+                    if (!query || searchData.includes(query)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
         }
     });
 </script>

@@ -23,10 +23,29 @@ def index():
         return redirect(url_for('voter.dashboard'))
     return redirect(url_for('auth.login'))
 
+@app.route('/verify')
+def public_verify():
+    return redirect(url_for('auth.verify_ballot'))
+
 def init_app_state():
     with app.app_context():
         try:
             db.create_all()
+            for table, col, defn in [
+                ('voter_eligibility', 'receipt_hash', 'VARCHAR(66) NULL'),
+                ('voter_eligibility', 'voted_at', 'DATETIME NULL'),
+                ('votes', 'receipt_hash', 'VARCHAR(66) NULL'),
+                ('audit_logs', 'receipt_hash', 'VARCHAR(66) NULL')
+            ]:
+                try:
+                    exists = db.session.execute(db.text(
+                        f"SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{table}' AND COLUMN_NAME = '{col}'"
+                    )).scalar()
+                    if not exists:
+                        db.session.execute(db.text(f"ALTER TABLE {table} ADD COLUMN {col} {defn}"))
+                        db.session.commit()
+                except Exception:
+                    db.session.rollback()
         except Exception as e:
             print(f" * Database init note: {e}")
     
