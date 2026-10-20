@@ -595,10 +595,14 @@
                         <h3 class="fw-bold text-dark mb-1">Election Management Console</h3>
                         <p class="text-muted mb-0 small">Create new elections, enroll student rosters, register candidates, and manage voting states.</p>
                     </div>
-                    <div>
-                        <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createElectionModal">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <a href="{{ url_for('admin.create_election_section') }}" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <span>Separate Protected Election Creator</span>
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createElectionModal">
                             <i class="bi bi-plus-circle"></i>
-                            <span>Create New Election</span>
+                            <span>Quick Staging</span>
                         </button>
                     </div>
                 </div>

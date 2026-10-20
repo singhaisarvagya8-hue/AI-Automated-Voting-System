@@ -32,6 +32,10 @@ def public_verify():
 def public_results(election_id=None):
     return redirect(url_for('voter.results_view', election_id=election_id))
 
+@app.route('/create-election')
+def public_create_election():
+    return redirect(url_for('admin.create_election_section'))
+
 def init_app_state():
     with app.app_context():
         try:

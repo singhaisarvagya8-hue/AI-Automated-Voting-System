@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Election • Protected Section{% endblock %}
+
+{% block content %}
+<div class="py-3">
+    <!-- Top Security Cleared Banner -->
+    <div class="classic-card p-3 p-md-4 mb-4 bg-white border d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="p-3 rounded-circle bg-success-subtle text-success border border-success-subtle">
+                <i class="bi bi-shield-check fs-3"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h4 class="fw-bold text-dark mb-0">Separate Election Creation Section</h4>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2.5 small">
+                        <i class="bi bi-lock-fill me-1"></i>Password Authorized
+                    </span>
+                </div>
+                <p class="text-muted small mb-0">
+                    Restricted electoral commissioner console. Configure new democratic ballots and register at least 4 candidate representatives.
+                </p>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1.5" onclick="fillDemoCandidates()">
+                <i class="bi bi-magic"></i>
+                <span>Pre-Fill 4 Sample Candidates</span>
+            </button>
+            <a href="{{ url_for('admin.lock_election_creator') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5" title="Lock this section immediately">
+                <i class="bi bi-lock-fill"></i>
+                <span>Lock Section</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash alerts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show small mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin.save_created_election') }}" id="createElectionForm" onsubmit="return validateForm()">
+        <div class="row g-4">
+            <!-- Left Column: Election Details -->
+            <div class="col-lg-4">
+                <div class="classic-card p-4 bg-white border sticky-top" style="top: 85px;">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                        <i class="bi bi-card-heading text-primary fs-5"></i>
+                        <h5 class="fw-bold text-dark mb-0">1. Ballot Specifications</h5>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Election Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" id="electionTitle" class="form-control" placeholder="e.g. University Student Senate Election 2026" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Description & Objective</label>
+                        <textarea name="description" id="electionDescription" class="form-control" rows="3" placeholder="State the purpose, scope, and key student guidelines for this election..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-semibold small">Initial Voting State</label>
+                        <select name="status" class="form-select" id="electionStatus">
+                            <option value="active" selected>Active • Immediately Open for Voting</option>
+                            <option value="draft">Draft • Staged & Hidden from Voters</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-semibold small">Ballot Duration</label>
+                        <select name="duration_hours" class="form-select">
+                            <option value="24" selected>24 Hours (Standard)</option>
+                            <option value="48">48 Hours (Extended)</option>
+                            <option value="72">72 Hours (Campus-wide)</option>
+                            <option value="168">7 Days (Full Week)</option>
+                        </select>
+                    </div>
+
+                    <!-- Auto-Enrollment Note -->
+                    <div class="p-3 bg-light rounded border small text-muted mb-4">
+                        <div class="d-flex align-items-center gap-2 fw-semibold text-dark mb-1">
+                            <i class="bi bi-people-fill text-primary"></i>
+                            <span>Automated Voter Quota</span>
+                        </div>
+                        All currently registered student voters will be automatically enrolled with 1 verified cryptographic vote quota upon creation.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-check2-circle fs-5"></i>
+                            <span>Create Ballot & Enforce Quotas</span>
+                        </button>
+                        <a href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('voter.results_view') }}" class="btn btn-outline-secondary py-2 small">
+                            Cancel & Return
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Candidate Representatives (Minimum 4) -->
+            <div class="col-lg-8">
+                <div class="classic-card p-4 bg-white border">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-lines-fill text-primary fs-5"></i>
+                            <h5 class="fw-bold text-dark mb-0">2. Candidate Representatives</h5>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1">
+                                Minimum 4 Required
+                            </span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" onclick="addCandidateSlot()">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add Candidate Slot</span>
+                        </button>
+                    </div>
+
+                    <!-- Minimum requirement callout -->
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 px-3 small mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill text-info flex-shrink-0"></i>
+                        <div>
+                            Democratic integrity policy requires <strong>at least 4 candidates</strong> on this ballot. Fill out the details below.
+                        </div>
+                    </div>
+
+                    <!-- Candidate Slots Container -->
+                    <div id="candidatesContainer" class="d-flex flex-column gap-3 mb-4">
+                        <!-- Candidate 1 -->
+                        <div class="candidate-entry-card p-3 rounded-3 border bg-light position-relative" data-index="1">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary text-white fw-bold px-2 py-1">Candidate Representative #1</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="cand_name" class="form-control form-control-sm cand-name-input" placeholder="e.g. Marcus Vance" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Running Position</label>
+                                    <input type="text" name="cand_position" class="form-control form-control-sm cand-pos-input" placeholder="e.g. President / Faculty Rep" value="President" required>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Manifesto & Agenda</label>
+                                    <textarea name="cand_manifesto" class="form-control form-control-sm cand-man-input" rows="2" placeholder="Key agenda items, proposed campus reforms, or student policy pledges..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Candidate 2 -->
+                        <div class="candidate-entry-card p-3 rounded-3 border bg-light position-relative" data-index="2">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary text-white fw-bold px-2 py-1">Candidate Representative #2</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="cand_name" class="form-control form-control-sm cand-name-input" placeholder="e.g. Samantha Wu" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Running Position</label>
+                                    <input type="text" name="cand_position" class="form-control form-control-sm cand-pos-input" placeholder="e.g. President / Faculty Rep" value="President" required>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Manifesto & Agenda</label>
+                                    <textarea name="cand_manifesto" class="form-control form-control-sm cand-man-input" rows="2" placeholder="Key agenda items, proposed campus reforms, or student policy pledges..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Candidate 3 -->
+                        <div class="candidate-entry-card p-3 rounded-3 border bg-light position-relative" data-index="3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary text-white fw-bold px-2 py-1">Candidate Representative #3</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="cand_name" class="form-control form-control-sm cand-name-input" placeholder="e.g. Tariq Al-Mansoor" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Running Position</label>
+                                    <input type="text" name="cand_position" class="form-control form-control-sm cand-pos-input" placeholder="e.g. President / Faculty Rep" value="President" required>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Manifesto & Agenda</label>
+                                    <textarea name="cand_manifesto" class="form-control form-control-sm cand-man-input" rows="2" placeholder="Key agenda items, proposed campus reforms, or student policy pledges..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Candidate 4 -->
+                        <div class="candidate-entry-card p-3 rounded-3 border bg-light position-relative" data-index="4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary text-white fw-bold px-2 py-1">Candidate Representative #4</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="cand_name" class="form-control form-control-sm cand-name-input" placeholder="e.g. Chloe Bennett" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Running Position</label>
+                                    <input type="text" name="cand_position" class="form-control form-control-sm cand-pos-input" placeholder="e.g. President / Faculty Rep" value="President" required>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <label class="form-label text-dark fw-semibold small mb-1">Manifesto & Agenda</label>
+                                    <textarea name="cand_manifesto" class="form-control form-control-sm cand-man-input" rows="2" placeholder="Key agenda items, proposed campus reforms, or student policy pledges..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Action to Add Candidate -->
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded bg-light border">
+                        <span class="small text-muted" id="candidateCountDisplay">
+                            <i class="bi bi-people me-1"></i>Currently 4 candidate representatives configured.
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" onclick="addCandidateSlot()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Add Another Representative Slot</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+let candidateCount = 4;
+
+function updateCountDisplay() {
+    const cards = document.querySelectorAll('.candidate-entry-card');
+    candidateCount = cards.length;
+    document.getElementById('candidateCountDisplay').innerHTML = `
+        <i class="bi bi-people me-1"></i>Currently <strong>${candidateCount}</strong> candidate representatives configured.
+    `;
+}
+
+function addCandidateSlot() {
+    candidateCount++;
+    const container = document.getElementById('candidatesContainer');
+    const newCard = document.createElement('div');
+    newCard.className = 'candidate-entry-card p-3 rounded-3 border bg-light position-relative';
+    newCard.dataset.index = candidateCount;
+    newCard.innerHTML = `
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-secondary text-white fw-bold px-2 py-1">Candidate Representative #${candidateCount}</span>
+            <button type="button" class="btn btn-outline-danger btn-xs py-0.5 px-2" style="font-size: 0.75rem;" onclick="removeCandidateSlot(this)">
+                <i class="bi bi-trash me-1"></i>Remove
+            </button>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label class="form-label text-dark fw-semibold small mb-1">Full Name <span class="text-danger">*</span></label>
+                <input type="text" name="cand_name" class="form-control form-control-sm cand-name-input" placeholder="e.g. Candidate Name" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-dark fw-semibold small mb-1">Running Position</label>
+                <input type="text" name="cand_position" class="form-control form-control-sm cand-pos-input" value="President" required>
+            </div>
+            <div class="col-12 mt-2">
+                <label class="form-label text-dark fw-semibold small mb-1">Manifesto & Agenda</label>
+                <textarea name="cand_manifesto" class="form-control form-control-sm cand-man-input" rows="2" placeholder="Key agenda items, proposed campus reforms, or student policy pledges..." required></textarea>
+            </div>
+        </div>
+    `;
+    container.appendChild(newCard);
+    updateCountDisplay();
+}
+
+function removeCandidateSlot(btn) {
+    const cards = document.querySelectorAll('.candidate-entry-card');
+    if (cards.length <= 4) {
+        alert("At least 4 candidate representatives are required by election policy.");
+        return;
+    }
+    btn.closest('.candidate-entry-card').remove();
+    updateCountDisplay();
+}
+
+function validateForm() {
+    const names = Array.from(document.querySelectorAll('.cand-name-input')).map(i => i.value.trim()).filter(n => n.length > 0);
+    if (names.length < 4) {
+        alert("Please provide valid information for at least 4 candidate representatives.");
+        return false;
+    }
+    return true;
+}
+
+function fillDemoCandidates() {
+    document.getElementById('electionTitle').value = "University Senate & Faculty Council Election 2026";
+    document.getElementById('electionDescription').value = "Official election for student body executive council representatives across all academic faculties.";
+
+    const demoCandidates = [
+        {
+            name: "Liam O'Connor",
+            pos: "Executive President",
+            man: "Focusing on transparent student funding, digital campus infrastructure, 24/7 library services, and expanding research travel bursaries."
+        },
+        {
+            name: "Maya Patel",
+            pos: "Executive President",
+            man: "Pledging enhanced career development workshops, industry mentorship programs, improved laboratory equipment, and dining subsidies."
+        },
+        {
+            name: "Aarav Sharma",
+            pos: "Executive President",
+            man: "Championing carbon-neutral campus sustainability, free printing quotas, mental health counseling expansion, and sports facility revamps."
+        },
+        {
+            name: "Elena Rostova",
+            pos: "Executive President",
+            man: "Advocating for student venture seed grants, international student integration support, transparent grade dispute appeals, and campus safety shuttles."
+        }
+    ];
+
+    const cards = document.querySelectorAll('.candidate-entry-card');
+    cards.forEach((card, idx) => {
+        if (idx < demoCandidates.length) {
+            card.querySelector('.cand-name-input').value = demoCandidates[idx].name;
+            card.querySelector('.cand-pos-input').value = demoCandidates[idx].pos;
+            card.querySelector('.cand-man-input').value = demoCandidates[idx].man;
+        }
+    });
+}
+</script>
+{% endblock %}

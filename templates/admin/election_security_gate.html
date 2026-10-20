@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Gate • Protected Election Creation Console{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-7 col-lg-5">
+        <!-- Security Header Icon -->
+        <div class="text-center mb-4">
+            <div class="d-inline-flex p-3 rounded-circle bg-primary-subtle text-primary mb-3 shadow-sm border border-primary-subtle">
+                <i class="bi bi-shield-lock-fill fs-1"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-1">Restricted Security Gate</h3>
+            <p class="text-muted small mb-0">Separate Election Creation Section • Master Authorization Required</p>
+        </div>
+
+        <!-- Security Card -->
+        <div class="classic-card p-4 p-md-4 bg-white shadow-sm border">
+            <div class="d-flex align-items-start gap-3 mb-4 p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                <i class="bi bi-key-fill fs-3 text-primary flex-shrink-0 mt-1"></i>
+                <div class="small">
+                    <div class="fw-bold text-dark mb-1">Protected Electoral Section</div>
+                    <div class="text-muted" style="line-height: 1.5;">
+                        Commissioning new democratic ballots and registering representative candidates is restricted. Please enter the master administrative security password to unlock this section.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flash alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show small mb-3" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('admin.verify_security_gate') }}">
+                <div class="mb-3">
+                    <label class="form-label text-dark fw-semibold small">Master Security Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" name="security_password" id="gatePasswordInput" class="form-control border-start-0" placeholder="Enter security password..." required autofocus>
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()" title="Toggle visibility">
+                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Viva / Quick Demo Passkey Pill -->
+                <div class="mb-4 p-2.5 rounded bg-light border d-flex align-items-center justify-content-between">
+                    <div class="small">
+                        <span class="text-muted">Master Passkey:</span>
+                        <code class="fw-bold text-primary">adminpassword</code>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-outline-primary py-1 px-2" style="font-size: 0.75rem;" onclick="document.getElementById('gatePasswordInput').value = 'adminpassword'">
+                        Auto-Fill Key
+                    </button>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-unlock-fill"></i>
+                        <span>Unlock Election Creation Section</span>
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary py-2 small">
+                        Return to Homepage
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center mt-3">
+            <span class="text-muted small">
+                <i class="bi bi-shield-check text-success me-1"></i>Cryptographic Verification & Single-Session Authentication Active
+            </span>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility() {
+    const input = document.getElementById('gatePasswordInput');
+    const icon = document.getElementById('togglePasswordIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+</script>
+{% endblock %}
