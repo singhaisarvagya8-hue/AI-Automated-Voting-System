@@ -3,320 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votex.ai - AI Secure Voting System</title>
-    <!-- Fonts -->
+    <title>{% block title %}Votex • Secure Democratic Voting Portal{% endblock %}</title>
+    
+    <!-- Professional Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap 5 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --bg-body: #f8fafc;
             --bg-card: #ffffff;
             --border-color: #e2e8f0;
-            --border-focus: #2563eb;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --text-main: #0f172a;
+            --border-subtle: #f1f5f9;
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --primary-light: #eff6ff;
+            --text-heading: #0f172a;
+            --text-body: #334155;
             --text-muted: #64748b;
-        }
-
-        .text-muted {
-            color: #64748b !important;
+            --success: #059669;
+            --success-light: #ecfdf5;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-body);
-            color: var(--text-main);
+            color: var(--text-body);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
 
         h1, h2, h3, h4, h5, h6, .brand-font {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            letter-spacing: -0.02em;
-            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-heading);
+            letter-spacing: -0.025em;
+            font-weight: 700;
         }
 
-        /* Classic Clean Cards */
-        .glass-card, .classic-card {
+        /* Clean Human-Crafted Cards */
+        .classic-card, .card-custom {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 16px -2px rgba(15, 23, 42, 0.03);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
 
-        .glass-card-hover:hover {
-            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+        .classic-card:hover {
             border-color: #cbd5e1;
         }
 
-        /* Navbar */
-        .navbar-tech {
+        .card-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+            border-color: #93c5fd;
+        }
+
+        /* Top Navigation */
+        .navbar-custom {
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
             padding: 0.75rem 0;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
         }
 
-        .brand-logo {
+        .brand-badge {
             width: 36px;
             height: 36px;
-            border-radius: 8px;
-            background: #2563eb;
-            display: inline-flex;
+            border-radius: 10px;
+            background: #1d4ed8;
+            color: white;
+            display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.15rem;
-            color: white;
+            box-shadow: 0 2px 6px rgba(29, 78, 216, 0.25);
         }
 
-        /* Buttons */
-        .btn-gradient {
-            background: #2563eb;
-            border: 1px solid #2563eb;
-            color: white;
-            font-weight: 500;
-            padding: 0.6rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.15s ease;
-        }
-
-        .btn-gradient:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
-            color: white;
-        }
-
-        .btn-gradient-cyan {
-            background: #0284c7;
-            border: 1px solid #0284c7;
-            color: white;
-            font-weight: 500;
-            padding: 0.55rem 1.15rem;
-            border-radius: 8px;
-            transition: all 0.15s ease;
-        }
-
-        .btn-gradient-cyan:hover {
-            background: #0369a1;
-            border-color: #0369a1;
-            color: white;
-        }
-
-        .btn-outline-tech {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+        .nav-link-custom {
             color: #334155;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 0.5rem 0.85rem;
             border-radius: 8px;
-            font-weight: 500;
-            padding: 0.55rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
             transition: all 0.15s ease;
         }
 
-        .btn-outline-tech:hover {
-            background: #f1f5f9;
-            border-color: #94a3b8;
+        .nav-link-custom:hover {
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+
+        .nav-link-custom.active {
+            color: #1d4ed8;
+            background: #dbeafe;
+        }
+
+        /* Standard Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.55rem 1.25rem;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: #bfdbfe;
+            background: #ffffff;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-secondary {
+            color: #475569;
+            border-color: #cbd5e1;
+            background: #ffffff;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #f1f5f9;
             color: #0f172a;
+            border-color: #94a3b8;
         }
 
         /* Form Controls */
-        .form-control-tech {
-            background: #ffffff;
+        .form-control, .form-select {
             border: 1px solid #cbd5e1;
-            color: #0f172a;
             border-radius: 8px;
-            padding: 0.75rem 1rem;
-            transition: all 0.15s ease;
+            color: #0f172a;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.95rem;
         }
 
-        .form-control-tech:focus {
-            background: #ffffff;
+        .form-control:focus, .form-select:focus {
             border-color: #2563eb;
-            color: #0f172a;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        .form-control-tech::placeholder {
-            color: #94a3b8;
-        }
-
         /* Badges */
-        .badge-tech-indigo {
+        .badge-soft-blue {
             background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
-            border-radius: 6px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .badge-tech-emerald {
+        .badge-soft-green {
             background: #ecfdf5;
             color: #047857;
             border: 1px solid #a7f3d0;
-            border-radius: 6px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .badge-tech-cyan {
-            background: #f0f9ff;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-
-        .badge-tech-amber {
+        .badge-soft-amber {
             background: #fffbeb;
             color: #b45309;
             border: 1px solid #fde68a;
-            border-radius: 6px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        /* Pulse indicator */
-        .pulse-dot {
+        /* Live Pulse Dot */
+        .live-dot {
             width: 8px;
             height: 8px;
+            background: #16a34a;
             border-radius: 50%;
-            background-color: #16a34a;
             display: inline-block;
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
         }
 
-        /* Alerts */
-        .alert-tech-danger {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            border-radius: 8px;
-        }
-
-        .alert-tech-warning {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #92400e;
-            border-radius: 8px;
-        }
-
-        .alert-tech-success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-            border-radius: 8px;
-        }
-
-        /* Footer */
-        .footer-tech {
+        /* Institutional Footer */
+        .footer-custom {
             margin-top: auto;
-            border-top: 1px solid var(--border-color);
             background: #ffffff;
-            padding: 1.25rem 0;
-            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
             font-size: 0.875rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
-    <nav class="navbar navbar-expand navbar-tech sticky-top mb-4">
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top mb-4">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-dark fw-bold brand-font" href="{{ url_for('index') }}">
-                <div class="brand-logo">
-                    <i class="bi bi-check-circle-fill"></i>
+            <!-- Brand Logo & Identity -->
+            <a class="navbar-brand d-flex align-items-center gap-2.5 text-decoration-none" href="{{ url_for('index') }}">
+                <div class="brand-badge">
+                    <i class="bi bi-box2-heart-fill"></i>
                 </div>
-                <span class="fs-5">Votex<span style="color: #2563eb;">.ai</span></span>
-                <span class="badge bg-light text-secondary border ms-1 px-2 py-1 small">v2.4</span>
+                <div>
+                    <div class="brand-font fs-5 text-dark lh-1">Votex<span style="color: #1d4ed8;">.gov</span></div>
+                    <span class="text-muted small" style="font-size: 0.72rem; letter-spacing: 0.03em;">Electoral Democracy Portal</span>
+                </div>
             </a>
-            <div class="d-none d-md-flex align-items-center gap-1 ms-3">
-                {% if session.get('role') == 'voter' %}
-                    <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('voter.vote_index') }}">
-                        <i class="bi bi-box2-heart text-primary"></i>
-                        <span>Vote</span>
-                    </a>
-                {% elif session.get('role') == 'admin' %}
-                    <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('admin.dashboard') }}">
-                        <i class="bi bi-speedometer2 text-primary"></i>
-                        <span>Admin Console</span>
-                    </a>
-                {% endif %}
-                <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('voter.results_view') }}">
-                    <i class="bi bi-bar-chart-line text-primary"></i>
-                    <span>Results</span>
-                </a>
-                <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('admin.create_election_section') }}" title="Protected Election Creation Console">
-                    <i class="bi bi-shield-lock text-primary"></i>
-                    <span>Create Election</span>
-                </a>
-                <a class="nav-link text-dark fw-semibold px-2.5 py-1 rounded d-flex align-items-center gap-1.5" href="{{ url_for('auth.verify_ballot') }}">
-                    <i class="bi bi-shield-check text-primary"></i>
-                    <span>Verify Ballot</span>
-                </a>
-            </div>
 
-            <div class="ms-auto d-flex align-items-center gap-2">
-                {% if session.get('user_id') %}
-                    <div class="d-none d-sm-flex align-items-center gap-2 me-1">
-                        <span class="pulse-dot"></span>
-                        <span class="text-secondary small fw-medium">{{ session.get('name', 'User') }}</span>
-                        {% if session.get('role') == 'admin' %}
-                            <span class="badge badge-tech-cyan">Admin</span>
-                        {% else %}
-                            <span class="badge badge-tech-indigo">Voter</span>
-                        {% endif %}
-                    </div>
-                    <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Logout</span>
+            <!-- Mobile Hamburger Toggle -->
+            <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-2 text-dark"></i>
+            </button>
+
+            <!-- Navigation Links: All Core Sections -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <div class="navbar-nav mx-auto gap-1 my-2 my-lg-0">
+                    {% if session.get('role') == 'voter' %}
+                        <a class="nav-link-custom" href="{{ url_for('voter.vote_index') }}">
+                            <i class="bi bi-box2-heart text-primary"></i>
+                            <span>Vote Room</span>
+                        </a>
+                    {% endif %}
+
+                    <a class="nav-link-custom" href="{{ url_for('voter.results_view') }}">
+                        <i class="bi bi-bar-chart-line text-success"></i>
+                        <span>Live Results</span>
                     </a>
-                {% else %}
-                    <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 me-1" href="{{ url_for('voter.results_view') }}">
-                        <i class="bi bi-bar-chart-line text-primary"></i>
-                        <span>Results</span>
+
+                    <a class="nav-link-custom" href="{{ url_for('admin.create_election_section') }}" title="Master Password Protected Election Creator">
+                        <i class="bi bi-shield-lock-fill text-warning"></i>
+                        <span>Create Election</span>
                     </a>
-                    <a class="btn btn-sm btn-primary d-flex align-items-center gap-1" href="{{ url_for('auth.login') }}">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span>Sign In</span>
+
+                    <a class="nav-link-custom" href="{{ url_for('auth.verify_ballot') }}">
+                        <i class="bi bi-shield-check text-info"></i>
+                        <span>Audit Ledger</span>
                     </a>
-                {% endif %}
+
+                    {% if session.get('role') == 'admin' %}
+                        <a class="nav-link-custom" href="{{ url_for('admin.dashboard') }}">
+                            <i class="bi bi-speedometer2 text-danger"></i>
+                            <span>Admin Console</span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- User Session & Authentication Actions -->
+                <div class="d-flex align-items-center gap-2">
+                    {% if session.get('user_id') %}
+                        <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded bg-light border">
+                            <span class="live-dot"></span>
+                            <span class="small fw-semibold text-dark">{{ session.get('name', 'User') }}</span>
+                            {% if session.get('role') == 'admin' %}
+                                <span class="badge badge-soft-amber px-2 py-0.5" style="font-size: 0.7rem;">Admin</span>
+                            {% else %}
+                                <span class="badge badge-soft-blue px-2 py-0.5" style="font-size: 0.7rem;">Voter</span>
+                            {% endif %}
+                        </div>
+                        <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-none d-sm-inline">Sign Out</span>
+                        </a>
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('voter.results_view') }}">
+                            <i class="bi bi-bar-chart-line text-primary"></i>
+                            <span>Public Standings</span>
+                        </a>
+                        <a class="btn btn-sm btn-primary d-flex align-items-center gap-1" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Voter Sign In</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Container Content -->
     <main class="container mb-5">
+        <!-- Flash Alert Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert {% if category == 'danger' %}alert-tech-danger{% elif category == 'warning' %}alert-tech-warning{% else %}alert-tech-success{% endif %} d-flex align-items-center gap-2 py-3 px-4 mb-4">
-                <i class="bi {% if category == 'danger' %}bi-exclamation-octagon-fill text-danger{% elif category == 'warning' %}bi-shield-exclamation text-warning{% else %}bi-check-circle-fill text-success{% endif %} fs-5"></i>
-                <div>{{ message }}</div>
-              </div>
-            {% endfor %}
-          {% endif %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category in ['danger', 'warning', 'info', 'success'] else 'primary' }} alert-dismissible fade show d-flex align-items-center gap-2 py-3 px-4 mb-4 shadow-sm border" role="alert">
+                        <i class="bi {% if category == 'danger' %}bi-shield-exclamation text-danger{% elif category == 'warning' %}bi-exclamation-triangle text-warning{% else %}bi-check-circle-fill text-success{% endif %} fs-5"></i>
+                        <div class="small fw-medium">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="footer-tech">
-        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <div class="d-flex align-items-center gap-2 text-secondary">
-                <i class="bi bi-shield-check text-primary"></i>
-                <span>Votex.ai Secure Online Voting System</span>
-            </div>
-            <div class="d-flex align-items-center gap-3 small text-muted">
-                <span><i class="bi bi-check2-circle text-success me-1"></i>256-Bit TLS</span>
-                <span><i class="bi bi-lock text-primary me-1"></i>Tamper-Proof Ledger</span>
-                <span><i class="bi bi-cpu text-info me-1"></i>AI Turnout & Anomaly Guard</span>
+    <!-- Professional Civic Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                        <i class="bi bi-shield-check text-primary"></i>
+                        <span class="fw-semibold text-dark">Votex Electoral Commission Portal</span>
+                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">v2.6 Certified</span>
+                    </div>
+                    <div class="small text-muted">
+                        Zero-Knowledge Identity Decoupling • Immutable SHA-256 Ledger • Single-Vote Quota Enforcement
+                    </div>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3 small text-muted">
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="live-dot"></span>
+                            <span>Ledger State: Synced</span>
+                        </span>
+                        <a href="{{ url_for('auth.verify_ballot') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-search me-1"></i>Receipt Lookup
+                        </a>
+                        <a href="{{ url_for('voter.results_view') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-graph-up me-1"></i>Audit Standings
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
+
+    <!-- Bootstrap 5 JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -51,14 +51,19 @@
                 </div>
 
                 <!-- Viva / Quick Demo Passkey Pill -->
-                <div class="mb-4 p-2.5 rounded bg-light border d-flex align-items-center justify-content-between">
+                <div class="mb-4 p-2.5 rounded bg-light border d-flex flex-wrap align-items-center justify-content-between gap-2">
                     <div class="small">
-                        <span class="text-muted">Master Passkey:</span>
-                        <code class="fw-bold text-primary">adminpassword</code>
+                        <span class="text-muted">Master Key:</span>
+                        <code class="fw-bold text-primary">adminpassword</code> <span class="text-muted">or</span> <code class="fw-bold text-primary">password123</code>
                     </div>
-                    <button type="button" class="btn btn-xs btn-outline-primary py-1 px-2" style="font-size: 0.75rem;" onclick="document.getElementById('gatePasswordInput').value = 'adminpassword'">
-                        Auto-Fill Key
-                    </button>
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-xs btn-outline-primary py-1 px-2" style="font-size: 0.75rem;" onclick="document.getElementById('gatePasswordInput').value = 'adminpassword'">
+                            adminpassword
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-1 px-2" style="font-size: 0.75rem;" onclick="document.getElementById('gatePasswordInput').value = 'password123'">
+                            password123
+                        </button>
+                    </div>
                 </div>
 
                 <div class="d-grid gap-2">

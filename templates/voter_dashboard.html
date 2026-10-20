@@ -1,223 +1,306 @@
 {% extends 'base.html' %}
+
+{% block title %}Voter Dashboard • Votex Electoral Portal{% endblock %}
+
 {% block content %}
-<!-- Voter Welcome Hero -->
-<div class="classic-card p-4 mb-4 bg-white">
+<!-- Voter Welcome & Identity Strip -->
+<div class="classic-card p-4 mb-4 bg-white border">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 52px; height: 52px; background: #1d4ed8; font-size: 1.25rem;">
+                {{ session.get('name', 'Voter')[:2]|upper }}
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h3 class="fw-bold text-dark mb-0">{{ session.get('name', 'Student Voter') }}</h3>
+                    <span class="badge badge-soft-green py-1 px-2.5 small">
+                        <span class="live-dot me-1"></span>Eligible & Enrolled
+                    </span>
+                </div>
+                <div class="text-muted small d-flex flex-wrap align-items-center gap-3">
+                    <span><i class="bi bi-person-badge text-primary me-1"></i>Voter ID: <strong class="text-dark">{{ session.get('voter_id', 'CS202601') }}</strong></span>
+                    <span><i class="bi bi-building text-secondary me-1"></i>Department of Computer Science</span>
+                    <span><i class="bi bi-calendar3 text-secondary me-1"></i>Academic Term 2026</span>
+                </div>
+            </div>
+        </div>
+        <div class="text-md-end border-top border-md-top-0 pt-2 pt-md-0">
+            <span class="badge badge-soft-blue py-1.5 px-3 fs-6 d-inline-flex align-items-center gap-1.5">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Single-Vote Quota: Active</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- 4-Section Unified Master Hub -->
+<div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-grid-fill text-primary"></i>
+            <span>Portal Sections</span>
+        </h5>
+        <span class="text-muted small">Choose any dedicated section below</span>
+    </div>
+
+    <div class="row g-3">
+        <!-- Section 1: Voting Room -->
+        <div class="col-md-6 col-xl-3">
+            <div class="classic-card card-interactive p-4 h-100 bg-white border d-flex flex-column justify-content-between" style="border-top: 4px solid #1d4ed8 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="p-2.5 rounded-3 bg-primary-subtle text-primary">
+                            <i class="bi bi-box2-heart-fill fs-4"></i>
+                        </div>
+                        <span class="badge bg-light text-primary border small fw-semibold">Section 1</span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Voting Room</h5>
+                    <p class="text-muted small mb-3">
+                        Cast your sealed vote between representative candidates. Compare manifestos side-by-side and secure your ballot.
+                    </p>
+                </div>
+                <a href="{{ url_for('voter.vote_index') }}" class="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-1 py-2">
+                    <span>Enter Voting Room</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 2: Results Section -->
+        <div class="col-md-6 col-xl-3">
+            <div class="classic-card card-interactive p-4 h-100 bg-white border d-flex flex-column justify-content-between" style="border-top: 4px solid #059669 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="p-2.5 rounded-3 bg-success-subtle text-success">
+                            <i class="bi bi-bar-chart-line-fill fs-4"></i>
+                        </div>
+                        <span class="badge bg-light text-success border small fw-semibold">Section 2</span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Live Results</h5>
+                    <p class="text-muted small mb-3">
+                        View certified vote tallies, percentage shares, leading representative front-runners, and overall student turnout rates.
+                    </p>
+                </div>
+                <a href="{{ url_for('voter.results_view') }}" class="btn btn-outline-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-1 py-2" style="border-color: #a7f3d0; color: #047857;">
+                    <span>View Live Results</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 3: Protected Election Creator -->
+        <div class="col-md-6 col-xl-3">
+            <div class="classic-card card-interactive p-4 h-100 bg-white border d-flex flex-column justify-content-between" style="border-top: 4px solid #d97706 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="p-2.5 rounded-3 bg-warning-subtle text-warning">
+                            <i class="bi bi-shield-lock-fill fs-4 text-warning"></i>
+                        </div>
+                        <span class="badge badge-soft-amber small fw-semibold">Section 3 • Protected</span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Create Election</h5>
+                    <p class="text-muted small mb-3">
+                        Master password-secured console to commission new ballots with unlimited candidate representatives.
+                    </p>
+                </div>
+                <a href="{{ url_for('admin.create_election_section') }}" class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-1 py-2">
+                    <i class="bi bi-lock-fill text-warning"></i>
+                    <span>Protected Creator</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 4: Public Audit & Certificate -->
+        <div class="col-md-6 col-xl-3">
+            <div class="classic-card card-interactive p-4 h-100 bg-white border d-flex flex-column justify-content-between" style="border-top: 4px solid #0284c7 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="p-2.5 rounded-3 bg-info-subtle text-info-emphasis">
+                            <i class="bi bi-patch-check-fill fs-4 text-primary"></i>
+                        </div>
+                        <span class="badge bg-light text-info-emphasis border small fw-semibold">Section 4</span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Audit Ledger</h5>
+                    <p class="text-muted small mb-3">
+                        Verify SHA-256 ballot hashes in the public ledger and download your official printable digital voter certificate.
+                    </p>
+                </div>
+                <a href="{{ url_for('auth.verify_ballot') }}" class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-1 py-2">
+                    <i class="bi bi-search"></i>
+                    <span>Verify / Certificate</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Ballots & Election Roster -->
+<div class="mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge badge-tech-indigo py-1 px-2">
-                    <i class="bi bi-shield-check text-primary me-1"></i>Voter Portal
-                </span>
-                <span class="badge badge-tech-emerald py-1 px-2">
-                    <span class="pulse-dot me-1"></span>Eligible & Authenticated
-                </span>
-            </div>
-            <h2 class="fw-bold text-dark mb-1">Welcome, {{ session.get('name', 'Student Voter') }}</h2>
-            <p class="text-muted mb-0 small">Review active campus elections below and cast your secured ballot.</p>
+            <h4 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-card-checklist text-primary"></i>
+                <span>Your Registered Ballots</span>
+            </h4>
+            <p class="text-muted small mb-0">Elections assigned to your department roster.</p>
         </div>
-        <div class="text-md-end">
-            <span class="text-muted small d-block">Academic Year 2026</span>
-            <span class="text-dark fw-semibold small"><i class="bi bi-shield-lock text-primary me-1"></i>Single-Vote Guard: <span class="text-success">Active</span></span>
-        </div>
-    </div>
-</div>
-
-<!-- 3-Section Modular Navigation Hub -->
-<div class="row g-3 mb-4">
-    <!-- Section 1: Voting Room -->
-    <div class="col-md-4">
-        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #2563eb;">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <div class="p-2 rounded bg-primary-subtle text-primary">
-                    <i class="bi bi-box2-heart fs-5"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold text-dark mb-0">1. Voting Section</h6>
-                    <span class="text-muted small">Choose Representatives</span>
-                </div>
-            </div>
-            <p class="text-muted small mb-3">Directly access active ballots to cast your vote between candidate representatives.</p>
-            <a href="{{ url_for('voter.vote_index') }}" class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
-                <span>Enter Voting Room</span>
-                <i class="bi bi-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- Section 2: Results Section -->
-    <div class="col-md-4">
-        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #16a34a;">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <div class="p-2 rounded bg-success-subtle text-success">
-                    <i class="bi bi-bar-chart-line fs-5"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold text-dark mb-0">2. Results Section</h6>
-                    <span class="text-muted small">Live Tally & Standings</span>
-                </div>
-            </div>
-            <p class="text-muted small mb-3">View certified vote tallies, percentage shares, leading candidates, and final winners.</p>
-            <a href="{{ url_for('voter.results_view') }}" class="btn btn-sm btn-outline-success w-100 d-flex align-items-center justify-content-center gap-1">
-                <span>View Results Section</span>
-                <i class="bi bi-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- Section 3: Verification & Certificate -->
-    <div class="col-md-4">
-        <div class="classic-card p-3.5 h-100 bg-white" style="border-top: 3px solid #0284c7;">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <div class="p-2 rounded bg-info-subtle text-info-emphasis">
-                    <i class="bi bi-shield-check fs-5"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold text-dark mb-0">3. Ledger Audit</h6>
-                    <span class="text-muted small">Verify & Certificate</span>
-                </div>
-            </div>
-            <p class="text-muted small mb-3">Audit your cryptographic receipt in the public ledger and download your certificate.</p>
-            <a href="{{ url_for('auth.verify_ballot') }}" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1">
-                <span>Public Audit Portal</span>
-                <i class="bi bi-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Active Elections Section -->
-<div class="mb-4 d-flex justify-content-between align-items-center">
-    <div>
-        <h4 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
-            <i class="bi bi-card-checklist text-primary"></i>
-            <span>Current Registered Ballots</span>
-        </h4>
-        <p class="text-muted small mb-0">Elections you are registered and authorized to participate in.</p>
-    </div>
-    <div>
-        <a href="{{ url_for('admin.create_election_section') }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5" title="Restricted Election Creation Console">
-            <i class="bi bi-shield-lock text-primary"></i>
-            <span>Create Election</span>
+        <a href="{{ url_for('admin.create_election_section') }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5 align-self-start">
+            <i class="bi bi-plus-circle text-primary"></i>
+            <span>New Election (Protected)</span>
         </a>
     </div>
-</div>
 
-<div class="row g-4 mb-5">
-    {% for election in elections %}
-        <div class="col-12">
-            <div class="classic-card glass-card-hover p-4 bg-white">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                    <div class="flex-grow-1">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            {% if election.status == 'active' %}
-                                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
-                                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; vertical-align: middle;"></i>Voting Open
+    <div class="row g-3">
+        {% for election in elections %}
+            <div class="col-12">
+                <div class="classic-card p-4 bg-white border">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                {% if election.status == 'active' %}
+                                    <span class="badge badge-soft-green py-1 px-2.5">
+                                        <span class="live-dot me-1"></span>Voting Open
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border py-1 px-2.5">
+                                        <i class="bi bi-lock-fill me-1"></i>Election Concluded
+                                    </span>
+                                {% endif %}
+                                <span class="badge bg-light text-muted border">
+                                    <i class="bi bi-people me-1"></i>{{ election.candidates|length }} Representatives
                                 </span>
-                            {% else %}
-                                <span class="badge bg-secondary-subtle text-secondary border py-1 px-2">
-                                    <i class="bi bi-lock-fill me-1"></i>Election Concluded
+                                <span class="badge bg-light text-muted border">
+                                    <i class="bi bi-clock me-1"></i>24-Hour Cycle
                                 </span>
-                            {% endif %}
-                            <span class="text-muted small">
-                                <i class="bi bi-calendar-event me-1"></i>Campus Election
-                            </span>
-                        </div>
-                        <h4 class="fw-bold text-dark mb-2">{{ election.title }}</h4>
-                        <p class="text-muted mb-3" style="max-width: 750px;">{{ election.description }}</p>
-                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
-                            <span><i class="bi bi-people-fill text-primary me-1"></i>{{ election.candidates|length }} Registered Candidates</span>
-                            <span><i class="bi bi-shield-lock-fill text-success me-1"></i>Double-Voting Guard Enforced</span>
-                        </div>
-                    </div>
+                            </div>
 
-                    <div class="text-md-end flex-shrink-0">
-                        {% if status_map.get(election.id) %}
-                            <div class="d-inline-flex flex-column align-items-md-end">
-                                <div class="badge bg-success-subtle text-success border border-success-subtle py-2 px-3 fs-6 d-flex align-items-center gap-2 mb-2">
-                                    <i class="bi bi-patch-check-fill fs-5"></i>
-                                    <span>Vote Recorded</span>
-                                </div>
-                                {% if receipt_map.get(election.id) %}
-                                    <div class="font-monospace small text-muted mb-2">
-                                        Receipt: <span class="text-primary fw-bold">{{ receipt_map.get(election.id)[:14] }}...</span>
+                            <h4 class="fw-bold text-dark mb-1">{{ election.title }}</h4>
+                            <p class="text-muted small mb-2" style="max-width: 720px; line-height: 1.5;">
+                                {{ election.description }}
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for cand in election.candidates[:4] %}
+                                    <span class="badge bg-light text-dark border small" style="font-size: 0.75rem;">
+                                        <i class="bi bi-person me-1 text-primary"></i>{{ cand.name }}
+                                    </span>
+                                {% endfor %}
+                                {% if election.candidates|length > 4 %}
+                                    <span class="badge bg-light text-muted border small" style="font-size: 0.75rem;">
+                                        +{{ election.candidates|length - 4 }} more
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons based on Voter State -->
+                        <div class="text-lg-end flex-shrink-0 pt-2 pt-lg-0 border-top border-lg-top-0">
+                            {% if status_map.get(election.id) %}
+                                <div class="d-inline-flex flex-column align-items-lg-end gap-2">
+                                    <div class="badge badge-soft-green py-2 px-3 fs-6 d-flex align-items-center gap-2">
+                                        <i class="bi bi-patch-check-fill fs-5 text-success"></i>
+                                        <span>Ballot Sealed & Cast</span>
                                     </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                    {% if receipt_map.get(election.id) %}
+                                        <div class="font-monospace small text-muted">
+                                            Receipt: <span class="text-primary fw-bold">{{ receipt_map.get(election.id)[:14] }}...</span>
+                                        </div>
+                                    {% endif %}
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
                                             <i class="bi bi-bar-chart-line"></i>
                                             <span>Results</span>
                                         </a>
-                                        <a href="{{ url_for('auth.verify_ballot', hash=receipt_map.get(election.id)) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                                        <a href="{{ url_for('auth.verify_ballot', hash=receipt_map.get(election.id)) }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
                                             <i class="bi bi-shield-check"></i>
-                                            <span>Verify</span>
+                                            <span>Audit</span>
                                         </a>
                                         <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
                                             <i class="bi bi-award"></i>
                                             <span>Certificate</span>
                                         </a>
                                     </div>
-                                {% endif %}
-                            </div>
-                        {% elif election.status == 'active' %}
-                            <div class="d-flex flex-column align-items-md-end gap-2">
-                                <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-primary py-2 px-3 d-flex align-items-center gap-2">
-                                    <i class="bi bi-box2-heart-fill"></i>
-                                    <span>Vote Representatives</span>
-                                    <i class="bi bi-arrow-right"></i>
-                                </a>
-                                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="text-decoration-none small text-primary d-flex align-items-center gap-1">
-                                    <i class="bi bi-bar-chart-line"></i>
-                                    <span>View Current Results &rarr;</span>
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="d-flex flex-column align-items-md-end gap-2">
-                                <div class="badge bg-light text-muted border py-1.5 px-3">
-                                    <i class="bi bi-lock me-1"></i>Voting Closed
                                 </div>
-                                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
-                                    <i class="bi bi-bar-chart-line"></i>
-                                    <span>View Final Results</span>
-                                </a>
-                            </div>
-                        {% endif %}
+                            {% elif election.status == 'active' %}
+                                <div class="d-flex flex-column align-items-lg-end gap-2">
+                                    <a href="{{ url_for('voter.cast_vote', election_id=election.id) }}" class="btn btn-primary py-2.5 px-4 d-flex align-items-center gap-2 shadow-sm">
+                                        <i class="bi bi-box2-heart-fill"></i>
+                                        <span>Vote Representatives</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="text-decoration-none small text-primary d-flex align-items-center gap-1">
+                                        <i class="bi bi-bar-chart-line"></i>
+                                        <span>View Live Standings &rarr;</span>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="d-flex flex-column align-items-lg-end gap-2">
+                                    <span class="badge bg-light text-muted border py-1.5 px-3">
+                                        <i class="bi bi-lock me-1"></i>Voting Closed
+                                    </span>
+                                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                                        <i class="bi bi-bar-chart-line"></i>
+                                        <span>View Final Outcome</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% else %}
-        <div class="col-12">
-            <div class="classic-card p-5 text-center bg-white">
-                <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
-                <h5 class="text-dark fw-bold">No Active Elections Found</h5>
-                <p class="text-muted mb-0">You currently have no ballots pending your vote. Check back when the next voting cycle opens.</p>
+        {% else %}
+            <div class="col-12">
+                <div class="classic-card p-5 text-center bg-white border">
+                    <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                    <h5 class="text-dark fw-bold">No Active Ballots Found</h5>
+                    <p class="text-muted small mb-3">There are currently no elections staged for your student voter profile.</p>
+                    <a href="{{ url_for('admin.create_election_section') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Create Election (Protected)
+                    </a>
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 
-<!-- 3-Step Voting Security Workflow -->
-<div class="classic-card p-4 bg-white">
-    <h5 class="fw-semibold text-dark mb-3 d-flex align-items-center gap-2">
-        <i class="bi bi-shield-lock text-primary"></i>
-        <span>Voting Integrity Safeguards</span>
-    </h5>
+<!-- Democratic Integrity Safeguards -->
+<div class="classic-card p-4 bg-white border">
+    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+        <i class="bi bi-shield-check text-primary fs-5"></i>
+        <h6 class="fw-bold text-dark mb-0">Democracy & Cryptographic Safeguards</h6>
+    </div>
     <div class="row g-3">
         <div class="col-md-4">
-            <div class="p-3 rounded h-100 bg-light border">
-                <div class="fw-bold text-dark mb-1"><span class="text-primary me-2">01.</span>Verified Eligibility</div>
-                <p class="text-muted small mb-0">Only authenticated students with active department enrollment can access and unlock ballots.</p>
+            <div class="p-3 rounded-3 bg-light border h-100">
+                <div class="fw-bold text-dark small mb-1 d-flex align-items-center gap-1.5">
+                    <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">01</span>
+                    <span>Zero-Knowledge Secrecy</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.5;">
+                    Your vote choice is cryptographically decoupled from your student roll number before insertion into the ledger.
+                </p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-3 rounded h-100 bg-light border">
-                <div class="fw-bold text-dark mb-1"><span class="text-primary me-2">02.</span>Decoupled Ledger</div>
-                <p class="text-muted small mb-0">Your vote choice is cryptographically separated from your identity to guarantee complete ballot secrecy.</p>
+            <div class="p-3 rounded-3 bg-light border h-100">
+                <div class="fw-bold text-dark small mb-1 d-flex align-items-center gap-1.5">
+                    <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">02</span>
+                    <span>Single-Vote Quota</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.5;">
+                    Database unique constraints prevent double-voting. Re-entry to the voting room displays your immutable receipt.
+                </p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-3 rounded h-100 bg-light border">
-                <div class="fw-bold text-dark mb-1"><span class="text-success me-2">03.</span>AI Threat Defense</div>
-                <p class="text-muted small mb-0">Machine learning algorithms audit voting velocity in real time to prevent automated burst manipulation.</p>
+            <div class="p-3 rounded-3 bg-light border h-100">
+                <div class="fw-bold text-dark small mb-1 d-flex align-items-center gap-1.5">
+                    <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">03</span>
+                    <span>Public Ledger Audit</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.5;">
+                    Every cast ballot produces a 66-character SHA-256 receipt that can be verified publicly by anyone on campus.
+                </p>
             </div>
         </div>
     </div>
