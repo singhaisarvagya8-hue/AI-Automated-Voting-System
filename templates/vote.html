@@ -1,62 +1,64 @@
 {% extends 'base.html' %}
+{% block title %}Vote Representatives • Votex.ai{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
+    <div class="col-lg-9 col-xl-8">
         <!-- Ballot Navigation / Breadcrumb -->
         <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
-                <i class="bi bi-chevron-left"></i>
-                <span>Back to Dashboard</span>
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Return to Hub</span>
             </a>
             <div class="d-flex align-items-center gap-2">
-                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1">
-                    <i class="bi bi-bar-chart-line"></i>
-                    <span>View Live Results Section</span>
+                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <i class="bi bi-bar-chart-line text-success"></i>
+                    <span>Live Results Portal</span>
                 </a>
-                <span class="badge bg-light text-primary border py-1.5 px-3">
-                    <i class="bi bi-shield-lock-fill me-1"></i>Encrypted Session
+                <span class="badge badge-soft-blue py-1.5 px-3">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Single-Vote Guard Active
                 </span>
             </div>
         </div>
 
         <!-- Ballot Header Card -->
-        <div class="classic-card p-4 mb-4 bg-white">
+        <div class="classic-card p-4 p-md-4 mb-4 bg-white border">
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2">
-                    <i class="bi bi-box2-heart-fill me-1"></i>Official Voting Section
+                <span class="badge badge-soft-blue py-1 px-2.5">
+                    <i class="bi bi-box2-heart-fill me-1"></i>Official Voting Room
                 </span>
-                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
-                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; vertical-align: middle;"></i>Single-Choice Ballot
+                <span class="badge badge-soft-green py-1 px-2.5">
+                    <span class="live-dot me-1"></span>Single-Choice Secret Ballot
                 </span>
             </div>
-            <h2 class="fw-bold text-dark mb-2">Vote Between Candidate Representatives</h2>
-            <p class="text-muted mb-0">{{ election.description }}</p>
+            <h3 class="fw-bold text-dark mb-1">{{ election.title }}</h3>
+            <p class="text-muted small mb-0" style="line-height: 1.6;">{{ election.description }}</p>
         </div>
 
         {% if already_voted %}
             <!-- Already Voted Notice -->
-            <div class="classic-card p-4 mb-4 bg-white" style="border-left: 4px solid #16a34a;">
+            <div class="classic-card p-4 mb-4 bg-white border" style="border-left: 5px solid #059669 !important;">
                 <div class="d-flex align-items-center gap-2 text-success fw-bold fs-5 mb-2">
-                    <i class="bi bi-patch-check-fill"></i>
-                    <span>Your Ballot Has Already Been Cast & Sealed</span>
+                    <i class="bi bi-patch-check-fill fs-4"></i>
+                    <span>Your Ballot Has Been Cryptographically Sealed</span>
                 </div>
                 <p class="text-muted small mb-3">
                     You have successfully exercised your voting quota for this election. To preserve democratic integrity, 
                     ballots cannot be modified once recorded in the ledger.
-                    Receipt Hash: <span class="font-monospace text-primary fw-semibold">{{ receipt_hash[:20] }}...</span>
+                    Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_hash[:22] }}...</code>
                 </p>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1">
+                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm">
                         <i class="bi bi-bar-chart-line-fill"></i>
-                        <span>View Results Section</span>
+                        <span>View Live Results Section</span>
                         <i class="bi bi-arrow-right"></i>
                     </a>
-                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-                        <i class="bi bi-award"></i>
+                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1.5">
+                        <i class="bi bi-award-fill text-warning"></i>
                         <span>Download Official Certificate</span>
                     </a>
-                    <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-                        <i class="bi bi-shield-check"></i>
+                    <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1.5">
+                        <i class="bi bi-shield-check text-primary"></i>
                         <span>Verify in Ledger</span>
                     </a>
                 </div>
@@ -67,15 +69,21 @@
         <form method="POST" id="ballotForm">
             <div class="mb-4">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-                    <h5 class="fw-semibold text-dark mb-0 d-flex align-items-center gap-2">
-                        <i class="bi bi-person-check-fill text-primary"></i>
-                        <span>Candidate Representatives</span>
-                    </h5>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-person-check-fill text-primary"></i>
+                            <span>Candidate Representatives</span>
+                        </h5>
+                        <span class="text-muted small">Choose one representative to cast your ballot</span>
+                    </div>
                     <div class="d-flex align-items-center gap-2">
-                        <input type="text" id="candidateSearchInput" class="form-control form-control-sm" placeholder="Filter candidates..." style="max-width: 200px;">
-                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
+                        <div class="input-group input-group-sm" style="max-width: 220px;">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Filter candidates...">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
                             <i class="bi bi-columns-gap"></i>
-                            <span>Compare Candidates</span>
+                            <span>Compare</span>
                         </button>
                     </div>
                 </div>
@@ -83,37 +91,38 @@
                 <div class="row g-3" id="candidatesList">
                     {% for candidate in candidates %}
                         <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
-                            <label class="candidate-card w-100 p-4 rounded-3 d-flex align-items-start gap-3 position-relative {% if not already_voted %}cursor-pointer{% endif %} bg-white" for="cand_{{ candidate.id }}">
+                            <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative {% if not already_voted %}cursor-pointer{% endif %}" for="cand_{{ candidate.id }}">
                                 <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" {% if already_voted %}disabled{% else %}required{% endif %}>
                                 
-                                <!-- Candidate Avatar with Initials -->
-                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle" style="width: 48px; height: 48px; background: {% if loop.index % 2 == 1 %}#2563eb{% else %}#0284c7{% endif %}; font-size: 1.1rem;">
+                                <!-- Candidate Avatar with High-Craft Gradient -->
+                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
+                                     style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
                                     {{ candidate.name[:2]|upper }}
                                 </div>
 
-                                <!-- Candidate Info -->
+                                <!-- Candidate Info & Platform -->
                                 <div class="flex-grow-1">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
                                         <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
-                                        <span class="badge bg-light text-primary border small">{{ candidate.position }}</span>
+                                        <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
                                     </div>
-                                    <p class="text-muted mb-2 small" style="line-height: 1.6;">
-                                        <i class="bi bi-quote text-secondary me-1"></i>{{ candidate.manifesto }}
-                                    </p>
+                                    <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
+                                        <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
+                                    </div>
                                     <div class="d-flex flex-wrap gap-1">
                                         {% if 'funding' in candidate.manifesto|lower or 'career' in candidate.manifesto|lower %}
-                                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#StudentOpportunities</span>
+                                            <span class="badge bg-white text-muted border" style="font-size: 0.72rem;">#StudentOpportunities</span>
                                         {% endif %}
-                                        {% if 'wi-fi' in candidate.manifesto|lower or 'green' in candidate.manifesto|lower %}
-                                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#CampusInitiatives</span>
+                                        {% if 'library' in candidate.manifesto|lower or 'wi-fi' in candidate.manifesto|lower or 'green' in candidate.manifesto|lower %}
+                                            <span class="badge bg-white text-muted border" style="font-size: 0.72rem;">#CampusInitiatives</span>
                                         {% endif %}
-                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">#OfficialNominee</span>
+                                        <span class="badge bg-white text-muted border" style="font-size: 0.72rem;">#OfficialNominee</span>
                                     </div>
                                 </div>
 
                                 {% if not already_voted %}
-                                    <!-- Selection Indicator Check -->
-                                    <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border">
+                                    <!-- Selection Indicator Radio Circle -->
+                                    <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
                                         <i class="bi bi-check-lg check-icon"></i>
                                     </div>
                                 {% endif %}
@@ -125,12 +134,12 @@
 
             {% if not already_voted %}
                 <!-- Security Assurance & Submit -->
-                <div class="classic-card p-4 bg-white">
-                    <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
-                        <i class="bi bi-shield-check fs-2 text-primary"></i>
+                <div class="classic-card p-4 bg-white border">
+                    <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                        <i class="bi bi-shield-check fs-2 text-primary flex-shrink-0"></i>
                         <div class="small">
-                            <div class="text-dark fw-semibold">Tamper-Proof Ballot Seal</div>
-                            <div class="text-muted">Once submitted, your ballot will be permanently locked into the ledger and cannot be altered or cast again.</div>
+                            <div class="text-dark fw-bold mb-0.5">Tamper-Proof Ledger Seal</div>
+                            <div class="text-muted">Once submitted, your choice is cryptographically signed and stored in the immutable audit ledger. It cannot be altered or cast again.</div>
                         </div>
                     </div>
 
@@ -138,18 +147,18 @@
                         <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary w-100 w-sm-auto">
                             Cancel & Return
                         </a>
-                        <button type="submit" class="btn btn-primary py-2.5 px-5 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2">
+                        <button type="submit" class="btn btn-primary py-2.5 px-4 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2 shadow-sm">
                             <i class="bi bi-box2-heart-fill"></i>
-                            <span>Confirm & Cast Vote for Selected Representative</span>
+                            <span>Confirm & Cast Ballot</span>
                         </button>
                     </div>
                 </div>
             {% else %}
-                <div class="classic-card p-4 bg-white text-center">
+                <div class="classic-card p-4 bg-white border text-center">
                     <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
                     <h5 class="fw-bold text-dark mb-1">Ballot Quota Consumed</h5>
                     <p class="text-muted small mb-3">Your vote is sealed in this election. View the current live standings in the Results section.</p>
-                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary px-4 py-2">
+                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary px-4 py-2 shadow-sm">
                         <i class="bi bi-bar-chart-line-fill me-1"></i> Open Results Section &rarr;
                     </a>
                 </div>
@@ -166,13 +175,15 @@
     .candidate-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        transition: all 0.15s ease;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .candidate-card:hover {
         border-color: #94a3b8;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
     }
 
     .candidate-check-circle {
@@ -191,14 +202,14 @@
 
     /* Active Selected State */
     .candidate-card.active-selected {
-        background: #eff6ff !important;
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        background: #f0f7ff !important;
+        border: 2px solid #1d4ed8 !important;
+        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15), 0 4px 14px rgba(29, 78, 216, 0.08) !important;
     }
 
     .candidate-card.active-selected .candidate-check-circle {
-        background: #2563eb;
-        border-color: #2563eb;
+        background: #1d4ed8;
+        border-color: #1d4ed8;
     }
 
     .candidate-card.active-selected .candidate-check-circle .check-icon {
@@ -208,49 +219,54 @@
 
 <!-- Candidate Comparison Modal -->
 <div class="modal fade" id="candidateCompareModal" tabindex="-1" aria-labelledby="candidateCompareModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom px-4 py-3 bg-light">
                 <div>
-                    <h5 class="modal-title fw-bold text-dark" id="candidateCompareModalLabel">
-                        <i class="bi bi-columns-gap text-primary me-2"></i>Candidate Comparison View
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="candidateCompareModalLabel">
+                        <i class="bi bi-columns-gap text-primary"></i>
+                        <span>Side-by-Side Candidate Evaluation</span>
                     </h5>
-                    <p class="text-muted small mb-0">Side-by-side platform and manifesto evaluation</p>
+                    <p class="text-muted small mb-0">Evaluate platforms and agendas side-by-side to make an informed democratic choice</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3">
                     {% for candidate in candidates %}
-                        <div class="col-md-{{ (12 / candidates|length)|round|int if candidates|length <= 3 else 6 }}">
-                            <div class="p-3 rounded border h-100 bg-light d-flex flex-column justify-content-between">
+                        <div class="col-md-6 col-lg-{{ (12 / candidates|length)|round|int if candidates|length <= 4 else 4 }}">
+                            <div class="p-3.5 rounded-3 border h-100 bg-white d-flex flex-column justify-content-between shadow-sm">
                                 <div>
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 40px; height: 40px; background: {% if loop.index % 2 == 1 %}#2563eb{% else %}#0284c7{% endif %};">
+                                    <div class="d-flex align-items-center gap-2.5 mb-3 pb-2 border-bottom">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                             style="width: 42px; height: 42px; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
                                             {{ candidate.name[:2]|upper }}
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-dark">{{ candidate.name }}</div>
-                                            <span class="badge bg-white text-primary border small">{{ candidate.position }}</span>
+                                            <div class="fw-bold text-dark fs-6">{{ candidate.name }}</div>
+                                            <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <div class="text-muted small fw-semibold mb-1">Key Manifesto & Vision:</div>
-                                        <p class="small text-dark mb-0 bg-white p-2.5 rounded border" style="line-height: 1.6;">
+                                        <div class="text-muted small fw-semibold mb-1">Key Agenda & Commitments:</div>
+                                        <p class="small text-dark mb-0 bg-light p-2.5 rounded-3 border" style="line-height: 1.6;">
                                             "{{ candidate.manifesto }}"
                                         </p>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2" onclick="selectCandidateFromModal('cand_{{ candidate.id }}')">
-                                    <i class="bi bi-check2-circle me-1"></i>Select This Candidate
-                                </button>
+                                {% if not already_voted %}
+                                    <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2 d-flex align-items-center justify-content-center gap-1.5" onclick="selectCandidateFromModal('cand_{{ candidate.id }}')">
+                                        <i class="bi bi-check2-circle"></i>
+                                        <span>Select This Candidate</span>
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             </div>
-            <div class="modal-footer border-top bg-light">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close Comparison</button>
+            <div class="modal-footer border-top bg-light px-4 py-2.5">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close Evaluation</button>
             </div>
         </div>
     </div>
@@ -266,38 +282,32 @@
         });
     });
 
-    // Check if one was already pre-selected
     const checked = document.querySelector('.candidate-radio:checked');
     if (checked) {
         checked.closest('.candidate-card').classList.add('active-selected');
     }
 
-    // Modal Selection Helper
     function selectCandidateFromModal(radioId) {
-        const targetRadio = document.getElementById(radioId);
-        if (targetRadio) {
-            targetRadio.checked = true;
-            targetRadio.dispatchEvent(new Event('change'));
-            
-            // Close modal
+        const radio = document.getElementById(radioId);
+        if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
             const modalEl = document.getElementById('candidateCompareModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) {
-                modal.hide();
-            }
+            if (modal) modal.hide();
+            radio.closest('.candidate-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 
-    // Instant Candidate Search / Filter
     const searchInput = document.getElementById('candidateSearchInput');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
             document.querySelectorAll('.candidate-item-wrapper').forEach(item => {
-                const name = item.getAttribute('data-name') || '';
-                const manifesto = item.getAttribute('data-manifesto') || '';
-                if (!query || name.includes(query) || manifesto.includes(query)) {
-                    item.style.display = '';
+                const name = item.dataset.name || '';
+                const manifesto = item.dataset.manifesto || '';
+                if (name.includes(query) || manifesto.includes(query)) {
+                    item.style.display = 'block';
                 } else {
                     item.style.display = 'none';
                 }
