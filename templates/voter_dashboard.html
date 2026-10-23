@@ -4,28 +4,28 @@
 
 {% block content %}
 <!-- Voter Welcome & Identity Strip -->
-<div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+<div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 60%, #eff6ff 100%); border-top: 4px solid #1e3a8a !important;">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
         <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 54px; height: 54px; background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); font-size: 1.25rem; box-shadow: 0 0 0 3px rgba(255,255,255,1), 0 0 0 5px rgba(29,78,216,0.2) !important;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 56px; height: 56px; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); font-size: 1.25rem; border: 2px solid rgba(217, 119, 6, 0.45); box-shadow: 0 0 0 3px #ffffff, 0 4px 14px rgba(15, 23, 42, 0.15) !important;">
                 {{ session.get('name', 'Voter')[:2]|upper }}
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <h3 class="fw-bold text-dark mb-0">{{ session.get('name', 'Student Voter') }}</h3>
+                    <h3 class="fw-bold text-dark mb-0" style="letter-spacing: -0.025em;">{{ session.get('name', 'Student Voter') }}</h3>
                     <span class="badge badge-soft-green py-1 px-2.5 small">
                         <span class="live-dot me-1"></span>Eligible & Enrolled
                     </span>
                 </div>
                 <div class="text-muted small d-flex flex-wrap align-items-center gap-3">
-                    <span><i class="bi bi-person-badge text-primary me-1"></i>Voter ID: <strong class="text-dark">{{ session.get('voter_id', 'CS202601') }}</strong></span>
+                    <span><i class="bi bi-person-badge text-primary me-1"></i>Voter ID: <strong class="text-dark font-monospace">{{ session.get('voter_id', 'CS202601') }}</strong></span>
                     <span><i class="bi bi-building text-secondary me-1"></i>Department of Computer Science</span>
                     <span><i class="bi bi-calendar3 text-secondary me-1"></i>Academic Term 2026</span>
                 </div>
             </div>
         </div>
         <div class="text-md-end border-top border-md-top-0 pt-2 pt-md-0">
-            <span class="badge badge-soft-blue py-1.5 px-3 fs-6 d-inline-flex align-items-center gap-1.5">
+            <span class="badge badge-soft-blue py-1.5 px-3 fs-6 d-inline-flex align-items-center gap-1.5 shadow-sm">
                 <i class="bi bi-shield-lock-fill"></i>
                 <span>Single-Vote Quota: Active</span>
             </span>

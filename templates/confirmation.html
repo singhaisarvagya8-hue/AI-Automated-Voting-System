@@ -1,81 +1,90 @@
 {% extends 'base.html' %}
+{% block title %}Ballot Sealed & Confirmed • Votex.ai{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center py-5">
+<div class="row justify-content-center py-4">
     <div class="col-lg-7 col-md-9 text-center">
-        <!-- Success Badge -->
-        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-4 bg-success-subtle text-success border border-success-subtle" style="width: 80px; height: 80px;">
-            <i class="bi bi-check-circle-fill" style="font-size: 2.5rem;"></i>
+        <!-- Success Civic Crest -->
+        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3 position-relative" 
+             style="width: 84px; height: 84px; background: #ecfdf5; border: 2px solid #a7f3d0; box-shadow: 0 4px 20px rgba(5, 150, 105, 0.15);">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                 style="width: 58px; height: 58px; background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);">
+                <i class="bi bi-check-lg fs-2"></i>
+            </div>
         </div>
 
         <h2 class="fw-bold text-dark mb-2">Ballot Successfully Sealed & Recorded</h2>
-        <p class="text-muted mb-4">
-            Thank you for participating in <strong>{{ election.title if election else 'the election' }}</strong>. 
-            Your selection has been cryptographically decoupled from your identity and permanently registered in the election ledger.
+        <p class="text-muted mb-4 mx-auto" style="max-width: 560px;">
+            Thank you for participating in <strong class="text-dark">{{ election.title if election else 'the election' }}</strong>. 
+            Your vote has been cryptographically decoupled from your voter identity and permanently recorded in the immutable ledger.
         </p>
 
         <!-- Cryptographic Receipt Card -->
-        <div class="classic-card p-4 text-start mb-4 bg-white">
+        <div class="classic-card p-4 p-md-4 text-start mb-4 bg-white border">
             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                <span class="small text-secondary fw-semibold text-uppercase" style="letter-spacing: 0.05em;">Digital Audit Receipt</span>
-                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                    <span class="small text-dark fw-bold text-uppercase" style="letter-spacing: 0.06em; font-size: 0.78rem;">Digital Audit Receipt</span>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2.5 font-monospace">
                     <i class="bi bi-shield-lock-fill me-1"></i>Immutable SHA-256
                 </span>
             </div>
 
-            <div class="row g-2 small mb-3">
+            <div class="row g-2.5 small mb-3">
                 <div class="col-sm-4 text-muted">Verification Status:</div>
-                <div class="col-sm-8 text-success fw-semibold"><i class="bi bi-check2-circle me-1"></i>Audit Confirmed & Sealed</div>
+                <div class="col-sm-8 text-success fw-semibold"><i class="bi bi-check2-circle me-1"></i>Cryptographic Audit Confirmed & Sealed</div>
                 
                 <div class="col-sm-4 text-muted">Integrity Guard:</div>
-                <div class="col-sm-8 text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Velocity Guard Passed Nominal Baseline</div>
+                <div class="col-sm-8 text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Passed Single-Vote Nonce Integrity Verification</div>
 
                 <div class="col-sm-4 text-muted">Voter Status:</div>
                 <div class="col-sm-8 text-dark"><span class="badge bg-primary-subtle text-primary border border-primary-subtle">Single-Vote Quota Consumed</span></div>
             </div>
 
-            <!-- Real Hash Box -->
-            <div class="p-3 rounded bg-light border mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="text-muted small fw-semibold">TRANSACTION RECEIPT HASH</span>
-                    <button class="btn btn-sm btn-link text-primary text-decoration-none p-0 small" onclick="copyReceiptHash(this)">
-                        <i class="bi bi-clipboard me-1"></i><span>Copy Hash</span>
+            <!-- Hash Box -->
+            <div class="p-3 rounded-3 bg-light border mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1.5">
+                    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">Transaction Receipt Hash</span>
+                    <button class="btn btn-sm btn-link text-primary text-decoration-none p-0 small fw-semibold d-flex align-items-center gap-1" onclick="copyReceiptHash(this)">
+                        <i class="bi bi-clipboard"></i><span>Copy Hash</span>
                     </button>
                 </div>
-                <div id="receiptHashText" class="font-monospace text-primary small fw-semibold" style="word-break: break-all;">
+                <div id="receiptHashText" class="font-monospace text-primary small fw-semibold" style="word-break: break-all; font-size: 0.85rem;">
                     {{ receipt_hash }}
                 </div>
             </div>
 
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 shadow-sm">
                     <i class="bi bi-shield-check"></i>
                     <span>Verify on Public Ledger</span>
                 </a>
                 {% if election %}
-                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
-                        <i class="bi bi-award"></i>
+                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5 shadow-sm">
+                        <i class="bi bi-award text-warning"></i>
                         <span>Download Digital Certificate</span>
                     </a>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Action Links -->
+        <!-- Classy Action Bar -->
         <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
-            <a href="{{ url_for('voter.cast_vote') }}" class="btn btn-primary py-2 px-3.5 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+            <a href="{{ url_for('voter.cast_vote') }}" class="btn btn-primary py-2.5 px-3.5 d-flex align-items-center justify-content-center gap-2 shadow-sm">
                 <i class="bi bi-ui-checks-grid"></i>
                 <span>Choose Another Election to Vote</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
-            <a href="{{ url_for('voter.results_view', election_id=election.id if election else None) }}" class="btn btn-outline-primary py-2 px-3.5 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('voter.results_view', election_id=election.id if election else None) }}" class="btn btn-outline-primary py-2.5 px-3.5 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-bar-chart-line-fill"></i>
                 <span>View Results Section</span>
             </a>
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary py-2 px-3 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary py-2.5 px-3 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary py-2 px-3 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary py-2.5 px-3 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
             </a>

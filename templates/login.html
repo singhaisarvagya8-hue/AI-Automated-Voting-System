@@ -1,25 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Sign In • Votex Electoral Portal{% endblock %}
+{% block title %}Sign In • Votex.ai Electoral Portal{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center align-items-center py-4">
     <div class="col-lg-5 col-md-7 col-sm-10">
         <!-- Civic Portal Header -->
         <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3 bg-white border shadow-sm text-primary" style="width: 64px; height: 64px;">
-                <i class="bi bi-box2-heart-fill fs-2" style="color: #1d4ed8;"></i>
+            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3 bg-white border shadow-sm" 
+                 style="width: 68px; height: 68px; box-shadow: 0 4px 20px rgba(30, 58, 138, 0.08) !important;">
+                <div class="brand-badge" style="width: 48px; height: 48px; font-size: 1.4rem;">
+                    <i class="bi bi-shield-check" style="color: #fbbf24;"></i>
+                </div>
             </div>
-            <h3 class="fw-bold text-dark mb-1">Democratic Election Sign-In</h3>
-            <p class="text-muted small mb-0">Authorized Student Voters & Electoral Commissioners</p>
+            <div class="d-flex align-items-center justify-content-center gap-1.5 mb-1">
+                <h3 class="fw-bold text-dark mb-0">Democratic Electoral Portal</h3>
+            </div>
+            <p class="text-muted small mb-0">Authorized Student Voters & Institutional Commission Gateway</p>
         </div>
 
-        <!-- Clean Login Card -->
+        <!-- Classy Login Card -->
         <div class="classic-card p-4 p-md-4 bg-white border">
-            <h5 class="fw-semibold text-dark mb-2 d-flex align-items-center gap-2">
-                <i class="bi bi-shield-lock text-primary"></i>
-                <span>Authentication Gateway</span>
-            </h5>
-            <p class="text-muted small mb-4">Enter your registered Roll Number or Administrator ID.</p>
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-lock text-primary"></i>
+                    <span>Authentication Gateway</span>
+                </h5>
+                <span class="badge badge-soft-blue small">Single-Sign-On</span>
+            </div>
+            <p class="text-muted small mb-4">Enter your institutional Roll Number or Administrator ID.</p>
 
             <form method="POST" id="loginForm">
                 <div class="mb-3">
@@ -28,12 +36,15 @@
                         <span class="input-group-text bg-light text-muted border-end-0">
                             <i class="bi bi-person-badge"></i>
                         </span>
-                        <input type="text" name="voter_id" id="voter_id" class="form-control border-start-0" placeholder="e.g. CS202601 or ADMIN001" required autofocus>
+                        <input type="text" name="voter_id" id="voter_id" class="form-control border-start-0 font-monospace" placeholder="e.g. CS202601 or ADMIN001" required autofocus>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label small fw-semibold text-dark">Password</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-semibold text-dark mb-0">Account Password</label>
+                        <span class="text-muted" style="font-size: 0.75rem;">Default: password123</span>
+                    </div>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted border-end-0">
                             <i class="bi bi-key"></i>
@@ -45,47 +56,63 @@
                 <button type="submit" class="btn btn-primary w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-sm">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Authenticate & Access Ballots</span>
+                    <i class="bi bi-arrow-right"></i>
                 </button>
             </form>
 
             <!-- Quick Demo Credentials Box -->
             <div class="mt-4 pt-3 border-top">
-                <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-2.5">
                     <span class="small text-secondary fw-semibold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.72rem;">
                         <i class="bi bi-lightning-charge-fill text-warning me-1"></i>One-Click Demo Credentials
                     </span>
-                    <span class="small text-muted" style="font-size: 0.72rem;">Password: password123</span>
+                    <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">Quick Fill</span>
                 </div>
-                <div class="d-flex flex-wrap gap-1.5">
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1" onclick="quickFill('CS202601', 'password123')">
-                        <i class="bi bi-person text-primary"></i>
-                        <span>Voter 1 (Rahul)</span>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1" onclick="quickFill('CS202602', 'password123')">
-                        <i class="bi bi-person text-success"></i>
-                        <span>Voter 2 (Sneha)</span>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1" onclick="quickFill('ADMIN001', 'password123')">
-                        <i class="bi bi-shield-shaded text-warning"></i>
-                        <span>Admin (ADMIN001)</span>
+                <div class="d-grid gap-2">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-start gap-2 py-1.5 px-2 text-start" onclick="quickFill('CS202601', 'password123')">
+                                <span class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 0.7rem;">R</span>
+                                <div class="lh-1 text-truncate">
+                                    <div class="fw-semibold text-dark small text-truncate">Rahul Sharma</div>
+                                    <span class="font-monospace text-muted" style="font-size: 0.68rem;">CS202601</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-start gap-2 py-1.5 px-2 text-start" onclick="quickFill('CS202602', 'password123')">
+                                <span class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 0.7rem;">S</span>
+                                <div class="lh-1 text-truncate">
+                                    <div class="fw-semibold text-dark small text-truncate">Sneha Patel</div>
+                                    <span class="font-monospace text-muted" style="font-size: 0.68rem;">CS202602</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-between py-1.5 px-2.5" onclick="quickFill('ADMIN001', 'password123')">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-shaded text-warning"></i>
+                            <span class="fw-semibold text-dark small">Electoral Administrator</span>
+                        </div>
+                        <span class="font-monospace text-muted small">ADMIN001</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Separate Public Section Shortcuts -->
-        <div class="d-flex justify-content-center gap-3 mt-3 small">
-            <a href="{{ url_for('voter.results_view') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1">
+        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4 small text-muted">
+            <a href="{{ url_for('voter.results_view') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1 hover-primary">
                 <i class="bi bi-bar-chart-line text-success"></i>
                 <span>Public Live Results</span>
             </a>
-            <span class="text-muted">•</span>
-            <a href="{{ url_for('admin.create_election_section') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1">
+            <span>•</span>
+            <a href="{{ url_for('admin.create_election_section') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1 hover-primary">
                 <i class="bi bi-shield-lock text-warning"></i>
-                <span>Protected Election Creator</span>
+                <span>Election Creator</span>
             </a>
-            <span class="text-muted">•</span>
-            <a href="{{ url_for('auth.verify_ballot') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1">
+            <span>•</span>
+            <a href="{{ url_for('auth.verify_ballot') }}" class="text-decoration-none text-muted d-flex align-items-center gap-1 hover-primary">
                 <i class="bi bi-search text-primary"></i>
                 <span>Verify Ballot</span>
             </a>

@@ -2,7 +2,7 @@
 {% block title %}Vote: Choose Election & Candidate • Votex.ai{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center py-2">
     <div class="col-lg-10 col-xl-9">
         
         <!-- Top Navigation / Breadcrumb -->
@@ -23,12 +23,13 @@
         </div>
 
         <!-- Master Hero Card: Vote by Choosing Election & Candidate -->
-        <div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-top: 4px solid #1d4ed8 !important;">
+        <div class="classic-card p-4 p-md-4 mb-4 bg-white border position-relative overflow-hidden" 
+             style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 60%, #eff6ff 100%); border-top: 4px solid #1e3a8a !important;">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                         <span class="badge badge-soft-blue py-1 px-2.5">
-                            <i class="bi bi-ui-checks-grid me-1"></i>Interactive Voting Portal
+                            <i class="bi bi-shield-check me-1"></i>Official Electoral Chamber
                         </span>
                         <span class="badge bg-light text-primary border py-1 px-2.5 small fw-semibold">
                             <i class="bi bi-collection-fill me-1"></i>{{ all_elections|length }} Elections Present
@@ -39,25 +40,25 @@
                             </span>
                         {% endif %}
                     </div>
-                    <h2 class="fw-bold text-dark mb-1">Vote: Choose Election & Candidate</h2>
-                    <p class="text-muted small mb-0" style="max-width: 620px; line-height: 1.55;">
-                        Select which election you want to participate in, choose your representative candidate, and cast your confidential cryptographic ballot.
+                    <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -0.03em;">Vote: Choose Election & Candidate</h2>
+                    <p class="text-muted small mb-0" style="max-width: 640px; line-height: 1.6;">
+                        Select which democratic contest you wish to participate in, evaluate representative nominees, and seal your confidential cryptographic ballot.
                     </p>
                 </div>
                 
                 <!-- Voter Ballot Quota Completion Meter -->
-                <div class="bg-white p-3 rounded-3 border shadow-sm flex-shrink-0" style="min-width: 250px;">
+                <div class="bg-white p-3 rounded-3 border shadow-sm flex-shrink-0" style="min-width: 250px; border-color: rgba(226, 232, 240, 0.9) !important;">
                     <div class="d-flex align-items-center justify-content-between mb-1.5">
-                        <span class="small fw-bold text-dark">Your Ballot Quota</span>
-                        <span class="badge {% if voted_elections_count == total_elections_count and total_elections_count > 0 %}bg-success{% else %}badge-soft-blue{% endif %} py-1 px-2">
+                        <span class="small fw-bold text-dark">Ballot Quota</span>
+                        <span class="badge {% if voted_elections_count == total_elections_count and total_elections_count > 0 %}bg-success text-white{% else %}badge-soft-blue{% endif %} py-1 px-2">
                             {{ voted_elections_count }} of {{ total_elections_count }} Cast
                         </span>
                     </div>
                     <div class="progress mb-1.5" style="height: 8px; background: #e2e8f0; border-radius: 6px;">
-                        <div class="progress-bar" style="width: {{ progress_pct }}%; background: linear-gradient(90deg, #2563eb, #059669);"></div>
+                        <div class="progress-bar" style="width: {{ progress_pct }}%; background: linear-gradient(90deg, #1d4ed8, #059669);"></div>
                     </div>
                     <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
-                        <span>{{ active_elections_count }} Active Elections</span>
+                        <span>{{ active_elections_count }} Active</span>
                         <span class="fw-semibold text-dark">{{ progress_pct }}% Complete</span>
                     </div>
                 </div>
@@ -69,20 +70,20 @@
             <input type="hidden" name="election_id" id="hiddenElectionId" value="{{ election.id }}">
 
             <!-- STEP 1: CHOOSE ELECTION PRESENT -->
-            <div class="classic-card p-4 mb-4 bg-white border">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">1</span>
-                            <h5 class="fw-bold text-dark mb-0">Step 1: Choose Election</h5>
+            <div class="classic-card p-4 p-md-4 mb-4 bg-white border">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2.5 border-bottom">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 26px; height: 26px; font-size: 0.82rem; background: #0f172a !important; border: 1px solid rgba(217, 119, 6, 0.4);">1</span>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Step 1: Choose Election Present</h5>
+                            <span class="text-muted small">Select an election chamber below or use the fast selector dropdown</span>
                         </div>
-                        <span class="text-muted small ms-4">Click any election below or use the selector dropdown to switch contest</span>
                     </div>
                     
                     <!-- Fast Dropdown Selector -->
-                    <div class="d-flex align-items-center gap-2" style="min-width: 260px;">
+                    <div class="d-flex align-items-center gap-2" style="min-width: 270px;">
                         <label for="electionSelectDropdown" class="small fw-semibold text-muted text-nowrap d-none d-sm-inline">Quick Pick:</label>
-                        <select id="electionSelectDropdown" class="form-select form-select-sm border-primary-subtle shadow-sm">
+                        <select id="electionSelectDropdown" class="form-select form-select-sm border-primary-subtle shadow-sm" style="border-radius: 8px;">
                             {% for el in all_elections %}
                                 <option value="{{ el.id }}" {% if el.id == election.id %}selected{% endif %}>
                                     {{ el.title }} {% if status_map.get(el.id) %}(Ballot Sealed){% elif el.status == 'active' %}(Ready to Vote){% else %}(Closed){% endif %}
@@ -99,13 +100,13 @@
                         {% set has_voted = status_map.get(el.id) %}
                         <div class="col-md-{{ (12 / all_elections|length)|round|int if all_elections|length in [2, 3] else 4 }}">
                             <div class="election-choice-card p-3 rounded-3 border h-100 transition-all cursor-pointer position-relative
-                                        {% if is_current %}active-election-card{% else %}bg-white border-slate-200{% endif %}"
+                                        {% if is_current %}active-election-card shadow-sm{% else %}bg-white border-slate-200{% endif %}"
                                  data-election-id="{{ el.id }}"
                                  data-title="{{ el.title }}"
                                  onclick="selectElection('{{ el.id }}')">
                                 
                                 <div class="position-absolute top-0 end-0 translate-middle-y me-3 active-indicator-badge {% if not is_current %}d-none{% endif %}">
-                                    <span class="badge bg-primary text-white shadow-sm" style="font-size: 0.65rem;">
+                                    <span class="badge bg-primary text-white shadow-sm" style="font-size: 0.68rem; padding: 0.25rem 0.55rem;">
                                         <i class="bi bi-check-circle-fill me-1"></i>Chosen Election
                                     </span>
                                 </div>
@@ -142,16 +143,16 @@
             </div>
 
             <!-- STEP 2: CHOOSE CANDIDATE REPRESENTATIVE -->
-            <div class="classic-card p-4 mb-4 bg-white border">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">2</span>
+            <div class="classic-card p-4 p-md-4 mb-4 bg-white border">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2.5 border-bottom">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 26px; height: 26px; font-size: 0.82rem; background: #0f172a !important; border: 1px solid rgba(217, 119, 6, 0.4);">2</span>
+                        <div>
                             <h5 class="fw-bold text-dark mb-0">
                                 Step 2: Choose Candidate in <span class="text-primary active-election-title-display">{{ election.title }}</span>
                             </h5>
+                            <span class="text-muted small">Select one nominee representative to cast your confidential ballot</span>
                         </div>
-                        <span class="text-muted small ms-4">Select one representative candidate to cast your ballot</span>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
@@ -179,23 +180,24 @@
                             <div class="p-4 rounded-3 bg-light border mb-2 text-center" style="border-left: 5px solid #059669 !important;">
                                 <i class="bi bi-patch-check-fill fs-2 text-success d-block mb-2"></i>
                                 <h5 class="fw-bold text-dark mb-1">Your Ballot Has Been Sealed for {{ el.title }}</h5>
-                                <p class="text-muted small mb-3">
-                                    You have exercised your single-vote quota for this election. 
-                                    Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_map.get(el.id, '')[:20] }}...</code>
+                                <p class="text-muted small mb-3" style="line-height: 1.55;">
+                                    You have exercised your single-vote quota for this contest. To maintain democratic integrity, sealed ballots cannot be modified.
+                                    <br/>
+                                    Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_map.get(el.id, '')[:24] }}...</code>
                                 </p>
                                 <div class="d-flex flex-wrap justify-content-center gap-2">
-                                    <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 shadow-sm">
+                                    <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
                                         <i class="bi bi-bar-chart-line-fill"></i>
-                                        <span>View Standings</span>
+                                        <span>View Live Standings</span>
                                     </a>
-                                    <a href="{{ url_for('voter.certificate', election_id=el.id) }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                                    <a href="{{ url_for('voter.certificate', election_id=el.id) }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5">
                                         <i class="bi bi-award-fill text-warning"></i>
-                                        <span>Download Certificate</span>
+                                        <span>Official Certificate</span>
                                     </a>
                                     <!-- Prompt to switch to next unvoted election -->
                                     {% for other_el in all_elections %}
                                         {% if other_el.status == 'active' and not status_map.get(other_el.id) and other_el.id != el.id %}
-                                            <button type="button" class="btn btn-sm btn-success text-white shadow-sm d-inline-flex align-items-center gap-1" onclick="selectElection('{{ other_el.id }}')">
+                                            <button type="button" class="btn btn-sm btn-success text-white shadow-sm d-inline-flex align-items-center gap-1.5" onclick="selectElection('{{ other_el.id }}')">
                                                 <span>Vote in {{ other_el.title }}</span>
                                                 <i class="bi bi-arrow-right"></i>
                                             </button>
@@ -209,7 +211,7 @@
                             <div class="p-4 rounded-3 bg-light border mb-2 text-center">
                                 <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
                                 <h5 class="fw-bold text-dark mb-1">Voting Concluded for {{ el.title }}</h5>
-                                <p class="text-muted small mb-3">This election has ended. You can view certified results in the Results section.</p>
+                                <p class="text-muted small mb-3">This election has officially ended. You can review the certified outcome in the Results section.</p>
                                 <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-bar-chart-line-fill me-1"></i> View Certified Standings
                                 </a>
@@ -220,7 +222,7 @@
                             <div class="row g-3 candidates-list-grid">
                                 {% for candidate in cands %}
                                     <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
-                                        <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_input_{{ el.id }}_{{ candidate.id }}">
+                                        <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3.5 position-relative cursor-pointer" for="cand_input_{{ el.id }}_{{ candidate.id }}">
                                             <input class="form-check-input candidate-radio visually-hidden" 
                                                    type="radio" 
                                                    name="candidate_id" 
@@ -230,9 +232,9 @@
                                                    data-election-id="{{ el.id }}"
                                                    data-election-title="{{ el.title }}">
                                             
-                                            <!-- Candidate Avatar with Vibrant High-Craft Gradient -->
+                                            <!-- Dignified Avatar with Dual-Tone Gradient & Border Ring -->
                                             <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
-                                                 style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
+                                                 style="width: 52px; height: 52px; font-size: 1.15rem; border: 2px solid rgba(255, 255, 255, 0.85); box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12) !important; background: {% if loop.index == 1 %}linear-gradient(135deg, #1e3a8a, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #065f46, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #581c87, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #92400e, #f59e0b){% else %}linear-gradient(135deg, #075985, #38bdf8){% endif %};">
                                                 {{ candidate.name[:2]|upper }}
                                             </div>
 
@@ -240,9 +242,9 @@
                                             <div class="flex-grow-1">
                                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
                                                     <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
-                                                    <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
+                                                    <span class="badge badge-soft-blue small py-1 px-2.5">{{ candidate.position }}</span>
                                                 </div>
-                                                <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
+                                                <div class="p-2.5 rounded-3 mb-2 text-dark small" style="line-height: 1.55; background: #f8fafc; border-left: 3px solid #3b82f6; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
                                                     <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
                                                 </div>
                                                 <div class="d-flex flex-wrap gap-1.5">
@@ -277,17 +279,20 @@
             </div>
 
             <!-- STEP 3: CONFIRM & CAST BALLOT -->
-            <div class="classic-card p-4 bg-white border" id="step3CastSection">
-                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                    <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">3</span>
-                    <h5 class="fw-bold text-dark mb-0">Step 3: Confirm & Cast Ballot</h5>
+            <div class="classic-card p-4 p-md-4 bg-white border" id="step3CastSection">
+                <div class="d-flex align-items-center gap-2.5 mb-3 pb-2.5 border-bottom">
+                    <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 26px; height: 26px; font-size: 0.82rem; background: #0f172a !important; border: 1px solid rgba(217, 119, 6, 0.4);">3</span>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Step 3: Confirm & Cast Ballot</h5>
+                        <span class="text-muted small">Cryptographically sign and record your secret ballot in the public ledger</span>
+                    </div>
                 </div>
 
                 <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1px solid #bfdbfe;">
                     <i class="bi bi-shield-check fs-2 text-primary flex-shrink-0"></i>
                     <div class="small">
                         <div class="text-dark fw-bold mb-0.5">Tamper-Proof Ledger Seal</div>
-                        <div class="text-muted">Once submitted, your choice is cryptographically signed with SHA-256 and sealed in the immutable ledger. It cannot be altered or cast again.</div>
+                        <div class="text-muted" style="line-height: 1.5;">Once submitted, your choice is cryptographically signed with SHA-256 and sealed in the immutable ledger. It cannot be altered or cast again.</div>
                     </div>
                 </div>
 
@@ -315,7 +320,8 @@
 
     .election-choice-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        border-radius: 12px;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -327,15 +333,15 @@
     }
 
     .active-election-card {
-        background: #f0f7ff !important;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%) !important;
         border: 2px solid #1d4ed8 !important;
-        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15), 0 4px 14px rgba(29, 78, 216, 0.08) !important;
+        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12), 0 6px 18px rgba(29, 78, 216, 0.08) !important;
     }
 
     .candidate-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 14px;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -343,7 +349,7 @@
     .candidate-card:hover {
         border-color: #94a3b8;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     }
 
     .candidate-check-circle {
@@ -362,9 +368,9 @@
 
     /* Active Selected Candidate State */
     .candidate-card.active-selected {
-        background: #f0f7ff !important;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%) !important;
         border: 2px solid #1d4ed8 !important;
-        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15), 0 4px 14px rgba(29, 78, 216, 0.08) !important;
+        box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.14), 0 8px 24px rgba(29, 78, 216, 0.08) !important;
     }
 
     .candidate-card.active-selected .candidate-check-circle {
@@ -559,11 +565,11 @@
 
         const colWidth = (data.candidates.length <= 4) ? Math.round(12 / data.candidates.length) : 4;
         const gradients = [
-            'linear-gradient(135deg, #1d4ed8, #3b82f6)',
-            'linear-gradient(135deg, #059669, #10b981)',
-            'linear-gradient(135deg, #7c3aed, #a855f7)',
-            'linear-gradient(135deg, #d97706, #f59e0b)',
-            'linear-gradient(135deg, #0284c7, #38bdf8)'
+            'linear-gradient(135deg, #1e3a8a, #3b82f6)',
+            'linear-gradient(135deg, #065f46, #10b981)',
+            'linear-gradient(135deg, #581c87, #a855f7)',
+            'linear-gradient(135deg, #92400e, #f59e0b)',
+            'linear-gradient(135deg, #075985, #38bdf8)'
         ];
 
         data.candidates.forEach((cand, idx) => {
