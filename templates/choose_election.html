@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% block title %}Choose Election to Vote • Votex.ai{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+        
+        <!-- Breadcrumb & Fast Navigation -->
+        <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Return to Hub</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('voter.results_view') }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <i class="bi bi-bar-chart-line text-success"></i>
+                    <span>Live Results Portal</span>
+                </a>
+                <span class="badge badge-soft-blue py-1.5 px-3">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Single-Vote Guard Active
+                </span>
+            </div>
+        </div>
+
+        <!-- Master Hero: Step 1 Election Chooser -->
+        <div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-top: 4px solid #1d4ed8 !important;">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <span class="badge badge-soft-blue py-1 px-2.5">
+                            <i class="bi bi-ui-checks-grid me-1"></i>Step 1 of 2 • Election Selection
+                        </span>
+                        <span class="badge bg-light text-primary border py-1 px-2.5 small fw-semibold">
+                            <i class="bi bi-collection-fill me-1"></i>{{ total_elections_count }} Elections Present
+                        </span>
+                        {% if unvoted_active_count > 0 %}
+                            <span class="badge badge-soft-green py-1 px-2.5 small fw-semibold">
+                                <span class="live-dot me-1"></span>{{ unvoted_active_count }} Awaiting Your Vote
+                            </span>
+                        {% endif %}
+                    </div>
+                    <h2 class="fw-bold text-dark mb-1">Choose an Election to Vote</h2>
+                    <p class="text-muted small mb-0" style="max-width: 620px; line-height: 1.55;">
+                        Select which election you want to participate in from the current elections present below. 
+                        Once chosen, you will enter its secure voting booth to evaluate candidate nominees and cast your confidential ballot.
+                    </p>
+                </div>
+                
+                <!-- Voter Ballot Quota Completion Meter -->
+                <div class="bg-white p-3 rounded-3 border shadow-sm flex-shrink-0" style="min-width: 250px;">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="small fw-bold text-dark">Your Ballot Quota</span>
+                        <span class="badge {% if voted_elections_count == total_elections_count and total_elections_count > 0 %}bg-success{% else %}badge-soft-blue{% endif %} py-1 px-2">
+                            {{ voted_elections_count }} of {{ total_elections_count }} Cast
+                        </span>
+                    </div>
+                    <div class="progress mb-1.5" style="height: 8px; background: #e2e8f0; border-radius: 6px;">
+                        <div class="progress-bar" style="width: {{ progress_pct }}%; background: linear-gradient(90deg, #2563eb, #059669);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
+                        <span>{{ active_elections_count }} Active</span>
+                        <span class="fw-semibold text-dark">{{ progress_pct }}% Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-3 bg-white rounded-3 border shadow-sm">
+            <!-- Filter Pills -->
+            <div class="d-flex flex-wrap align-items-center gap-1.5" id="filterPills">
+                <button type="button" class="btn btn-sm btn-primary py-1 px-3 rounded-pill filter-btn active" data-filter="all">
+                    All Present ({{ total_elections_count }})
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 rounded-pill filter-btn" data-filter="ready">
+                    <span class="live-dot me-1"></span>Ready to Vote ({{ unvoted_active_count }})
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 rounded-pill filter-btn" data-filter="sealed">
+                    <i class="bi bi-check2-circle text-success me-1"></i>Ballot Sealed ({{ voted_elections_count }})
+                </button>
+                {% if closed_count > 0 %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 rounded-pill filter-btn" data-filter="closed">
+                        <i class="bi bi-lock me-1"></i>Closed ({{ closed_count }})
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- Search Filter -->
+            <div class="input-group input-group-sm" style="max-width: 260px;">
+                <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="electionSearchInput" class="form-control border-start-0" placeholder="Filter by election name...">
+            </div>
+        </div>
+
+        <!-- Election Choice Cards Gallery -->
+        <div class="row g-3" id="electionsGallery">
+            {% for el in all_elections %}
+                {% set has_voted = status_map.get(el.id) %}
+                {% set cands = candidates_by_election.get(el.id, []) %}
+                {% set status_type = 'sealed' if has_voted else ('ready' if el.status == 'active' else 'closed') %}
+
+                <div class="col-12 election-item-card" data-status="{{ status_type }}" data-title="{{ el.title|lower }}" data-desc="{{ el.description|lower }}">
+                    <div class="classic-card p-4 bg-white border h-100 position-relative transition-all {% if el.status == 'active' and not has_voted %}election-ready-glow{% endif %}">
+                        
+                        <!-- Top Meta Strip -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                {% if has_voted %}
+                                    <span class="badge bg-success text-white py-1.5 px-3 d-inline-flex align-items-center gap-1.5 shadow-sm">
+                                        <i class="bi bi-patch-check-fill fs-6"></i>
+                                        <span>Ballot Sealed & Recorded</span>
+                                    </span>
+                                {% elif el.status == 'active' %}
+                                    <span class="badge badge-soft-green py-1.5 px-3 d-inline-flex align-items-center gap-1.5">
+                                        <span class="live-dot"></span>
+                                        <span>Ready to Vote</span>
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border py-1.5 px-3 d-inline-flex align-items-center gap-1.5">
+                                        <i class="bi bi-lock-fill"></i>
+                                        <span>Election Concluded</span>
+                                    </span>
+                                {% endif %}
+                                <span class="badge bg-light text-muted border">
+                                    <i class="bi bi-people me-1"></i>{{ cands|length }} Nominees
+                                </span>
+                                <span class="badge bg-light text-muted border">
+                                    <i class="bi bi-shield-check me-1"></i>Single-Vote Quota
+                                </span>
+                            </div>
+                            <span class="text-muted small font-monospace">Election ID #{{ el.id }}</span>
+                        </div>
+
+                        <!-- Title & Description -->
+                        <div class="mb-3">
+                            <h4 class="fw-bold text-dark mb-1.5">{{ el.title }}</h4>
+                            <p class="text-muted small mb-0" style="line-height: 1.55; max-width: 780px;">
+                                {{ el.description }}
+                            </p>
+                        </div>
+
+                        <!-- Candidates Roster Preview -->
+                        <div class="p-3 rounded-3 bg-light border mb-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-person-lines-fill text-primary me-1"></i>Candidate Representatives on Ballot:
+                                </span>
+                                <span class="text-muted small" style="font-size: 0.72rem;">{{ cands|length }} Nominee{{ 's' if cands|length != 1 else '' }}</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for cand in cands %}
+                                    <div class="badge bg-white text-dark border p-1.5 pe-2.5 rounded-3 shadow-sm d-inline-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold" 
+                                             style="width: 26px; height: 26px; font-size: 0.7rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
+                                            {{ cand.name[:2]|upper }}
+                                        </div>
+                                        <div class="text-start">
+                                            <div class="fw-bold text-dark" style="font-size: 0.8rem; line-height: 1.1;">{{ cand.name }}</div>
+                                            <div class="text-muted" style="font-size: 0.68rem;">{{ cand.position }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Action Zone: Choose and Enter -->
+                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pt-3 border-top">
+                            <div>
+                                {% if has_voted %}
+                                    <div class="small text-muted">
+                                        <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i>Ballot cast</span> • 
+                                        Receipt: <code class="text-primary font-monospace">{{ receipt_map.get(el.id)[:16] }}...</code>
+                                    </div>
+                                {% elif el.status == 'active' %}
+                                    <div class="small text-muted">
+                                        <i class="bi bi-shield-lock-fill text-primary me-1"></i>Your confidential single ballot is ready to be cast.
+                                    </div>
+                                {% else %}
+                                    <div class="small text-muted">
+                                        <i class="bi bi-lock text-secondary me-1"></i>Voting has closed. Final certified tally is available.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                {% if el.status == 'active' and not has_voted %}
+                                    <a href="{{ url_for('voter.cast_vote', election_id=el.id) }}" class="btn btn-primary py-2.5 px-4 d-inline-flex align-items-center gap-2 shadow-sm fw-semibold">
+                                        <i class="bi bi-box2-heart-fill"></i>
+                                        <span>Select & Enter Voting Booth</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                {% elif has_voted %}
+                                    <a href="{{ url_for('voter.cast_vote', election_id=el.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5">
+                                        <i class="bi bi-eye"></i>
+                                        <span>Review Ballot Booth</span>
+                                    </a>
+                                    <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5">
+                                        <i class="bi bi-bar-chart-line"></i>
+                                        <span>View Standings</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5">
+                                        <i class="bi bi-bar-chart-line-fill"></i>
+                                        <span>View Certified Results &rarr;</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty Filter State -->
+        <div id="emptyFilterState" class="classic-card p-5 bg-white border text-center my-4 d-none">
+            <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
+            <h5 class="fw-bold text-dark mb-1">No Matching Elections Found</h5>
+            <p class="text-muted small mb-3">Try adjusting your search keyword or switching your filter pill.</p>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">Reset Filters</button>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .election-ready-glow {
+        border-color: #bfdbfe !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+    }
+    
+    .election-ready-glow:hover {
+        border-color: #3b82f6 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    .filter-btn {
+        font-weight: 500;
+        transition: all 0.15s ease;
+    }
+</style>
+
+<script>
+    let currentFilter = 'all';
+    const searchInput = document.getElementById('electionSearchInput');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.election-item-card');
+    const emptyState = document.getElementById('emptyFilterState');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterButtons.forEach(b => {
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-outline-secondary');
+            });
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-primary', 'active');
+            currentFilter = this.dataset.filter;
+            applyFilter();
+        });
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilter);
+    }
+
+    function applyFilter() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const status = card.dataset.status;
+            const title = card.dataset.title || '';
+            const desc = card.dataset.desc || '';
+
+            const matchesFilter = (currentFilter === 'all') || (status === currentFilter);
+            const matchesSearch = !query || title.includes(query) || desc.includes(query);
+
+            if (matchesFilter && matchesSearch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0) {
+            emptyState.classList.remove('d-none');
+        } else {
+            emptyState.classList.add('d-none');
+        }
+    }
+
+    function resetFilters() {
+        if (searchInput) searchInput.value = '';
+        const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+        if (allBtn) allBtn.click();
+    }
+</script>
+{% endblock %}

@@ -39,9 +39,65 @@ def dashboard():
                            voted_at_map=voted_at_map)
 
 @voter_bp.route('/vote')
+@voter_required
+def choose_election():
+    user_id = session['user_id']
+    
+    # Query all elections present in the system
+    all_elections = Election.query.order_by(Election.created_at.desc()).all()
+    if not all_elections:
+        flash("No elections are currently present in the system.", "info")
+        return redirect(url_for('voter.dashboard'))
+
+    # Auto-enroll / ensure eligibility for this voter across all present elections
+    user = User.query.get(user_id)
+    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
+    existing_ids = {el.election_id for el in eligibilities}
+    new_eligibilities = False
+    for el_obj in all_elections:
+        if el_obj.id not in existing_ids:
+            db.session.add(VoterEligibility(election_id=el_obj.id, voter_id=user_id, has_voted=False))
+            new_eligibilities = True
+    if new_eligibilities:
+        db.session.commit()
+        eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
+
+    status_map = {el.election_id: el.has_voted for el in eligibilities}
+    receipt_map = {el.election_id: el.receipt_hash for el in eligibilities if el.has_voted and el.receipt_hash}
+    voted_at_map = {el.election_id: el.voted_at for el in eligibilities if el.has_voted and el.voted_at}
+
+    # Fetch candidates and counts for each election
+    candidates_by_election = {}
+    candidate_counts = {}
+    for e in all_elections:
+        cands = Candidate.query.filter_by(election_id=e.id).all()
+        candidates_by_election[e.id] = cands
+        candidate_counts[e.id] = len(cands)
+
+    active_elections_count = sum(1 for e in all_elections if e.status == 'active')
+    voted_elections_count = sum(1 for e in all_elections if status_map.get(e.id))
+    unvoted_active_count = sum(1 for e in all_elections if e.status == 'active' and not status_map.get(e.id))
+    closed_count = sum(1 for e in all_elections if e.status != 'active')
+    total_elections_count = len(all_elections)
+    progress_pct = round((voted_elections_count / total_elections_count * 100), 1) if total_elections_count > 0 else 0
+
+    return render_template('choose_election.html',
+                           all_elections=all_elections,
+                           candidates_by_election=candidates_by_election,
+                           candidate_counts=candidate_counts,
+                           status_map=status_map,
+                           receipt_map=receipt_map,
+                           voted_at_map=voted_at_map,
+                           active_elections_count=active_elections_count,
+                           voted_elections_count=voted_elections_count,
+                           unvoted_active_count=unvoted_active_count,
+                           closed_count=closed_count,
+                           total_elections_count=total_elections_count,
+                           progress_pct=progress_pct)
+
 @voter_bp.route('/vote/<int:election_id>', methods=['GET', 'POST'])
 @voter_required
-def cast_vote(election_id=None):
+def cast_vote(election_id):
     user_id = session['user_id']
     
     # Query all elections present in the system
@@ -66,21 +122,7 @@ def cast_vote(election_id=None):
     status_map = {el.election_id: el.has_voted for el in eligibilities}
     receipt_map = {el.election_id: el.receipt_hash for el in eligibilities if el.has_voted and el.receipt_hash}
 
-    # If election_id is not specified in the URL:
-    if not election_id:
-        # 1. Prefer first active election where voter hasn't voted yet
-        selected = next((e for e in all_elections if e.status == 'active' and not status_map.get(e.id)), None)
-        if not selected:
-            # 2. Next prefer any active election
-            selected = next((e for e in all_elections if e.status == 'active'), None)
-        if not selected:
-            # 3. Fallback to latest election present
-            selected = all_elections[0]
-        election_id = selected.id
-        election = selected
-    else:
-        election = Election.query.get_or_404(election_id)
-
+    election = Election.query.get_or_404(election_id)
     eligibility = VoterEligibility.query.filter_by(election_id=election.id, voter_id=user_id).first()
     candidates = Candidate.query.filter_by(election_id=election.id).all()
 
@@ -147,7 +189,7 @@ def cast_vote(election_id=None):
         except Exception:
             db.session.rollback()
             flash("Error processing vote.", "danger")
-            return redirect(url_for('voter.dashboard'))
+            return redirect(url_for('voter.choose_election'))
 
     return render_template('vote.html', 
                            election=election, 
@@ -166,7 +208,7 @@ def cast_vote(election_id=None):
 @voter_bp.route('/voting-room')
 @voter_required
 def vote_index():
-    return redirect(url_for('voter.cast_vote'))
+    return redirect(url_for('voter.choose_election'))
 
 @voter_bp.route('/confirmation')
 @voter_required

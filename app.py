@@ -41,7 +41,7 @@ def public_create_election():
 def public_vote(election_id=None):
     if election_id:
         return redirect(url_for('voter.cast_vote', election_id=election_id))
-    return redirect(url_for('voter.cast_vote'))
+    return redirect(url_for('voter.choose_election'))
 
 def init_app_state():
     with app.app_context():

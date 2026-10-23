@@ -7,10 +7,16 @@
         
         <!-- Ballot Navigation / Breadcrumb -->
         <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 shadow-sm">
-                <i class="bi bi-arrow-left"></i>
-                <span>Return to Hub</span>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('voter.choose_election') }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Choose Different Election</span>
+                </a>
+                <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5">
+                    <i class="bi bi-house"></i>
+                    <span>Hub</span>
+                </a>
+            </div>
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
                     <i class="bi bi-bar-chart-line text-success"></i>
@@ -22,27 +28,26 @@
             </div>
         </div>
 
-        <!-- Dedicated Section Banner: Elections Present Master Header -->
+        <!-- Dedicated Section Banner: Step 2 Voting Booth for Chosen Election -->
         <div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-top: 4px solid #1d4ed8 !important;">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                         <span class="badge badge-soft-blue py-1 px-2.5">
-                            <i class="bi bi-box2-heart-fill me-1"></i>Dedicated Voting Section
+                            <i class="bi bi-box2-heart-fill me-1"></i>Step 2 of 2 • Voting Booth
                         </span>
-                        <span class="badge bg-light text-primary border py-1 px-2.5 small fw-semibold">
-                            <i class="bi bi-collection-fill me-1"></i>{{ all_elections|length }} Elections Present
-                        </span>
-                        {% if active_elections_count > 0 %}
+                        <a href="{{ url_for('voter.choose_election') }}" class="badge bg-white text-primary border text-decoration-none py-1 px-2.5 small fw-semibold shadow-sm">
+                            <i class="bi bi-arrow-left me-1"></i>Change Election Choice
+                        </a>
+                        {% if election.status == 'active' and not already_voted %}
                             <span class="badge badge-soft-green py-1 px-2.5 small fw-semibold">
-                                <span class="live-dot me-1"></span>{{ active_elections_count }} Open for Voting
+                                <span class="live-dot me-1"></span>Ready to Cast Ballot
                             </span>
                         {% endif %}
                     </div>
-                    <h3 class="fw-bold text-dark mb-1">Voting in Elections Present</h3>
+                    <h3 class="fw-bold text-dark mb-1">Voting in: {{ election.title }}</h3>
                     <p class="text-muted small mb-0" style="max-width: 620px; line-height: 1.55;">
-                        Cast your confidential ballot across all democratic elections present in the portal. 
-                        Select any election booth below to review nominees and exercise your democratic right.
+                        You have chosen to vote in <strong>{{ election.title }}</strong>. Select your representative candidate nominee below and seal your confidential ballot.
                     </p>
                 </div>
                 
@@ -159,6 +164,10 @@
                     Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_hash[:22] }}...</code>
                 </p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
+                    <a href="{{ url_for('voter.choose_election') }}" class="btn btn-outline-primary d-flex align-items-center gap-1.5 shadow-sm">
+                        <i class="bi bi-ui-checks-grid"></i>
+                        <span>Choose Another Election</span>
+                    </a>
                     <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm">
                         <i class="bi bi-bar-chart-line-fill"></i>
                         <span>View Live Results Section</span>
