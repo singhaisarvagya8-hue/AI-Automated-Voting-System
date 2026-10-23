@@ -278,7 +278,7 @@
             <div class="collapse navbar-collapse" id="navbarMain">
                 <div class="navbar-nav mx-auto gap-1 my-2 my-lg-0">
                     {% if session.get('role') == 'voter' %}
-                        <a class="nav-link-custom" href="{{ url_for('voter.choose_election') }}">
+                        <a class="nav-link-custom" href="{{ url_for('voter.cast_vote') }}">
                             <i class="bi bi-box2-heart text-primary"></i>
                             <span>Voting Section</span>
                         </a>

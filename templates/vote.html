@@ -1,22 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Voting Section • Elections Present • Votex.ai{% endblock %}
+{% block title %}Vote: Choose Election & Candidate • Votex.ai{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-9">
         
-        <!-- Ballot Navigation / Breadcrumb -->
+        <!-- Top Navigation / Breadcrumb -->
         <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <div class="d-flex align-items-center gap-2">
-                <a href="{{ url_for('voter.choose_election') }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Choose Different Election</span>
-                </a>
-                <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5">
-                    <i class="bi bi-house"></i>
-                    <span>Hub</span>
-                </a>
-            </div>
+            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Return to Hub</span>
+            </a>
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
                     <i class="bi bi-bar-chart-line text-success"></i>
@@ -28,26 +22,26 @@
             </div>
         </div>
 
-        <!-- Dedicated Section Banner: Step 2 Voting Booth for Chosen Election -->
+        <!-- Master Hero Card: Vote by Choosing Election & Candidate -->
         <div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-top: 4px solid #1d4ed8 !important;">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                         <span class="badge badge-soft-blue py-1 px-2.5">
-                            <i class="bi bi-box2-heart-fill me-1"></i>Step 2 of 2 • Voting Booth
+                            <i class="bi bi-ui-checks-grid me-1"></i>Interactive Voting Portal
                         </span>
-                        <a href="{{ url_for('voter.choose_election') }}" class="badge bg-white text-primary border text-decoration-none py-1 px-2.5 small fw-semibold shadow-sm">
-                            <i class="bi bi-arrow-left me-1"></i>Change Election Choice
-                        </a>
-                        {% if election.status == 'active' and not already_voted %}
+                        <span class="badge bg-light text-primary border py-1 px-2.5 small fw-semibold">
+                            <i class="bi bi-collection-fill me-1"></i>{{ all_elections|length }} Elections Present
+                        </span>
+                        {% if unvoted_active_count > 0 %}
                             <span class="badge badge-soft-green py-1 px-2.5 small fw-semibold">
-                                <span class="live-dot me-1"></span>Ready to Cast Ballot
+                                <span class="live-dot me-1"></span>{{ unvoted_active_count }} Awaiting Your Vote
                             </span>
                         {% endif %}
                     </div>
-                    <h3 class="fw-bold text-dark mb-1">Voting in: {{ election.title }}</h3>
+                    <h2 class="fw-bold text-dark mb-1">Vote: Choose Election & Candidate</h2>
                     <p class="text-muted small mb-0" style="max-width: 620px; line-height: 1.55;">
-                        You have chosen to vote in <strong>{{ election.title }}</strong>. Select your representative candidate nominee below and seal your confidential ballot.
+                        Select which election you want to participate in, choose your representative candidate, and cast your confidential cryptographic ballot.
                     </p>
                 </div>
                 
@@ -63,267 +57,254 @@
                         <div class="progress-bar" style="width: {{ progress_pct }}%; background: linear-gradient(90deg, #2563eb, #059669);"></div>
                     </div>
                     <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
-                        <span>{{ active_elections_count }} Active</span>
+                        <span>{{ active_elections_count }} Active Elections</span>
                         <span class="fw-semibold text-dark">{{ progress_pct }}% Complete</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Elections Present Switcher / Booth Selector Tabs -->
-        <div class="mb-4">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.75rem;">
-                    <i class="bi bi-grid-3x3-gap-fill text-primary me-1"></i>Select an Election Present to Vote:
-                </span>
-                <span class="text-muted small">Click any card to switch voting booth</span>
-            </div>
+        <!-- Master Voting Form -->
+        <form method="POST" action="{{ url_for('voter.cast_vote') }}" id="masterVotingForm">
+            <input type="hidden" name="election_id" id="hiddenElectionId" value="{{ election.id }}">
 
-            <div class="row g-2.5">
-                {% for el in all_elections %}
-                    {% set is_current = (el.id == election.id) %}
-                    {% set has_voted = status_map.get(el.id) %}
-                    <div class="col-md-{{ (12 / all_elections|length)|round|int if all_elections|length in [2, 3] else 4 }}">
-                        <a href="{{ url_for('voter.cast_vote', election_id=el.id) }}" 
-                           class="text-decoration-none d-block p-3 rounded-3 border h-100 transition-all position-relative
-                                  {% if is_current %}bg-white border-primary active-election-card shadow-sm{% else %}bg-white border-slate-200 election-switcher-card{% endif %}"
-                           style="border-width: {% if is_current %}2px{% else %}1px{% endif %} !important;">
-                            
-                            {% if is_current %}
-                                <div class="position-absolute top-0 end-0 translate-middle-y me-3">
+            <!-- STEP 1: CHOOSE ELECTION PRESENT -->
+            <div class="classic-card p-4 mb-4 bg-white border">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">1</span>
+                            <h5 class="fw-bold text-dark mb-0">Step 1: Choose Election</h5>
+                        </div>
+                        <span class="text-muted small ms-4">Click any election below or use the selector dropdown to switch contest</span>
+                    </div>
+                    
+                    <!-- Fast Dropdown Selector -->
+                    <div class="d-flex align-items-center gap-2" style="min-width: 260px;">
+                        <label for="electionSelectDropdown" class="small fw-semibold text-muted text-nowrap d-none d-sm-inline">Quick Pick:</label>
+                        <select id="electionSelectDropdown" class="form-select form-select-sm border-primary-subtle shadow-sm">
+                            {% for el in all_elections %}
+                                <option value="{{ el.id }}" {% if el.id == election.id %}selected{% endif %}>
+                                    {{ el.title }} {% if status_map.get(el.id) %}(Ballot Sealed){% elif el.status == 'active' %}(Ready to Vote){% else %}(Closed){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Visual Election Choice Cards -->
+                <div class="row g-2.5" id="electionCardsGrid">
+                    {% for el in all_elections %}
+                        {% set is_current = (el.id == election.id) %}
+                        {% set has_voted = status_map.get(el.id) %}
+                        <div class="col-md-{{ (12 / all_elections|length)|round|int if all_elections|length in [2, 3] else 4 }}">
+                            <div class="election-choice-card p-3 rounded-3 border h-100 transition-all cursor-pointer position-relative
+                                        {% if is_current %}active-election-card{% else %}bg-white border-slate-200{% endif %}"
+                                 data-election-id="{{ el.id }}"
+                                 data-title="{{ el.title }}"
+                                 onclick="selectElection('{{ el.id }}')">
+                                
+                                <div class="position-absolute top-0 end-0 translate-middle-y me-3 active-indicator-badge {% if not is_current %}d-none{% endif %}">
                                     <span class="badge bg-primary text-white shadow-sm" style="font-size: 0.65rem;">
-                                        <i class="bi bi-box2-heart-fill me-1"></i>Active Booth
+                                        <i class="bi bi-check-circle-fill me-1"></i>Chosen Election
                                     </span>
                                 </div>
-                            {% endif %}
 
-                            <div class="d-flex align-items-center justify-content-between gap-1 mb-2">
-                                <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
-                                    <i class="bi bi-people me-1"></i>{{ candidate_counts.get(el.id, 0) }} Candidates
-                                </span>
-                                {% if has_voted %}
-                                    <span class="badge bg-success text-white py-1 px-2" style="font-size: 0.7rem;">
-                                        <i class="bi bi-check2-circle me-1"></i>Ballot Sealed
+                                <div class="d-flex align-items-center justify-content-between gap-1 mb-2">
+                                    <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
+                                        <i class="bi bi-people me-1"></i>{{ candidate_counts.get(el.id, 0) }} Nominees
                                     </span>
-                                {% elif el.status == 'active' %}
-                                    <span class="badge badge-soft-green py-1 px-2" style="font-size: 0.7rem;">
-                                        <span class="live-dot me-1"></span>Ready to Vote
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 0.7rem;">
-                                        <i class="bi bi-lock me-1"></i>Closed
-                                    </span>
-                                {% endif %}
+                                    {% if has_voted %}
+                                        <span class="badge bg-success text-white py-1 px-2" style="font-size: 0.7rem;">
+                                            <i class="bi bi-patch-check-fill me-1"></i>Ballot Sealed
+                                        </span>
+                                    {% elif el.status == 'active' %}
+                                        <span class="badge badge-soft-green py-1 px-2" style="font-size: 0.7rem;">
+                                            <span class="live-dot me-1"></span>Ready to Vote
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 0.7rem;">
+                                            <i class="bi bi-lock me-1"></i>Closed
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="fw-bold text-dark mb-1 election-card-title" style="font-size: 0.95rem; line-height: 1.35;">
+                                    {{ el.title }}
+                                </div>
+                                <div class="text-muted small text-truncate" style="font-size: 0.78rem;">
+                                    {{ el.description }}
+                                </div>
                             </div>
-
-                            <div class="fw-bold text-dark mb-1" style="font-size: 0.95rem; line-height: 1.35;">
-                                {{ el.title }}
-                            </div>
-                            <div class="text-muted small text-truncate" style="font-size: 0.78rem;">
-                                {{ el.description }}
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Selected Ballot Room Card -->
-        <div class="classic-card p-4 p-md-4 mb-4 bg-white border">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge badge-soft-blue py-1 px-2.5">
-                        <i class="bi bi-box2-heart-fill me-1"></i>Current Voting Booth
-                    </span>
-                    {% if election.status == 'active' %}
-                        <span class="badge badge-soft-green py-1 px-2.5">
-                            <span class="live-dot me-1"></span>Single-Choice Secret Ballot
-                        </span>
-                    {% else %}
-                        <span class="badge bg-secondary-subtle text-secondary border py-1 px-2.5">
-                            <i class="bi bi-lock-fill me-1"></i>Election Closed
-                        </span>
-                    {% endif %}
-                </div>
-                <span class="text-muted small font-monospace">Election ID #{{ election.id }}</span>
-            </div>
-            <h3 class="fw-bold text-dark mb-1">{{ election.title }}</h3>
-            <p class="text-muted small mb-0" style="line-height: 1.6;">{{ election.description }}</p>
-        </div>
-
-        {% if already_voted %}
-            <!-- Already Voted Notice -->
-            <div class="classic-card p-4 mb-4 bg-white border" style="border-left: 5px solid #059669 !important;">
-                <div class="d-flex align-items-center gap-2 text-success fw-bold fs-5 mb-2">
-                    <i class="bi bi-patch-check-fill fs-4"></i>
-                    <span>Your Ballot Has Been Cryptographically Sealed</span>
-                </div>
-                <p class="text-muted small mb-3">
-                    You have successfully exercised your voting quota for <strong>{{ election.title }}</strong>. To preserve democratic integrity, 
-                    ballots cannot be modified once recorded in the ledger.
-                    Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_hash[:22] }}...</code>
-                </p>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    <a href="{{ url_for('voter.choose_election') }}" class="btn btn-outline-primary d-flex align-items-center gap-1.5 shadow-sm">
-                        <i class="bi bi-ui-checks-grid"></i>
-                        <span>Choose Another Election</span>
-                    </a>
-                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm">
-                        <i class="bi bi-bar-chart-line-fill"></i>
-                        <span>View Live Results Section</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                    <a href="{{ url_for('voter.certificate', election_id=election.id) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1.5">
-                        <i class="bi bi-award-fill text-warning"></i>
-                        <span>Download Official Certificate</span>
-                    </a>
-                    <a href="{{ url_for('auth.verify_ballot', hash=receipt_hash) }}" class="btn btn-outline-secondary d-flex align-items-center gap-1.5">
-                        <i class="bi bi-shield-check text-primary"></i>
-                        <span>Verify in Ledger</span>
-                    </a>
-                </div>
-
-                <!-- Next Available Election Notice -->
-                {% set unvoted_active = [] %}
-                {% for e in all_elections %}
-                    {% if e.status == 'active' and not status_map.get(e.id) and e.id != election.id %}
-                        {% set _ = unvoted_active.append(e) %}
-                    {% endif %}
-                {% endfor %}
-                {% if unvoted_active|length > 0 %}
-                    <div class="p-3 rounded-3 border d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2" style="background: #eff6ff; border-color: #bfdbfe !important;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-info-circle-fill text-primary fs-5 flex-shrink-0"></i>
-                            <span class="small text-dark">
-                                You have <strong>{{ unvoted_active|length }}</strong> other active election{{ 's' if unvoted_active|length > 1 else '' }} present awaiting your vote!
-                            </span>
                         </div>
-                        <a href="{{ url_for('voter.cast_vote', election_id=unvoted_active[0].id) }}" class="btn btn-sm btn-primary text-nowrap d-inline-flex align-items-center gap-1 shadow-sm">
-                            <span>Vote in {{ unvoted_active[0].title }}</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
-        {% elif election.status != 'active' %}
-            <!-- Closed Election Notice -->
-            <div class="classic-card p-4 mb-4 bg-white border text-center">
-                <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
-                <h5 class="fw-bold text-dark mb-1">Voting Closed for this Election</h5>
-                <p class="text-muted small mb-3">This election has officially ended. You can view the certified outcome in the Results section.</p>
-                <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-outline-primary px-3 py-2">
-                        <i class="bi bi-bar-chart-line-fill me-1"></i> View Certified Results
-                    </a>
-                    {% set next_active = [] %}
-                    {% for e in all_elections %}
-                        {% if e.status == 'active' and not status_map.get(e.id) %}
-                            {% set _ = next_active.append(e) %}
-                        {% endif %}
                     {% endfor %}
-                    {% if next_active|length > 0 %}
-                        <a href="{{ url_for('voter.cast_vote', election_id=next_active[0].id) }}" class="btn btn-primary px-3 py-2">
-                            <span>Vote in {{ next_active[0].title }} &rarr;</span>
-                        </a>
-                    {% endif %}
                 </div>
             </div>
-        {% endif %}
 
-        {% if not already_voted and election.status == 'active' %}
-            <!-- Candidate Selection Form -->
-            <form method="POST" id="ballotForm">
-                <div class="mb-4">
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-                        <div>
-                            <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                                <i class="bi bi-person-check-fill text-primary"></i>
-                                <span>Candidate Representatives ({{ candidates|length }})</span>
-                            </h5>
-                            <span class="text-muted small">Choose one representative to cast your ballot</span>
-                        </div>
+            <!-- STEP 2: CHOOSE CANDIDATE REPRESENTATIVE -->
+            <div class="classic-card p-4 mb-4 bg-white border">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
+                    <div>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="input-group input-group-sm" style="max-width: 220px;">
-                                <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Filter candidates...">
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
-                                <i class="bi bi-columns-gap"></i>
-                                <span>Compare</span>
-                            </button>
+                            <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">2</span>
+                            <h5 class="fw-bold text-dark mb-0">
+                                Step 2: Choose Candidate in <span class="text-primary active-election-title-display">{{ election.title }}</span>
+                            </h5>
                         </div>
+                        <span class="text-muted small ms-4">Select one representative candidate to cast your ballot</span>
                     </div>
 
-                    <div class="row g-3" id="candidatesList">
-                        {% for candidate in candidates %}
-                            <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
-                                <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_{{ candidate.id }}">
-                                    <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
-                                    
-                                    <!-- Candidate Avatar with High-Craft Gradient -->
-                                    <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
-                                         style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
-                                        {{ candidate.name[:2]|upper }}
-                                    </div>
-
-                                    <!-- Candidate Info & Platform -->
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
-                                            <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
-                                            <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
-                                        </div>
-                                        <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
-                                            <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
-                                        </div>
-                                        <div class="d-flex flex-wrap gap-1.5">
-                                            {% if 'placement' in candidate.manifesto|lower or 'funding' in candidate.manifesto|lower %}
-                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-briefcase text-primary me-1"></i>#PlacementCellGrowth</span>
-                                            {% endif %}
-                                            {% if 'library' in candidate.manifesto|lower or 'wi-fi' in candidate.manifesto|lower %}
-                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-wifi text-success me-1"></i>#24x7DigitalLibrary</span>
-                                            {% endif %}
-                                            {% if 'hostel' in candidate.manifesto|lower or 'sports' in candidate.manifesto|lower %}
-                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-building text-warning me-1"></i>#HostelAndSportsReforms</span>
-                                            {% endif %}
-                                            {% if 'wellness' in candidate.manifesto|lower or 'incubation' in candidate.manifesto|lower %}
-                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-lightbulb text-info me-1"></i>#StudentIncubation</span>
-                                            {% endif %}
-                                            <span class="badge bg-white text-muted border" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill text-primary me-1"></i>Official Nominee</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Selection Indicator Radio Circle -->
-                                    <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
-                                        <i class="bi bi-check-lg check-icon"></i>
-                                    </div>
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Security Assurance & Submit -->
-                <div class="classic-card p-4 bg-white border">
-                    <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1px solid #bfdbfe;">
-                        <i class="bi bi-shield-check fs-2 text-primary flex-shrink-0"></i>
-                        <div class="small">
-                            <div class="text-dark fw-bold mb-0.5">Tamper-Proof Ledger Seal</div>
-                            <div class="text-muted">Once submitted, your choice is cryptographically signed and stored in the immutable audit ledger. It cannot be altered or cast again.</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group input-group-sm" style="max-width: 220px;">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Filter candidates...">
                         </div>
-                    </div>
-
-                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
-                        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary w-100 w-sm-auto">
-                            Cancel & Return
-                        </a>
-                        <button type="submit" class="btn btn-primary py-2.5 px-4 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2 shadow-sm">
-                            <i class="bi bi-box2-heart-fill"></i>
-                            <span>Confirm & Cast Ballot in {{ election.title }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
+                            <i class="bi bi-columns-gap"></i>
+                            <span>Compare</span>
                         </button>
                     </div>
                 </div>
-            </form>
-        {% endif %}
+
+                <!-- Panels for Each Election -->
+                {% for el in all_elections %}
+                    {% set has_voted = status_map.get(el.id) %}
+                    {% set cands = candidates_by_election.get(el.id, []) %}
+                    {% set is_active_panel = (el.id == election.id) %}
+
+                    <div class="election-panel-container {% if not is_active_panel %}d-none{% endif %}" id="election_panel_{{ el.id }}">
+                        
+                        {% if has_voted %}
+                            <!-- Already Voted Notice for This Election -->
+                            <div class="p-4 rounded-3 bg-light border mb-2 text-center" style="border-left: 5px solid #059669 !important;">
+                                <i class="bi bi-patch-check-fill fs-2 text-success d-block mb-2"></i>
+                                <h5 class="fw-bold text-dark mb-1">Your Ballot Has Been Sealed for {{ el.title }}</h5>
+                                <p class="text-muted small mb-3">
+                                    You have exercised your single-vote quota for this election. 
+                                    Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_map.get(el.id, '')[:20] }}...</code>
+                                </p>
+                                <div class="d-flex flex-wrap justify-content-center gap-2">
+                                    <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 shadow-sm">
+                                        <i class="bi bi-bar-chart-line-fill"></i>
+                                        <span>View Standings</span>
+                                    </a>
+                                    <a href="{{ url_for('voter.certificate', election_id=el.id) }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-award-fill text-warning"></i>
+                                        <span>Download Certificate</span>
+                                    </a>
+                                    <!-- Prompt to switch to next unvoted election -->
+                                    {% for other_el in all_elections %}
+                                        {% if other_el.status == 'active' and not status_map.get(other_el.id) and other_el.id != el.id %}
+                                            <button type="button" class="btn btn-sm btn-success text-white shadow-sm d-inline-flex align-items-center gap-1" onclick="selectElection('{{ other_el.id }}')">
+                                                <span>Vote in {{ other_el.title }}</span>
+                                                <i class="bi bi-arrow-right"></i>
+                                            </button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                        {% elif el.status != 'active' %}
+                            <!-- Election Closed Notice -->
+                            <div class="p-4 rounded-3 bg-light border mb-2 text-center">
+                                <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
+                                <h5 class="fw-bold text-dark mb-1">Voting Concluded for {{ el.title }}</h5>
+                                <p class="text-muted small mb-3">This election has ended. You can view certified results in the Results section.</p>
+                                <a href="{{ url_for('voter.results_view', election_id=el.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-bar-chart-line-fill me-1"></i> View Certified Standings
+                                </a>
+                            </div>
+
+                        {% else %}
+                            <!-- Candidate Cards Grid for Active Unvoted Election -->
+                            <div class="row g-3 candidates-list-grid">
+                                {% for candidate in cands %}
+                                    <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
+                                        <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_input_{{ el.id }}_{{ candidate.id }}">
+                                            <input class="form-check-input candidate-radio visually-hidden" 
+                                                   type="radio" 
+                                                   name="candidate_id" 
+                                                   id="cand_input_{{ el.id }}_{{ candidate.id }}" 
+                                                   value="{{ candidate.id }}" 
+                                                   data-candidate-name="{{ candidate.name }}" 
+                                                   data-election-id="{{ el.id }}"
+                                                   data-election-title="{{ el.title }}">
+                                            
+                                            <!-- Candidate Avatar with Vibrant High-Craft Gradient -->
+                                            <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
+                                                 style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
+                                                {{ candidate.name[:2]|upper }}
+                                            </div>
+
+                                            <!-- Candidate Info & Manifesto Platform -->
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
+                                                    <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
+                                                    <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
+                                                </div>
+                                                <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
+                                                    <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-1.5">
+                                                    {% if 'placement' in candidate.manifesto|lower or 'funding' in candidate.manifesto|lower %}
+                                                        <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-briefcase text-primary me-1"></i>#PlacementCellGrowth</span>
+                                                    {% endif %}
+                                                    {% if 'library' in candidate.manifesto|lower or 'wi-fi' in candidate.manifesto|lower %}
+                                                        <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-wifi text-success me-1"></i>#24x7DigitalLibrary</span>
+                                                    {% endif %}
+                                                    {% if 'hostel' in candidate.manifesto|lower or 'sports' in candidate.manifesto|lower %}
+                                                        <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-building text-warning me-1"></i>#HostelAndSportsReforms</span>
+                                                    {% endif %}
+                                                    {% if 'wellness' in candidate.manifesto|lower or 'incubation' in candidate.manifesto|lower %}
+                                                        <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-lightbulb text-info me-1"></i>#StudentIncubation</span>
+                                                    {% endif %}
+                                                    <span class="badge bg-white text-muted border" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill text-primary me-1"></i>Official Nominee</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Selection Indicator Radio Circle -->
+                                            <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
+                                                <i class="bi bi-check-lg check-icon"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- STEP 3: CONFIRM & CAST BALLOT -->
+            <div class="classic-card p-4 bg-white border" id="step3CastSection">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <span class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.8rem;">3</span>
+                    <h5 class="fw-bold text-dark mb-0">Step 3: Confirm & Cast Ballot</h5>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                    <i class="bi bi-shield-check fs-2 text-primary flex-shrink-0"></i>
+                    <div class="small">
+                        <div class="text-dark fw-bold mb-0.5">Tamper-Proof Ledger Seal</div>
+                        <div class="text-muted">Once submitted, your choice is cryptographically signed with SHA-256 and sealed in the immutable ledger. It cannot be altered or cast again.</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+                    <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary w-100 w-sm-auto">
+                        Cancel & Return
+                    </a>
+                    
+                    <button type="submit" id="mainSubmitVoteBtn" class="btn btn-primary py-2.5 px-4 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2 shadow-sm font-semibold">
+                        <i class="bi bi-box2-heart-fill"></i>
+                        <span id="submitBtnLabel">Select a candidate above to cast ballot in <strong class="active-election-title-display">{{ election.title }}</strong></span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
     </div>
 </div>
 
@@ -331,7 +312,26 @@
     .cursor-pointer {
         cursor: pointer;
     }
-    
+
+    .election-choice-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .election-choice-card:hover {
+        border-color: #93c5fd !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.08);
+    }
+
+    .active-election-card {
+        background: #f0f7ff !important;
+        border: 2px solid #1d4ed8 !important;
+        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15), 0 4px 14px rgba(29, 78, 216, 0.08) !important;
+    }
+
     .candidate-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -360,7 +360,7 @@
         font-size: 1rem;
     }
 
-    /* Active Selected State */
+    /* Active Selected Candidate State */
     .candidate-card.active-selected {
         background: #f0f7ff !important;
         border: 2px solid #1d4ed8 !important;
@@ -375,19 +375,6 @@
     .candidate-card.active-selected .candidate-check-circle .check-icon {
         display: block;
     }
-
-    /* Switcher hover & active styles */
-    .election-switcher-card:hover {
-        border-color: #93c5fd !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-    }
-
-    .active-election-card {
-        border-color: #2563eb !important;
-        background: #ffffff !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12), 0 4px 14px rgba(37, 99, 235, 0.08) !important;
-    }
 </style>
 
 <!-- Candidate Comparison Modal -->
@@ -398,44 +385,15 @@
                 <div>
                     <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="candidateCompareModalLabel">
                         <i class="bi bi-columns-gap text-primary"></i>
-                        <span>Side-by-Side Candidate Evaluation • {{ election.title }}</span>
+                        <span>Side-by-Side Candidate Evaluation • <span class="active-election-title-display">{{ election.title }}</span></span>
                     </h5>
                     <p class="text-muted small mb-0">Evaluate platforms and agendas side-by-side to make an informed democratic choice</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <div class="row g-3">
-                    {% for candidate in candidates %}
-                        <div class="col-md-6 col-lg-{{ (12 / candidates|length)|round|int if candidates|length <= 4 and candidates|length > 0 else 4 }}">
-                            <div class="p-3.5 rounded-3 border h-100 bg-white d-flex flex-column justify-content-between shadow-sm">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2.5 mb-3 pb-2 border-bottom">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                                             style="width: 42px; height: 42px; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
-                                            {{ candidate.name[:2]|upper }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark fs-6">{{ candidate.name }}</div>
-                                            <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="text-muted small fw-semibold mb-1">Key Agenda & Commitments:</div>
-                                        <p class="small text-dark mb-0 bg-light p-2.5 rounded-3 border" style="line-height: 1.6;">
-                                            "{{ candidate.manifesto }}"
-                                        </p>
-                                    </div>
-                                </div>
-                                {% if not already_voted and election.status == 'active' %}
-                                    <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2 d-flex align-items-center justify-content-center gap-1.5" onclick="selectCandidateFromModal('cand_{{ candidate.id }}')">
-                                        <i class="bi bi-check2-circle"></i>
-                                        <span>Select This Candidate</span>
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
+            <div class="modal-body p-4" id="compareModalBody">
+                <div class="row g-3" id="compareCandidatesRow">
+                    <!-- Populated dynamically via JS -->
                 </div>
             </div>
             <div class="modal-footer border-top bg-light px-4 py-2.5">
@@ -446,22 +404,207 @@
 </div>
 
 <script>
+    let activeElectionId = "{{ election.id }}";
+    let activeElectionTitle = "{{ election.title }}";
+    let selectedCandidateId = null;
+    let selectedCandidateName = null;
+
+    // Election candidates data for modal
+    const electionsData = {
+        {% for el in all_elections %}
+            "{{ el.id }}": {
+                title: {{ el.title|tojson }},
+                status: {{ el.status|tojson }},
+                hasVoted: {{ 'true' if status_map.get(el.id) else 'false' }},
+                candidates: [
+                    {% for c in candidates_by_election.get(el.id, []) %}
+                        {
+                            id: "{{ c.id }}",
+                            name: {{ c.name|tojson }},
+                            position: {{ c.position|tojson }},
+                            manifesto: {{ c.manifesto|tojson }}
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function selectElection(electionId) {
+        activeElectionId = electionId;
+        const electionInfo = electionsData[electionId];
+        if (!electionInfo) return;
+
+        activeElectionTitle = electionInfo.title;
+
+        // 1. Update Hidden Field
+        document.getElementById('hiddenElectionId').value = electionId;
+
+        // 2. Update Dropdown
+        const dropdown = document.getElementById('electionSelectDropdown');
+        if (dropdown) dropdown.value = electionId;
+
+        // 3. Update Visual Cards
+        document.querySelectorAll('.election-choice-card').forEach(card => {
+            const cardId = card.dataset.electionId;
+            const badge = card.querySelector('.active-indicator-badge');
+            if (cardId === electionId) {
+                card.classList.add('active-election-card');
+                if (badge) badge.classList.remove('d-none');
+            } else {
+                card.classList.remove('active-election-card');
+                if (badge) badge.classList.add('d-none');
+            }
+        });
+
+        // 4. Update Header Labels
+        document.querySelectorAll('.active-election-title-display').forEach(el => {
+            el.textContent = activeElectionTitle;
+        });
+
+        // 5. Switch Candidate Panels
+        document.querySelectorAll('.election-panel-container').forEach(panel => {
+            if (panel.id === `election_panel_${electionId}`) {
+                panel.classList.remove('d-none');
+            } else {
+                panel.classList.add('d-none');
+            }
+        });
+
+        // 6. Reset Candidate Selection
+        selectedCandidateId = null;
+        selectedCandidateName = null;
+        document.querySelectorAll('.candidate-card').forEach(c => c.classList.remove('active-selected'));
+        document.querySelectorAll('.candidate-radio').forEach(r => r.checked = false);
+
+        // 7. Check if this election is already voted or closed
+        const submitBtn = document.getElementById('mainSubmitVoteBtn');
+        const submitBtnLabel = document.getElementById('submitBtnLabel');
+
+        if (electionInfo.hasVoted) {
+            submitBtn.disabled = true;
+            submitBtnLabel.innerHTML = `<i class="bi bi-patch-check-fill me-1 text-success"></i> Ballot Already Sealed in <strong>${activeElectionTitle}</strong>`;
+        } else if (electionInfo.status !== 'active') {
+            submitBtn.disabled = true;
+            submitBtnLabel.innerHTML = `<i class="bi bi-lock-fill me-1"></i> Voting Closed for <strong>${activeElectionTitle}</strong>`;
+        } else {
+            submitBtn.disabled = false;
+            submitBtnLabel.innerHTML = `Choose a candidate above to cast ballot in <strong>${activeElectionTitle}</strong>`;
+        }
+
+        // 8. Update Compare Modal contents
+        updateCompareModal();
+    }
+
+    // Dropdown change listener
+    const dropdownEl = document.getElementById('electionSelectDropdown');
+    if (dropdownEl) {
+        dropdownEl.addEventListener('change', function() {
+            selectElection(this.value);
+        });
+    }
+
+    // Radio Candidate selection listeners
     document.querySelectorAll('.candidate-radio').forEach(radio => {
         radio.addEventListener('change', function() {
-            document.querySelectorAll('.candidate-card').forEach(card => card.classList.remove('active-selected'));
             if (this.checked) {
+                document.querySelectorAll('.candidate-card').forEach(card => card.classList.remove('active-selected'));
                 this.closest('.candidate-card').classList.add('active-selected');
+
+                selectedCandidateId = this.value;
+                selectedCandidateName = this.dataset.candidateName;
+
+                // Update Submit Button Label
+                const submitBtnLabel = document.getElementById('submitBtnLabel');
+                const submitBtn = document.getElementById('mainSubmitVoteBtn');
+                submitBtn.disabled = false;
+                submitBtnLabel.innerHTML = `Confirm & Cast Ballot for <strong>${selectedCandidateName}</strong> in <strong>${activeElectionTitle}</strong> &rarr;`;
             }
         });
     });
 
-    const checked = document.querySelector('.candidate-radio:checked');
-    if (checked) {
-        checked.closest('.candidate-card').classList.add('active-selected');
+    // Form submit validation
+    const form = document.getElementById('masterVotingForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const currentElection = electionsData[activeElectionId];
+            if (currentElection && currentElection.hasVoted) {
+                e.preventDefault();
+                alert(`You have already voted in "${activeElectionTitle}". Please select another election above.`);
+                return false;
+            }
+
+            const activePanel = document.getElementById(`election_panel_${activeElectionId}`);
+            const checkedRadio = activePanel ? activePanel.querySelector('.candidate-radio:checked') : null;
+            if (!checkedRadio) {
+                e.preventDefault();
+                alert(`Please select a candidate representative in "${activeElectionTitle}" before submitting.`);
+                if (activePanel) activePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        });
     }
 
-    function selectCandidateFromModal(radioId) {
-        const radio = document.getElementById(radioId);
+    // Populate Side-by-Side Modal
+    function updateCompareModal() {
+        const row = document.getElementById('compareCandidatesRow');
+        if (!row) return;
+        row.innerHTML = '';
+
+        const data = electionsData[activeElectionId];
+        if (!data || !data.candidates || data.candidates.length === 0) {
+            row.innerHTML = '<div class="col-12 text-center text-muted p-4">No candidates registered for this election.</div>';
+            return;
+        }
+
+        const colWidth = (data.candidates.length <= 4) ? Math.round(12 / data.candidates.length) : 4;
+        const gradients = [
+            'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+            'linear-gradient(135deg, #059669, #10b981)',
+            'linear-gradient(135deg, #7c3aed, #a855f7)',
+            'linear-gradient(135deg, #d97706, #f59e0b)',
+            'linear-gradient(135deg, #0284c7, #38bdf8)'
+        ];
+
+        data.candidates.forEach((cand, idx) => {
+            const col = document.createElement('div');
+            col.className = `col-md-6 col-lg-${colWidth}`;
+            const bg = gradients[idx % gradients.length];
+            col.innerHTML = `
+                <div class="p-3.5 rounded-3 border h-100 bg-white d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center gap-2.5 mb-3 pb-2 border-bottom">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                 style="width: 42px; height: 42px; background: ${bg}; font-size: 1rem;">
+                                ${cand.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-6">${cand.name}</div>
+                                <span class="badge badge-soft-blue small">${cand.position}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted small fw-semibold mb-1">Key Agenda & Commitments:</div>
+                            <p class="small text-dark mb-0 bg-light p-2.5 rounded-3 border" style="line-height: 1.6;">
+                                "${cand.manifesto}"
+                            </p>
+                        </div>
+                    </div>
+                    ${!data.hasVoted && data.status === 'active' ? `
+                        <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2 d-flex align-items-center justify-content-center gap-1.5" onclick="selectCandidateFromModal('${activeElectionId}', '${cand.id}')">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Select This Candidate</span>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            row.appendChild(col);
+        });
+    }
+
+    function selectCandidateFromModal(electionId, candidateId) {
+        selectElection(electionId);
+        const radio = document.getElementById(`cand_input_${electionId}_${candidateId}`);
         if (radio) {
             radio.checked = true;
             radio.dispatchEvent(new Event('change'));
@@ -472,11 +615,15 @@
         }
     }
 
+    // Real-time Candidate Search Filter
     const searchInput = document.getElementById('candidateSearchInput');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
-            document.querySelectorAll('.candidate-item-wrapper').forEach(item => {
+            const activePanel = document.getElementById(`election_panel_${activeElectionId}`);
+            if (!activePanel) return;
+
+            activePanel.querySelectorAll('.candidate-item-wrapper').forEach(item => {
                 const name = item.dataset.name || '';
                 const manifesto = item.dataset.manifesto || '';
                 if (name.includes(query) || manifesto.includes(query)) {
@@ -487,5 +634,8 @@
             });
         });
     }
+
+    // Initialize on page load
+    selectElection(activeElectionId);
 </script>
 {% endblock %}
