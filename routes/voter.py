@@ -39,60 +39,89 @@ def dashboard():
                            voted_at_map=voted_at_map)
 
 @voter_bp.route('/vote')
-@voter_required
-def vote_index():
-    user_id = session['user_id']
-    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
-    # Prioritize active election where voter hasn't voted
-    for el in eligibilities:
-        if not el.has_voted:
-            election = Election.query.filter_by(id=el.election_id, status='active').first()
-            if election:
-                return redirect(url_for('voter.cast_vote', election_id=election.id))
-    # Otherwise go to the active election or first election
-    active = Election.query.filter_by(status='active').first()
-    if active:
-        return redirect(url_for('voter.cast_vote', election_id=active.id))
-    return redirect(url_for('voter.dashboard'))
-
 @voter_bp.route('/vote/<int:election_id>', methods=['GET', 'POST'])
 @voter_required
-def cast_vote(election_id):
+def cast_vote(election_id=None):
     user_id = session['user_id']
-    eligibility = VoterEligibility.query.filter_by(election_id=election_id, voter_id=user_id).first()
     
-    if not eligibility:
-        flash("Not registered for this election.", "danger")
+    # Query all elections present in the system
+    all_elections = Election.query.order_by(Election.created_at.desc()).all()
+    if not all_elections:
+        flash("No elections are currently present in the system.", "info")
         return redirect(url_for('voter.dashboard'))
 
-    election = Election.query.get_or_404(election_id)
-    if election.status != 'active':
-        flash("This election is currently closed for voting.", "warning")
-        return redirect(url_for('voter.results_view', election_id=election.id))
+    # Auto-enroll / ensure eligibility for this voter across all present elections
+    user = User.query.get(user_id)
+    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
+    existing_ids = {el.election_id for el in eligibilities}
+    new_eligibilities = False
+    for el_obj in all_elections:
+        if el_obj.id not in existing_ids:
+            db.session.add(VoterEligibility(election_id=el_obj.id, voter_id=user_id, has_voted=False))
+            new_eligibilities = True
+    if new_eligibilities:
+        db.session.commit()
+        eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
 
-    if eligibility.has_voted:
-        if request.method == 'POST':
+    status_map = {el.election_id: el.has_voted for el in eligibilities}
+    receipt_map = {el.election_id: el.receipt_hash for el in eligibilities if el.has_voted and el.receipt_hash}
+
+    # If election_id is not specified in the URL:
+    if not election_id:
+        # 1. Prefer first active election where voter hasn't voted yet
+        selected = next((e for e in all_elections if e.status == 'active' and not status_map.get(e.id)), None)
+        if not selected:
+            # 2. Next prefer any active election
+            selected = next((e for e in all_elections if e.status == 'active'), None)
+        if not selected:
+            # 3. Fallback to latest election present
+            selected = all_elections[0]
+        election_id = selected.id
+        election = selected
+    else:
+        election = Election.query.get_or_404(election_id)
+
+    eligibility = VoterEligibility.query.filter_by(election_id=election.id, voter_id=user_id).first()
+    candidates = Candidate.query.filter_by(election_id=election.id).all()
+
+    # Pre-calculate candidate counts for the elections present switcher
+    candidate_counts = {}
+    for e in all_elections:
+        candidate_counts[e.id] = Candidate.query.filter_by(election_id=e.id).count()
+
+    active_elections_count = sum(1 for e in all_elections if e.status == 'active')
+    voted_elections_count = sum(1 for e in all_elections if status_map.get(e.id))
+    total_elections_count = len(all_elections)
+    progress_pct = round((voted_elections_count / total_elections_count * 100), 1) if total_elections_count > 0 else 0
+
+    already_voted = bool(eligibility and eligibility.has_voted)
+    receipt_hash = eligibility.receipt_hash if eligibility else None
+
+    # Handle POST vote submission
+    if request.method == 'POST':
+        if election.status != 'active':
+            flash("This election is currently closed for voting.", "warning")
+            return redirect(url_for('voter.results_view', election_id=election.id))
+            
+        if already_voted:
             flash("Security Alert: Double-voting attempt blocked. Your ballot is already sealed.", "warning")
             return redirect(url_for('voter.results_view', election_id=election.id))
-        candidates = Candidate.query.filter_by(election_id=election_id).all()
-        return render_template('vote.html', 
-                               election=election, 
-                               candidates=candidates, 
-                               already_voted=True, 
-                               receipt_hash=eligibility.receipt_hash)
 
-    if request.method == 'POST':
         candidate_id = request.form.get('candidate_id')
+        if not candidate_id:
+            flash("Please choose a candidate representative to cast your ballot.", "warning")
+            return redirect(url_for('voter.cast_vote', election_id=election.id))
+
         now = datetime.utcnow()
         try:
             # Generate cryptographic SHA-256 ballot receipt
             entropy = secrets.token_hex(16)
-            raw_token = f"{election_id}:{candidate_id}:{now.isoformat()}:{entropy}"
+            raw_token = f"{election.id}:{candidate_id}:{now.isoformat()}:{entropy}"
             receipt_hash = "0x" + hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
 
             # Record vote decoupled from voter identity
             db.session.add(Vote(
-                election_id=election_id, 
+                election_id=election.id, 
                 candidate_id=candidate_id, 
                 receipt_hash=receipt_hash, 
                 created_at=now
@@ -105,7 +134,7 @@ def cast_vote(election_id):
 
             # Append to immutable audit ledger
             db.session.add(AuditLog(
-                election_id=election_id, 
+                election_id=election.id, 
                 action=f"Vote recorded & sealed [{receipt_hash[:16]}...]",
                 receipt_hash=receipt_hash,
                 timestamp=now
@@ -113,15 +142,31 @@ def cast_vote(election_id):
             db.session.commit()
 
             session['last_receipt'] = receipt_hash
-            session['last_election_id'] = election_id
-            return redirect(url_for('voter.confirmation', election_id=election_id))
+            session['last_election_id'] = election.id
+            return redirect(url_for('voter.confirmation', election_id=election.id))
         except Exception:
             db.session.rollback()
             flash("Error processing vote.", "danger")
             return redirect(url_for('voter.dashboard'))
 
-    candidates = Candidate.query.filter_by(election_id=election_id).all()
-    return render_template('vote.html', election=election, candidates=candidates, already_voted=False)
+    return render_template('vote.html', 
+                           election=election, 
+                           candidates=candidates, 
+                           already_voted=already_voted, 
+                           receipt_hash=receipt_hash,
+                           all_elections=all_elections,
+                           status_map=status_map,
+                           receipt_map=receipt_map,
+                           candidate_counts=candidate_counts,
+                           active_elections_count=active_elections_count,
+                           voted_elections_count=voted_elections_count,
+                           total_elections_count=total_elections_count,
+                           progress_pct=progress_pct)
+
+@voter_bp.route('/voting-room')
+@voter_required
+def vote_index():
+    return redirect(url_for('voter.cast_vote'))
 
 @voter_bp.route('/confirmation')
 @voter_required

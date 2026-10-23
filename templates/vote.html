@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Vote Representatives • Votex.ai{% endblock %}
+{% block title %}Voting Section • Elections Present • Votex.ai{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-9 col-xl-8">
+    <div class="col-lg-10 col-xl-9">
+        
         <!-- Ballot Navigation / Breadcrumb -->
         <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
             <a href="{{ url_for('voter.dashboard') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 shadow-sm">
@@ -21,15 +22,125 @@
             </div>
         </div>
 
-        <!-- Ballot Header Card -->
+        <!-- Dedicated Section Banner: Elections Present Master Header -->
+        <div class="classic-card p-4 mb-4 bg-white border position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-top: 4px solid #1d4ed8 !important;">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <span class="badge badge-soft-blue py-1 px-2.5">
+                            <i class="bi bi-box2-heart-fill me-1"></i>Dedicated Voting Section
+                        </span>
+                        <span class="badge bg-light text-primary border py-1 px-2.5 small fw-semibold">
+                            <i class="bi bi-collection-fill me-1"></i>{{ all_elections|length }} Elections Present
+                        </span>
+                        {% if active_elections_count > 0 %}
+                            <span class="badge badge-soft-green py-1 px-2.5 small fw-semibold">
+                                <span class="live-dot me-1"></span>{{ active_elections_count }} Open for Voting
+                            </span>
+                        {% endif %}
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">Voting in Elections Present</h3>
+                    <p class="text-muted small mb-0" style="max-width: 620px; line-height: 1.55;">
+                        Cast your confidential ballot across all democratic elections present in the portal. 
+                        Select any election booth below to review nominees and exercise your democratic right.
+                    </p>
+                </div>
+                
+                <!-- Voter Ballot Quota Completion Meter -->
+                <div class="bg-white p-3 rounded-3 border shadow-sm flex-shrink-0" style="min-width: 250px;">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="small fw-bold text-dark">Your Ballot Quota</span>
+                        <span class="badge {% if voted_elections_count == total_elections_count and total_elections_count > 0 %}bg-success{% else %}badge-soft-blue{% endif %} py-1 px-2">
+                            {{ voted_elections_count }} of {{ total_elections_count }} Cast
+                        </span>
+                    </div>
+                    <div class="progress mb-1.5" style="height: 8px; background: #e2e8f0; border-radius: 6px;">
+                        <div class="progress-bar" style="width: {{ progress_pct }}%; background: linear-gradient(90deg, #2563eb, #059669);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
+                        <span>{{ active_elections_count }} Active</span>
+                        <span class="fw-semibold text-dark">{{ progress_pct }}% Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Elections Present Switcher / Booth Selector Tabs -->
+        <div class="mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.75rem;">
+                    <i class="bi bi-grid-3x3-gap-fill text-primary me-1"></i>Select an Election Present to Vote:
+                </span>
+                <span class="text-muted small">Click any card to switch voting booth</span>
+            </div>
+
+            <div class="row g-2.5">
+                {% for el in all_elections %}
+                    {% set is_current = (el.id == election.id) %}
+                    {% set has_voted = status_map.get(el.id) %}
+                    <div class="col-md-{{ (12 / all_elections|length)|round|int if all_elections|length in [2, 3] else 4 }}">
+                        <a href="{{ url_for('voter.cast_vote', election_id=el.id) }}" 
+                           class="text-decoration-none d-block p-3 rounded-3 border h-100 transition-all position-relative
+                                  {% if is_current %}bg-white border-primary active-election-card shadow-sm{% else %}bg-white border-slate-200 election-switcher-card{% endif %}"
+                           style="border-width: {% if is_current %}2px{% else %}1px{% endif %} !important;">
+                            
+                            {% if is_current %}
+                                <div class="position-absolute top-0 end-0 translate-middle-y me-3">
+                                    <span class="badge bg-primary text-white shadow-sm" style="font-size: 0.65rem;">
+                                        <i class="bi bi-box2-heart-fill me-1"></i>Active Booth
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex align-items-center justify-content-between gap-1 mb-2">
+                                <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
+                                    <i class="bi bi-people me-1"></i>{{ candidate_counts.get(el.id, 0) }} Candidates
+                                </span>
+                                {% if has_voted %}
+                                    <span class="badge bg-success text-white py-1 px-2" style="font-size: 0.7rem;">
+                                        <i class="bi bi-check2-circle me-1"></i>Ballot Sealed
+                                    </span>
+                                {% elif el.status == 'active' %}
+                                    <span class="badge badge-soft-green py-1 px-2" style="font-size: 0.7rem;">
+                                        <span class="live-dot me-1"></span>Ready to Vote
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 0.7rem;">
+                                        <i class="bi bi-lock me-1"></i>Closed
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="fw-bold text-dark mb-1" style="font-size: 0.95rem; line-height: 1.35;">
+                                {{ el.title }}
+                            </div>
+                            <div class="text-muted small text-truncate" style="font-size: 0.78rem;">
+                                {{ el.description }}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Selected Ballot Room Card -->
         <div class="classic-card p-4 p-md-4 mb-4 bg-white border">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge badge-soft-blue py-1 px-2.5">
-                    <i class="bi bi-box2-heart-fill me-1"></i>Official Voting Room
-                </span>
-                <span class="badge badge-soft-green py-1 px-2.5">
-                    <span class="live-dot me-1"></span>Single-Choice Secret Ballot
-                </span>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-soft-blue py-1 px-2.5">
+                        <i class="bi bi-box2-heart-fill me-1"></i>Current Voting Booth
+                    </span>
+                    {% if election.status == 'active' %}
+                        <span class="badge badge-soft-green py-1 px-2.5">
+                            <span class="live-dot me-1"></span>Single-Choice Secret Ballot
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary border py-1 px-2.5">
+                            <i class="bi bi-lock-fill me-1"></i>Election Closed
+                        </span>
+                    {% endif %}
+                </div>
+                <span class="text-muted small font-monospace">Election ID #{{ election.id }}</span>
             </div>
             <h3 class="fw-bold text-dark mb-1">{{ election.title }}</h3>
             <p class="text-muted small mb-0" style="line-height: 1.6;">{{ election.description }}</p>
@@ -43,11 +154,11 @@
                     <span>Your Ballot Has Been Cryptographically Sealed</span>
                 </div>
                 <p class="text-muted small mb-3">
-                    You have successfully exercised your voting quota for this election. To preserve democratic integrity, 
+                    You have successfully exercised your voting quota for <strong>{{ election.title }}</strong>. To preserve democratic integrity, 
                     ballots cannot be modified once recorded in the ledger.
                     Receipt Hash: <code class="text-primary fw-semibold font-monospace">{{ receipt_hash[:22] }}...</code>
                 </p>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="d-flex flex-wrap gap-2 mb-3">
                     <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm">
                         <i class="bi bi-bar-chart-line-fill"></i>
                         <span>View Live Results Section</span>
@@ -62,83 +173,126 @@
                         <span>Verify in Ledger</span>
                     </a>
                 </div>
+
+                <!-- Next Available Election Notice -->
+                {% set unvoted_active = [] %}
+                {% for e in all_elections %}
+                    {% if e.status == 'active' and not status_map.get(e.id) and e.id != election.id %}
+                        {% set _ = unvoted_active.append(e) %}
+                    {% endif %}
+                {% endfor %}
+                {% if unvoted_active|length > 0 %}
+                    <div class="p-3 rounded-3 border d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2" style="background: #eff6ff; border-color: #bfdbfe !important;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle-fill text-primary fs-5 flex-shrink-0"></i>
+                            <span class="small text-dark">
+                                You have <strong>{{ unvoted_active|length }}</strong> other active election{{ 's' if unvoted_active|length > 1 else '' }} present awaiting your vote!
+                            </span>
+                        </div>
+                        <a href="{{ url_for('voter.cast_vote', election_id=unvoted_active[0].id) }}" class="btn btn-sm btn-primary text-nowrap d-inline-flex align-items-center gap-1 shadow-sm">
+                            <span>Vote in {{ unvoted_active[0].title }}</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% elif election.status != 'active' %}
+            <!-- Closed Election Notice -->
+            <div class="classic-card p-4 mb-4 bg-white border text-center">
+                <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
+                <h5 class="fw-bold text-dark mb-1">Voting Closed for this Election</h5>
+                <p class="text-muted small mb-3">This election has officially ended. You can view the certified outcome in the Results section.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-outline-primary px-3 py-2">
+                        <i class="bi bi-bar-chart-line-fill me-1"></i> View Certified Results
+                    </a>
+                    {% set next_active = [] %}
+                    {% for e in all_elections %}
+                        {% if e.status == 'active' and not status_map.get(e.id) %}
+                            {% set _ = next_active.append(e) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if next_active|length > 0 %}
+                        <a href="{{ url_for('voter.cast_vote', election_id=next_active[0].id) }}" class="btn btn-primary px-3 py-2">
+                            <span>Vote in {{ next_active[0].title }} &rarr;</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
 
-        <!-- Candidate Selection Form -->
-        <form method="POST" id="ballotForm">
-            <div class="mb-4">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-                    <div>
-                        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                            <i class="bi bi-person-check-fill text-primary"></i>
-                            <span>Candidate Representatives</span>
-                        </h5>
-                        <span class="text-muted small">Choose one representative to cast your ballot</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="input-group input-group-sm" style="max-width: 220px;">
-                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                            <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Filter candidates...">
+        {% if not already_voted and election.status == 'active' %}
+            <!-- Candidate Selection Form -->
+            <form method="POST" id="ballotForm">
+                <div class="mb-4">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-person-check-fill text-primary"></i>
+                                <span>Candidate Representatives ({{ candidates|length }})</span>
+                            </h5>
+                            <span class="text-muted small">Choose one representative to cast your ballot</span>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
-                            <i class="bi bi-columns-gap"></i>
-                            <span>Compare</span>
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="input-group input-group-sm" style="max-width: 220px;">
+                                <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Filter candidates...">
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#candidateCompareModal">
+                                <i class="bi bi-columns-gap"></i>
+                                <span>Compare</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row g-3" id="candidatesList">
-                    {% for candidate in candidates %}
-                        <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
-                            <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative {% if not already_voted %}cursor-pointer{% endif %}" for="cand_{{ candidate.id }}">
-                                <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" {% if already_voted %}disabled{% else %}required{% endif %}>
-                                
-                                <!-- Candidate Avatar with High-Craft Gradient -->
-                                <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
-                                     style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
-                                    {{ candidate.name[:2]|upper }}
-                                </div>
+                    <div class="row g-3" id="candidatesList">
+                        {% for candidate in candidates %}
+                            <div class="col-12 candidate-item-wrapper" data-name="{{ candidate.name|lower }}" data-manifesto="{{ candidate.manifesto|lower }}">
+                                <label class="candidate-card w-100 p-3.5 p-md-4 rounded-3 d-flex align-items-start gap-3 position-relative cursor-pointer" for="cand_{{ candidate.id }}">
+                                    <input class="form-check-input candidate-radio visually-hidden" type="radio" name="candidate_id" id="cand_{{ candidate.id }}" value="{{ candidate.id }}" required>
+                                    
+                                    <!-- Candidate Avatar with High-Craft Gradient -->
+                                    <div class="candidate-avatar flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm" 
+                                         style="width: 52px; height: 52px; font-size: 1.15rem; background: {% if loop.index == 1 %}linear-gradient(135deg, #1d4ed8, #3b82f6){% elif loop.index == 2 %}linear-gradient(135deg, #059669, #10b981){% elif loop.index == 3 %}linear-gradient(135deg, #7c3aed, #a855f7){% elif loop.index == 4 %}linear-gradient(135deg, #d97706, #f59e0b){% else %}linear-gradient(135deg, #0284c7, #38bdf8){% endif %};">
+                                        {{ candidate.name[:2]|upper }}
+                                    </div>
 
-                                <!-- Candidate Info & Platform -->
-                                <div class="flex-grow-1">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
-                                        <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
-                                        <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
+                                    <!-- Candidate Info & Platform -->
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
+                                            <h5 class="fw-bold text-dark mb-0">{{ candidate.name }}</h5>
+                                            <span class="badge badge-soft-blue small">{{ candidate.position }}</span>
+                                        </div>
+                                        <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
+                                            <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-1.5">
+                                            {% if 'placement' in candidate.manifesto|lower or 'funding' in candidate.manifesto|lower %}
+                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-briefcase text-primary me-1"></i>#PlacementCellGrowth</span>
+                                            {% endif %}
+                                            {% if 'library' in candidate.manifesto|lower or 'wi-fi' in candidate.manifesto|lower %}
+                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-wifi text-success me-1"></i>#24x7DigitalLibrary</span>
+                                            {% endif %}
+                                            {% if 'hostel' in candidate.manifesto|lower or 'sports' in candidate.manifesto|lower %}
+                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-building text-warning me-1"></i>#HostelAndSportsReforms</span>
+                                            {% endif %}
+                                            {% if 'wellness' in candidate.manifesto|lower or 'incubation' in candidate.manifesto|lower %}
+                                                <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-lightbulb text-info me-1"></i>#StudentIncubation</span>
+                                            {% endif %}
+                                            <span class="badge bg-white text-muted border" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill text-primary me-1"></i>Official Nominee</span>
+                                        </div>
                                     </div>
-                                    <div class="p-2.5 rounded-3 bg-light border mb-2 text-dark small" style="line-height: 1.55;">
-                                        <i class="bi bi-quote text-primary me-1 fs-6"></i>{{ candidate.manifesto }}
-                                    </div>
-                                    <div class="d-flex flex-wrap gap-1.5">
-                                        {% if 'placement' in candidate.manifesto|lower or 'funding' in candidate.manifesto|lower %}
-                                            <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-briefcase text-primary me-1"></i>#PlacementCellGrowth</span>
-                                        {% endif %}
-                                        {% if 'library' in candidate.manifesto|lower or 'wi-fi' in candidate.manifesto|lower %}
-                                            <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-wifi text-success me-1"></i>#24x7DigitalLibrary</span>
-                                        {% endif %}
-                                        {% if 'hostel' in candidate.manifesto|lower or 'sports' in candidate.manifesto|lower %}
-                                            <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-building text-warning me-1"></i>#HostelAndSportsReforms</span>
-                                        {% endif %}
-                                        {% if 'wellness' in candidate.manifesto|lower or 'incubation' in candidate.manifesto|lower %}
-                                            <span class="badge bg-white text-dark border" style="font-size: 0.72rem;"><i class="bi bi-lightbulb text-info me-1"></i>#StudentIncubation</span>
-                                        {% endif %}
-                                        <span class="badge bg-white text-muted border" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill text-primary me-1"></i>Official Nominee</span>
-                                    </div>
-                                </div>
 
-                                {% if not already_voted %}
                                     <!-- Selection Indicator Radio Circle -->
                                     <div class="candidate-check-circle ms-2 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
                                         <i class="bi bi-check-lg check-icon"></i>
                                     </div>
-                                {% endif %}
-                            </label>
-                        </div>
-                    {% endfor %}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
 
-            {% if not already_voted %}
                 <!-- Security Assurance & Submit -->
                 <div class="classic-card p-4 bg-white border">
                     <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background: #eff6ff; border: 1px solid #bfdbfe;">
@@ -155,21 +309,12 @@
                         </a>
                         <button type="submit" class="btn btn-primary py-2.5 px-4 w-100 w-sm-auto d-flex align-items-center justify-content-center gap-2 shadow-sm">
                             <i class="bi bi-box2-heart-fill"></i>
-                            <span>Confirm & Cast Ballot</span>
+                            <span>Confirm & Cast Ballot in {{ election.title }}</span>
                         </button>
                     </div>
                 </div>
-            {% else %}
-                <div class="classic-card p-4 bg-white border text-center">
-                    <i class="bi bi-lock-fill fs-2 text-muted d-block mb-2"></i>
-                    <h5 class="fw-bold text-dark mb-1">Ballot Quota Consumed</h5>
-                    <p class="text-muted small mb-3">Your vote is sealed in this election. View the current live standings in the Results section.</p>
-                    <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-primary px-4 py-2 shadow-sm">
-                        <i class="bi bi-bar-chart-line-fill me-1"></i> Open Results Section &rarr;
-                    </a>
-                </div>
-            {% endif %}
-        </form>
+            </form>
+        {% endif %}
     </div>
 </div>
 
@@ -221,6 +366,19 @@
     .candidate-card.active-selected .candidate-check-circle .check-icon {
         display: block;
     }
+
+    /* Switcher hover & active styles */
+    .election-switcher-card:hover {
+        border-color: #93c5fd !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .active-election-card {
+        border-color: #2563eb !important;
+        background: #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12), 0 4px 14px rgba(37, 99, 235, 0.08) !important;
+    }
 </style>
 
 <!-- Candidate Comparison Modal -->
@@ -231,7 +389,7 @@
                 <div>
                     <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="candidateCompareModalLabel">
                         <i class="bi bi-columns-gap text-primary"></i>
-                        <span>Side-by-Side Candidate Evaluation</span>
+                        <span>Side-by-Side Candidate Evaluation • {{ election.title }}</span>
                     </h5>
                     <p class="text-muted small mb-0">Evaluate platforms and agendas side-by-side to make an informed democratic choice</p>
                 </div>
@@ -240,7 +398,7 @@
             <div class="modal-body p-4">
                 <div class="row g-3">
                     {% for candidate in candidates %}
-                        <div class="col-md-6 col-lg-{{ (12 / candidates|length)|round|int if candidates|length <= 4 else 4 }}">
+                        <div class="col-md-6 col-lg-{{ (12 / candidates|length)|round|int if candidates|length <= 4 and candidates|length > 0 else 4 }}">
                             <div class="p-3.5 rounded-3 border h-100 bg-white d-flex flex-column justify-content-between shadow-sm">
                                 <div>
                                     <div class="d-flex align-items-center gap-2.5 mb-3 pb-2 border-bottom">
@@ -260,7 +418,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                {% if not already_voted %}
+                                {% if not already_voted and election.status == 'active' %}
                                     <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2 d-flex align-items-center justify-content-center gap-1.5" onclick="selectCandidateFromModal('cand_{{ candidate.id }}')">
                                         <i class="bi bi-check2-circle"></i>
                                         <span>Select This Candidate</span>

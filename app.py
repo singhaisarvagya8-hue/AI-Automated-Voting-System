@@ -36,6 +36,13 @@ def public_results(election_id=None):
 def public_create_election():
     return redirect(url_for('admin.create_election_section'))
 
+@app.route('/vote')
+@app.route('/vote/<int:election_id>')
+def public_vote(election_id=None):
+    if election_id:
+        return redirect(url_for('voter.cast_vote', election_id=election_id))
+    return redirect(url_for('voter.cast_vote'))
+
 def init_app_state():
     with app.app_context():
         try:
