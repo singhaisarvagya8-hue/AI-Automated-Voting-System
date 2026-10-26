@@ -310,7 +310,7 @@
                         <div>
                             <!-- Pebble Logo with votex.ai Branding -->
                             <div class="text-center mb-4 pt-1">
-                                <a href="{{ url_for('voter.dashboard') }}" class="votex-pebble-logo votex-pebble-sm">
+                                <a href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('voter.dashboard') }}" class="votex-pebble-logo votex-pebble-sm">
                                     votex<span style="opacity: 0.85;">.ai</span>
                                 </a>
                                 <div class="text-muted small mt-1" style="font-size: 0.72rem; letter-spacing: 0.05em; font-weight: 600;">
@@ -326,21 +326,32 @@
                                 </div>
                                 <h6 class="fw-bold text-dark mb-0 text-truncate">{{ session.get('name', 'Student Voter') }}</h6>
                                 <span class="badge bg-light text-muted border small mt-1 font-monospace" style="font-size: 0.68rem;">
-                                    {{ session.get('voter_id', 'CS202601') }}
+                                    {{ session.get('voter_id') or ('ADMIN001' if session.get('role') == 'admin' else 'CS202601') }}
                                 </span>
                                 <div class="mt-2">
-                                    <a href="{{ url_for('voter.dashboard') }}" class="small text-decoration-none fw-semibold" style="color: #6366f1; font-size: 0.75rem;">
-                                        View Profile &rarr;
-                                    </a>
+                                    <span class="badge {% if session.get('role') == 'admin' %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %} rounded-pill small" style="font-size: 0.7rem;">
+                                        {{ 'Electoral Commissioner' if session.get('role') == 'admin' else 'Student Voter' }}
+                                    </span>
                                 </div>
                             </div>
 
                             <!-- Nav Menu Pills -->
                             <nav class="nav flex-column">
-                                <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
-                                    <i class="bi bi-grid-fill"></i>
-                                    <span>Dashboard</span>
-                                </a>
+                                {% if session.get('role') == 'admin' %}
+                                    <a href="{{ url_for('admin.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-speedometer2"></i>
+                                        <span>Admin Console</span>
+                                    </a>
+                                    <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>Student View</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                {% endif %}
                                 <a href="{{ url_for('voter.cast_vote') }}" class="votex-nav-link {% if 'vote' in request.endpoint and request.endpoint != 'voter.dashboard' %}active{% endif %}">
                                     <i class="bi bi-box2-heart-fill"></i>
                                     <span>Vote</span>
@@ -353,7 +364,7 @@
                                     <i class="bi bi-shield-check"></i>
                                     <span>Voting Guidelines</span>
                                 </a>
-                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link {% if 'admin' in request.endpoint or 'create_election' in request.endpoint %}active{% endif %}">
+                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link {% if 'create_election' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-gear-fill"></i>
                                     <span>Settings / Create</span>
                                 </a>
@@ -378,7 +389,7 @@
                         
                         <!-- Mobile Hamburger / Logo -->
                         <div class="d-flex align-items-center gap-2">
-                            <a href="{{ url_for('voter.dashboard') }}" class="votex-pebble-logo votex-pebble-sm d-lg-none">
+                            <a href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('voter.dashboard') }}" class="votex-pebble-logo votex-pebble-sm d-lg-none">
                                 votex<span style="opacity: 0.85;">.ai</span>
                             </a>
                             <!-- Search Bar -->
@@ -391,7 +402,7 @@
                         <!-- Top Right Utilities & User Chip -->
                         <div class="d-flex align-items-center gap-2.5">
                             <!-- Notification Bell -->
-                            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-light rounded-circle p-2 text-muted position-relative" style="width: 40px; height: 40px;" title="Notifications">
+                            <a href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('voter.dashboard') }}" class="btn btn-light rounded-circle p-2 text-muted position-relative" style="width: 40px; height: 40px;" title="Notifications">
                                 <i class="bi bi-bell"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                             </a>
@@ -421,10 +432,21 @@
                     <div class="collapse d-lg-none mb-3" id="mobileNavMenu">
                         <div class="p-3 bg-light rounded-4">
                             <nav class="nav flex-column">
-                                <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
-                                    <i class="bi bi-grid-fill"></i>
-                                    <span>Dashboard</span>
-                                </a>
+                                {% if session.get('role') == 'admin' %}
+                                    <a href="{{ url_for('admin.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-speedometer2"></i>
+                                        <span>Admin Console</span>
+                                    </a>
+                                    <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>Student View</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('voter.dashboard') }}" class="votex-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                {% endif %}
                                 <a href="{{ url_for('voter.cast_vote') }}" class="votex-nav-link {% if 'vote' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-box2-heart-fill"></i>
                                     <span>Vote</span>
@@ -509,8 +531,9 @@
                     {% endif %}
                 {% endwith %}
 
-                {% block public_content %}
-                    {% block content_fallback %}{% endblock %}
+                <!-- Guest Content Block (renders the same block content) -->
+                {% block guest_content %}
+                    {{ self.content() }}
                 {% endblock %}
             </div>
             {% endif %}

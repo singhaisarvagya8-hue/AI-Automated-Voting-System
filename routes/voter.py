@@ -10,7 +10,7 @@ voter_bp = Blueprint('voter', __name__)
 
 def voter_required(f):
     def wrap(*args, **kwargs):
-        if 'user_id' not in session or session.get('role') != 'voter':
+        if 'user_id' not in session:
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     wrap.__name__ = f.__name__

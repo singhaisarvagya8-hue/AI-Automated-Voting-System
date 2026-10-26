@@ -7,6 +7,11 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET' and 'user_id' in session:
+        if session.get('role') == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        return redirect(url_for('voter.dashboard'))
+
     if request.method == 'POST':
         voter_id = (request.form.get('voter_id') or '').strip()
         password = (request.form.get('password') or '').strip()
@@ -14,6 +19,7 @@ def login():
         user = User.query.filter(db.func.lower(User.voter_id) == voter_id.lower()).first()
         if user and user.check_password(password):
             session['user_id'] = user.id
+            session['voter_id'] = user.voter_id
             session['role'] = user.role
             session['name'] = user.name
             
