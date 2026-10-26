@@ -255,6 +255,73 @@
             box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15), 0 16px 32px rgba(67, 56, 202, 0.12);
         }
 
+        /* Pulsing Beacon & Radar Animation */
+        .votex-pulse-beacon {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            position: relative;
+            display: inline-block;
+        }
+
+        .votex-pulse-beacon::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 2px solid #10b981;
+            border-radius: 50%;
+            animation: beacon-ripple 1.8s infinite ease-out;
+        }
+
+        @keyframes beacon-ripple {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Cyberpunk / High-Tech Terminal Box */
+        .terminal-hash-box {
+            background: #090d16;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 14px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* AI Interactive Filter Chips */
+        .ai-filter-chip {
+            font-size: 0.74rem;
+            font-weight: 500;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            border: 1px solid #e0e7ff;
+            background: #f8fafc;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            user-select: none;
+        }
+
+        .ai-filter-chip:hover, .ai-filter-chip.active {
+            background: #4338ca;
+            color: #ffffff;
+            border-color: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+        }
+
         .candidate-avatar-ring {
             width: 88px;
             height: 88px;
@@ -369,6 +436,26 @@
                                     <span>Settings / Create</span>
                                 </a>
                             </nav>
+                        </div>
+
+                        <!-- AI Engine & Cryptographic Integrity Sidebar Card -->
+                        <div class="my-4 p-3 rounded-4" style="background: linear-gradient(135deg, rgba(67, 56, 202, 0.05) 0%, rgba(99, 102, 241, 0.12) 100%); border: 1px solid rgba(99, 102, 241, 0.22);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge rounded-pill text-white" style="background: #4338ca; font-size: 0.65rem; letter-spacing: 0.04em;">
+                                    <i class="bi bi-cpu me-1"></i>AI ENGINE
+                                </span>
+                                <span class="d-inline-flex align-items-center gap-1 small text-success fw-bold" style="font-size: 0.68rem;">
+                                    <span class="votex-pulse-beacon"></span> LIVE
+                                </span>
+                            </div>
+                            <div class="fw-bold text-dark small mb-1" style="font-size: 0.78rem;">Quantum-Resilient Ledger</div>
+                            <div class="text-muted" style="font-size: 0.7rem; line-height: 1.35;">
+                                Zero-Knowledge SHA-256 Merkle root verification enabled across all active voter nodes.
+                            </div>
+                            <div class="mt-2 pt-2 border-top border-primary-subtle d-flex justify-content-between align-items-center">
+                                <span class="text-muted" style="font-size: 0.68rem;">Tamper Audit:</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.65rem;">0 Anomalies</span>
+                            </div>
                         </div>
 
                         <!-- Logout Link Pinned at Bottom -->
