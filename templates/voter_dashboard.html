@@ -211,24 +211,70 @@
 
                         <!-- Filter Tabs: Today / Next week / This month -->
                         <div class="d-flex gap-1.5 p-1 bg-light rounded-pill mb-3">
-                            <button class="btn btn-sm btn-ivote-primary flex-fill rounded-pill py-1" style="font-size: 0.75rem;">Today</button>
-                            <button class="btn btn-sm btn-light flex-fill rounded-pill py-1 text-muted" style="font-size: 0.75rem;">Next week</button>
-                            <button class="btn btn-sm btn-light flex-fill rounded-pill py-1 text-muted" style="font-size: 0.75rem;">This month</button>
+                            <button type="button" class="btn btn-sm btn-ivote-primary flex-fill rounded-pill py-1 cal-tab-btn" onclick="switchCalendarTab('cal-pane-today', this)" style="font-size: 0.75rem;">Today</button>
+                            <button type="button" class="btn btn-sm btn-light flex-fill rounded-pill py-1 text-muted cal-tab-btn" onclick="switchCalendarTab('cal-pane-next-week', this)" style="font-size: 0.75rem;">Next week</button>
+                            <button type="button" class="btn btn-sm btn-light flex-fill rounded-pill py-1 text-muted cal-tab-btn" onclick="switchCalendarTab('cal-pane-this-month', this)" style="font-size: 0.75rem;">This month</button>
                         </div>
 
-                        <!-- Upcoming Election Schedule Box -->
-                        <div class="p-3 rounded-4" style="background: #eef2ff; border: 1px solid #c7d2fe;">
+                        <!-- Pane 1: Today -->
+                        <div id="cal-pane-today" class="cal-pane p-3 rounded-4" style="background: #eef2ff; border: 1px solid #c7d2fe;">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="fw-bold text-dark small">November 2026</span>
-                                <span class="badge bg-primary rounded-pill" style="font-size: 0.68rem;">Open Today</span>
+                                <span class="fw-bold text-dark small"><i class="bi bi-clock-history text-primary me-1"></i>Today's Schedule</span>
+                                <span class="badge bg-success rounded-pill" style="font-size: 0.68rem;">Live Now</span>
                             </div>
                             <div class="p-2.5 bg-white rounded-3 shadow-sm border mb-2">
-                                <div class="fw-bold text-primary small">Student Council Election</div>
-                                <div class="text-muted" style="font-size: 0.72rem;">09:00 AM – 06:00 PM UTC</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="fw-bold text-primary small">Student Council Election 2026</div>
+                                    <span class="badge bg-primary-subtle text-primary border rounded-pill" style="font-size: 0.65rem;">Active</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.72rem;">09:00 AM – 06:00 PM UTC &bull; Ballots Open</div>
                             </div>
                             <div class="p-2.5 bg-white rounded-3 shadow-sm border">
-                                <div class="fw-bold text-dark small">College CR Election</div>
-                                <div class="text-muted" style="font-size: 0.72rem;">Active • 5 Candidates Nominated</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="fw-bold text-dark small">College CR Election</div>
+                                    <span class="badge bg-success-subtle text-success border rounded-pill" style="font-size: 0.65rem;">Live Tally</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.72rem;">5 Candidates Nominated &bull; Ready to Vote</div>
+                            </div>
+                        </div>
+
+                        <!-- Pane 2: Next Week -->
+                        <div id="cal-pane-next-week" class="cal-pane p-3 rounded-4 d-none" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold text-dark small"><i class="bi bi-calendar-week text-success me-1"></i>Next Week's Lineup</span>
+                                <span class="badge bg-primary rounded-pill" style="font-size: 0.68rem;">Upcoming</span>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border mb-2">
+                                <div class="fw-bold text-success small">Presidential Candidate Scrutiny</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Tuesday &bull; 10:00 AM UTC &bull; Commission Board</div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border mb-2">
+                                <div class="fw-bold text-dark small">Council Public Townhall Debate</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Thursday &bull; 04:00 PM UTC &bull; Live Q&A Stream</div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border">
+                                <div class="fw-bold text-dark small">Pre-Poll Key Generation Ceremony</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Friday &bull; 02:00 PM UTC &bull; Ledger Nonce Protocol</div>
+                            </div>
+                        </div>
+
+                        <!-- Pane 3: This Month -->
+                        <div id="cal-pane-this-month" class="cal-pane p-3 rounded-4 d-none" style="background: #faf5ff; border: 1px solid #e9d5ff;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold text-dark small"><i class="bi bi-calendar3 me-1" style="color: #9333ea;"></i>Monthly Milestones</span>
+                                <span class="badge rounded-pill text-white" style="background: #9333ea; font-size: 0.68rem;">Term 2026</span>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border mb-2">
+                                <div class="fw-bold small" style="color: #7e22ce;">Institutional General Election Phase</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Nov 1 – Nov 10, 2026 &bull; All Departments</div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border mb-2">
+                                <div class="fw-bold text-dark small">Ledger Sealing & Zero-Knowledge Audit</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Nov 15, 2026 &bull; Public Verification Portal</div>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-3 shadow-sm border">
+                                <div class="fw-bold text-dark small">Official Council Swearing-In</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Nov 28, 2026 &bull; Academic Senate Hall</div>
                             </div>
                         </div>
                     </div>
@@ -279,4 +325,21 @@
 
     </div>
 </div>
+
+<script>
+    function switchCalendarTab(paneId, btn) {
+        document.querySelectorAll('.cal-tab-btn').forEach(b => {
+            b.classList.remove('btn-ivote-primary', 'btn-primary');
+            b.classList.add('btn-light', 'text-muted');
+        });
+        btn.classList.remove('btn-light', 'text-muted');
+        btn.classList.add('btn-ivote-primary');
+
+        document.querySelectorAll('.cal-pane').forEach(p => p.classList.add('d-none'));
+        const target = document.getElementById(paneId);
+        if (target) {
+            target.classList.remove('d-none');
+        }
+    }
+</script>
 {% endblock %}

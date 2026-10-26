@@ -16,8 +16,13 @@
             </p>
         </div>
 
-        <!-- Quick Switcher Dropdown (if voter wants to jump to specific election) -->
-        <div class="d-flex align-items-center gap-2">
+    <!-- Quick Switcher Dropdown & Live Filter Info -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+        <div id="searchFilterBadge" class="d-none align-items-center gap-2 bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 small">
+            <span><i class="bi bi-funnel-fill me-1"></i>Filtered by: <strong id="searchFilterText"></strong></span>
+            <button type="button" class="btn-close btn-close-sm" style="font-size: 0.65rem;" onclick="clearOnPageSearch()" aria-label="Clear filter"></button>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
             <span class="text-muted small fw-semibold d-none d-sm-inline">Switch Chamber:</span>
             <select class="form-select form-select-sm rounded-pill px-3 py-1.5 border-primary-subtle shadow-sm" id="electionJumper" onchange="switchElectionChamber(this.value)" style="min-width: 220px;">
                 {% for el in all_elections %}
@@ -293,5 +298,66 @@
         
         new bootstrap.Modal(document.getElementById('candidateDetailModal')).show();
     }
+
+    function applyCandidateFilter(rawQuery) {
+        const query = (rawQuery || '').trim().toLowerCase();
+        const badge = document.getElementById('searchFilterBadge');
+        const badgeText = document.getElementById('searchFilterText');
+        const cards = document.querySelectorAll('.ivote-candidate-card');
+
+        if (!query) {
+            cards.forEach(c => {
+                const col = c.closest('.col-sm-6') || c;
+                col.classList.remove('d-none');
+            });
+            if (badge) badge.classList.add('d-none');
+            return;
+        }
+
+        let visibleCount = 0;
+        cards.forEach(c => {
+            const col = c.closest('.col-sm-6') || c;
+            const text = (c.innerText || '').toLowerCase();
+            if (text.includes(query)) {
+                col.classList.remove('d-none');
+                visibleCount++;
+            } else {
+                col.classList.add('d-none');
+            }
+        });
+
+        if (badge && badgeText) {
+            badgeText.textContent = `"${rawQuery}" (${visibleCount} matched)`;
+            badge.classList.remove('d-none');
+            badge.classList.add('d-inline-flex');
+        }
+    }
+
+    function clearOnPageSearch() {
+        const globalInput = document.getElementById('globalSearchInput');
+        if (globalInput) globalInput.value = '';
+        applyCandidateFilter('');
+        // Clean URL param without full reload
+        const url = new URL(window.location.href);
+        url.searchParams.delete('search');
+        window.history.replaceState({}, '', url.toString());
+    }
+
+    // Initialize from URL param or custom event
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const searchQuery = params.get('search');
+        if (searchQuery) {
+            const globalInput = document.getElementById('globalSearchInput');
+            if (globalInput) globalInput.value = searchQuery;
+            applyCandidateFilter(searchQuery);
+        }
+
+        window.addEventListener('votex:search', function(e) {
+            if (e.detail && e.detail.query !== undefined) {
+                applyCandidateFilter(e.detail.query);
+            }
+        });
+    });
 </script>
 {% endblock %}

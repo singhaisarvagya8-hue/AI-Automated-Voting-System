@@ -1,7 +1,8 @@
 import os
-from flask import Flask, redirect, url_for, session
+from flask import Flask, redirect, url_for, session, jsonify, request
 from config import Config
 from models.user import db
+from models.election import Election, Candidate
 from routes.auth import auth_bp
 from routes.voter import voter_bp
 from routes.admin import admin_bp
@@ -42,6 +43,49 @@ def public_vote(election_id=None):
     if election_id:
         return redirect(url_for('voter.cast_vote', election_id=election_id))
     return redirect(url_for('voter.choose_election'))
+
+@app.route('/api/search')
+def global_search():
+    query = (request.args.get('q') or '').strip().lower()
+    if not query or len(query) < 1:
+        return jsonify({'candidates': [], 'elections': []})
+    
+    candidates = []
+    elections = []
+    
+    all_cands = Candidate.query.all()
+    for c in all_cands:
+        el = Election.query.get(c.election_id)
+        pos = (c.position or '').lower()
+        mf = (c.manifesto or '').lower()
+        if query in c.name.lower() or query in pos or query in mf or (el and query in el.title.lower()):
+            candidates.append({
+                'id': c.id,
+                'name': c.name,
+                'position': c.position or 'Representative',
+                'election_id': c.election_id,
+                'election_title': el.title if el else 'Election',
+                'vote_url': url_for('voter.cast_vote', election_id=c.election_id),
+                'results_url': url_for('voter.results_view', election_id=c.election_id)
+            })
+            
+    all_elecs = Election.query.all()
+    for e in all_elecs:
+        desc = (e.description or '').lower()
+        if query in e.title.lower() or query in desc:
+            elections.append({
+                'id': e.id,
+                'title': e.title,
+                'status': e.status,
+                'vote_url': url_for('voter.cast_vote', election_id=e.id),
+                'results_url': url_for('voter.results_view', election_id=e.id)
+            })
+            
+    return jsonify({
+        'query': query,
+        'candidates': candidates[:6],
+        'elections': elections[:4]
+    })
 
 def init_app_state():
     with app.app_context():
