@@ -63,37 +63,17 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Mobile Phone & Ballot Vector Illustration from Mockup -->
+                            <!-- 3D Ballot Box Image from Design System -->
                             <div class="col-md-5 text-center mt-3 mt-md-0">
-                                <svg width="180" height="150" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="img-fluid">
-                                    <!-- Ambient Glow -->
-                                    <ellipse cx="100" cy="140" rx="70" ry="14" fill="#E0E7FF" />
-                                    <!-- Smartphone Body -->
-                                    <rect x="70" y="15" width="80" height="130" rx="14" fill="#3730A3" />
-                                    <rect x="74" y="22" width="72" height="116" rx="10" fill="#EEF2FF" />
-                                    <!-- Screen Elements -->
-                                    <rect x="82" y="32" width="56" height="10" rx="5" fill="#4338CA" />
-                                    <rect x="82" y="48" width="40" height="6" rx="3" fill="#C7D2FE" />
-                                    <!-- Candidate Checkboxes on Phone -->
-                                    <rect x="82" y="60" width="56" height="16" rx="4" fill="#FFFFFF" />
-                                    <circle cx="90" cy="68" r="4" fill="#4338CA" />
-                                    <rect x="98" y="66" width="32" height="4" rx="2" fill="#94A3B8" />
-                                    
-                                    <rect x="82" y="80" width="56" height="16" rx="4" fill="#FFFFFF" />
-                                    <circle cx="90" cy="88" r="4" fill="#E2E8F0" />
-                                    <rect x="98" y="86" width="28" height="4" rx="2" fill="#CBD5E1" />
-                                    
-                                    <!-- Submit Button on Phone -->
-                                    <rect x="82" y="104" width="56" height="14" rx="7" fill="#4F46E5" />
-                                    <circle cx="110" cy="111" r="3" fill="#FFFFFF" />
-
-                                    <!-- Student / Voter Character beside phone -->
-                                    <circle cx="48" cy="70" r="14" fill="#F97316" />
-                                    <path d="M48 88C36 88 30 102 30 118H66C66 102 60 88 48 88Z" fill="#3B82F6" />
-                                    <!-- Floating Checkmark Badge -->
-                                    <circle cx="152" cy="45" r="14" fill="#10B981" />
-                                    <path d="M146 45L150 49L158 41" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                                <div class="position-relative d-inline-block">
+                                    <img src="{{ url_for('static', filename='img/voting_ballot_box.jpg') }}" 
+                                         alt="Digital Ballot Box Illustration" 
+                                         class="img-fluid rounded-4 shadow-sm border border-primary-subtle" 
+                                         style="max-height: 140px; width: 100%; max-width: 210px; object-fit: cover;">
+                                    <span class="position-absolute bottom-0 end-0 translate-middle-y me-2 badge bg-success-subtle text-success border border-success-subtle rounded-pill shadow-sm" style="font-size: 0.65rem;">
+                                        <i class="bi bi-shield-check me-1"></i>Encrypted
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>

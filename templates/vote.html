@@ -51,6 +51,83 @@
         <!-- ========================================== -->
         <div class="col-12 col-lg-5 col-xl-4">
             
+            <!-- Featured Election & Voting Visual Showcase -->
+            <div class="votex-card p-0 mb-3 overflow-hidden shadow-sm" style="border: 1px solid rgba(99, 102, 241, 0.35);">
+                <!-- Header with Image Switcher Tabs -->
+                <div class="p-3 pb-2.5 d-flex align-items-center justify-content-between bg-white border-bottom">
+                    <div class="d-flex align-items-center gap-1.5">
+                        <span class="badge rounded-circle p-1.5 text-white" style="background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%); width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-box2-heart" style="font-size: 0.75rem;"></i>
+                        </span>
+                        <span class="fw-bold text-dark small" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                            Campus Democracy In Action
+                        </span>
+                    </div>
+                    <div class="d-flex gap-1" id="electionImageTabs">
+                        <button type="button" class="btn btn-sm btn-ivote-primary py-0.5 px-2.5 rounded-pill visual-tab-btn" onclick="switchVisualImage('ballot', this)" style="font-size: 0.68rem;">
+                            <span>Ballot Box</span>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light border py-0.5 px-2.5 rounded-pill text-muted visual-tab-btn" onclick="switchVisualImage('students', this)" style="font-size: 0.68rem;">
+                            <span>Voters</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 1: 3D Holographic Ballot Box -->
+                <div id="visual-pane-ballot" class="visual-image-pane position-relative">
+                    <img src="{{ url_for('static', filename='img/voting_ballot_box.jpg') }}" 
+                         alt="3D Digital Voting Ballot Box" 
+                         class="w-100 object-fit-cover" 
+                         style="height: 200px; display: block;">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-2.5 d-flex justify-content-between align-items-end" 
+                         style="background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.88) 100%);">
+                        <div>
+                            <span class="badge rounded-pill text-white px-2.5 py-0.5 mb-1" style="background: rgba(67, 56, 202, 0.95); font-size: 0.65rem;">
+                                <i class="bi bi-shield-check me-1"></i>Official 2026 Ballot
+                            </span>
+                            <div class="text-white fw-bold small" style="font-size: 0.82rem; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+                                Encrypted Digital Ballot Box
+                            </div>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.65rem;">
+                            <i class="bi bi-lock-fill me-1"></i>SHA-256 Sealed
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Indian Students Voting in Campus Council Election -->
+                <div id="visual-pane-students" class="visual-image-pane position-relative d-none">
+                    <img src="{{ url_for('static', filename='img/students_voting.jpg') }}" 
+                         alt="Indian College Students Proudly Voting" 
+                         class="w-100 object-fit-cover" 
+                         style="height: 200px; display: block;">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-2.5 d-flex justify-content-between align-items-end" 
+                         style="background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.88) 100%);">
+                        <div>
+                            <span class="badge rounded-pill text-white px-2.5 py-0.5 mb-1" style="background: rgba(16, 185, 129, 0.95); font-size: 0.65rem;">
+                                <i class="bi bi-patch-check-fill me-1"></i>Student Civic Pride
+                            </span>
+                            <div class="text-white fw-bold small" style="font-size: 0.82rem; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+                                Proud Campus Voters
+                            </div>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 0.65rem;">
+                            <i class="bi bi-check-circle-fill me-1"></i>Inked & Verified
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Motivational Tagline Footer -->
+                <div class="p-2.5 bg-light border-top d-flex align-items-center justify-content-between">
+                    <span class="text-muted small" style="font-size: 0.72rem;">
+                        <i class="bi bi-megaphone-fill text-primary me-1"></i>Your vote shapes campus policies & resources.
+                    </span>
+                    <span class="badge rounded-pill text-dark border bg-white px-2 py-0.5" style="font-size: 0.65rem;">
+                        votex.ai
+                    </span>
+                </div>
+            </div>
+            
             <!-- Card 1: AI Neural Auditor & Real-Time Integrity -->
             <div class="votex-card p-3.5 mb-3 position-relative overflow-hidden" style="border: 1px solid rgba(99, 102, 241, 0.35); background: linear-gradient(180deg, #ffffff 0%, #fcfaff 100%);">
                 <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
@@ -622,6 +699,23 @@
         const url = new URL(window.location.href);
         url.searchParams.delete('search');
         window.history.replaceState({}, '', url.toString());
+    }
+
+    function switchVisualImage(tabName, btn) {
+        document.querySelectorAll('.visual-tab-btn').forEach(b => {
+            b.classList.remove('btn-ivote-primary');
+            b.classList.add('btn-light', 'text-muted');
+        });
+        if (btn) {
+            btn.classList.remove('btn-light', 'text-muted');
+            btn.classList.add('btn-ivote-primary');
+        }
+
+        document.querySelectorAll('.visual-image-pane').forEach(p => p.classList.add('d-none'));
+        const pane = document.getElementById('visual-pane-' + tabName);
+        if (pane) {
+            pane.classList.remove('d-none');
+        }
     }
 
     // Dynamic Live Nonce Ticker Simulation
