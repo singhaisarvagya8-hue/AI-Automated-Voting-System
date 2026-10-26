@@ -496,11 +496,95 @@
 
                         <!-- Top Right Utilities & User Chip -->
                         <div class="d-flex align-items-center gap-2.5">
-                            <!-- Notification Bell -->
-                            <a href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('voter.dashboard') }}" class="btn btn-light rounded-circle p-2 text-muted position-relative" style="width: 40px; height: 40px;" title="Notifications">
-                                <i class="bi bi-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                            </a>
+                            <!-- Notification Bell & Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-light rounded-circle p-2 text-muted position-relative" 
+                                        type="button" 
+                                        id="topNotificationBell" 
+                                        data-bs-toggle="dropdown" 
+                                        data-bs-auto-close="outside"
+                                        aria-expanded="false" 
+                                        style="width: 40px; height: 40px;" 
+                                        title="Announcements & Winner Notifications">
+                                    <i class="bi bi-bell"></i>
+                                    {% if global_unread_notifications_count and global_unread_notifications_count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.62rem; padding: 0.25em 0.5em;">
+                                            {{ global_unread_notifications_count }}
+                                        </span>
+                                    {% endif %}
+                                </button>
+                                
+                                <div class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 p-0 border" 
+                                     aria-labelledby="topNotificationBell" 
+                                     style="width: 360px; max-width: 90vw; border-color: rgba(99, 102, 241, 0.25) !important; z-index: 1070;">
+                                    
+                                    <!-- Header -->
+                                    <div class="p-3 bg-light border-bottom rounded-top-4 d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 26px; height: 26px; background: #4338ca;">
+                                                <i class="bi bi-bell-fill" style="font-size: 0.75rem;"></i>
+                                            </div>
+                                            <span class="fw-bold text-dark small" style="font-family: 'Poppins', sans-serif;">Announcements & Notifications</span>
+                                        </div>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.68rem;">
+                                            {{ global_announcements|length }} Total
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Notifications List -->
+                                    <div class="p-2" style="max-height: 380px; overflow-y: auto;">
+                                        {% if global_announcements %}
+                                            {% for item in global_announcements[:6] %}
+                                                <a href="{{ url_for('voter.results_view', election_id=item.election_id) if item.announcement_type == 'winner_declared' else (url_for('voter.cast_vote', election_id=item.election_id) if item.election_id else url_for('voter.choose_election')) }}" 
+                                                   class="d-flex gap-2.5 p-2.5 rounded-3 text-decoration-none transition-all mb-1.5 {% if item.announcement_type == 'winner_declared' %}bg-warning-subtle text-dark border border-warning-subtle{% else %}bg-light text-dark border{% endif %}">
+                                                    <div class="flex-shrink-0 mt-0.5">
+                                                        {% if item.announcement_type == 'winner_declared' %}
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 32px; height: 32px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                                                <i class="bi bi-trophy-fill" style="font-size: 0.85rem;"></i>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 32px; height: 32px; background: linear-gradient(135deg, #4338ca, #6366f1);">
+                                                                <i class="bi bi-megaphone-fill" style="font-size: 0.85rem;"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="flex-grow-1 overflow-hidden">
+                                                        <div class="d-flex align-items-center justify-content-between gap-1 mb-0.5">
+                                                            <span class="fw-bold small text-truncate {% if item.announcement_type == 'winner_declared' %}text-warning-emphasis{% else %}text-primary{% endif %}" style="font-size: 0.76rem;">
+                                                                {% if item.announcement_type == 'winner_declared' %}
+                                                                    🏆 Winner Declared
+                                                                {% else %}
+                                                                    📢 New Election Added
+                                                                {% endif %}
+                                                            </span>
+                                                            <span class="text-muted" style="font-size: 0.65rem;">{{ item.created_at.strftime('%b %d') if item.created_at else 'Recent' }}</span>
+                                                        </div>
+                                                        <div class="text-dark small fw-semibold text-truncate" style="font-size: 0.76rem;">
+                                                            {{ item.title }}
+                                                        </div>
+                                                        <p class="text-muted small mb-0 text-truncate" style="font-size: 0.7rem; line-height: 1.35;">
+                                                            {{ item.message }}
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="p-4 text-center text-muted small">
+                                                <i class="bi bi-bell-slash fs-3 d-block mb-1 text-secondary"></i>
+                                                No notifications at this time.
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Footer Link -->
+                                    <div class="p-2 bg-light border-top rounded-bottom-4 text-center">
+                                        <a href="{{ url_for('voter.choose_election') }}" class="small fw-semibold text-primary text-decoration-none d-flex align-items-center justify-content-center gap-1" style="font-size: 0.75rem;">
+                                            <span>View All in Election Directory</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <!-- Ledger Verification Link -->
                             <a href="{{ url_for('auth.verify_ballot') }}" class="btn btn-light rounded-circle p-2 text-muted" style="width: 40px; height: 40px;" title="Verify Ledger">

@@ -34,6 +34,148 @@
         </div>
     </div>
 
+    <!-- Dedicated Announcement & Winner Notification Section -->
+    {% set display_announcements = announcements if announcements is defined and announcements else global_announcements %}
+    {% set display_winners = winners if winners is defined and winners else global_winners %}
+    {% if display_announcements %}
+        <div class="votex-card p-4 mb-4 position-relative overflow-hidden" 
+             style="background: linear-gradient(135deg, #fcfaff 0%, #ffffff 100%); border: 1.5px solid rgba(99, 102, 241, 0.28); box-shadow: 0 10px 25px rgba(67, 56, 202, 0.06);">
+            
+            <!-- Section Header -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-2 border-bottom">
+                <div class="d-flex align-items-center gap-2.5">
+                    <span class="d-inline-flex align-items-center justify-content-center text-white rounded-circle shadow-sm" 
+                          style="width: 34px; height: 34px; background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);">
+                        <i class="bi bi-megaphone-fill" style="font-size: 0.88rem;"></i>
+                    </span>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h5 class="fw-bold text-dark mb-0" style="font-family: 'Poppins', sans-serif;">
+                                Announcements & Winner Notifications
+                            </h5>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-0.5" style="font-size: 0.68rem;">
+                                <span class="votex-pulse-beacon me-1" style="background:#ef4444;"></span>Live Bulletins
+                            </span>
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.76rem;">
+                            Certified winner declarations and official notifications when elections are added
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Announcement Category Filter Tabs -->
+                <div class="d-flex align-items-center gap-1.5 p-1 bg-light rounded-pill border" id="announcementFilterBar">
+                    <button type="button" class="btn btn-sm btn-ivote-primary rounded-pill py-1 px-3 ann-filter-btn active" onclick="filterAnnouncements('all', this)" style="font-size: 0.72rem;">
+                        All Bulletins ({{ display_announcements|length }})
+                    </button>
+                    {% if display_winners %}
+                        <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-3 text-warning-emphasis ann-filter-btn" onclick="filterAnnouncements('winner_declared', this)" style="font-size: 0.72rem;">
+                            <i class="bi bi-trophy-fill text-warning me-1"></i>Winners ({{ display_winners|length }})
+                        </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-sm btn-light border rounded-pill py-1 px-3 text-muted ann-filter-btn" onclick="filterAnnouncements('election_added', this)" style="font-size: 0.72rem;">
+                        <i class="bi bi-plus-circle-fill text-primary me-1"></i>New Elections
+                    </button>
+                </div>
+            </div>
+
+            <!-- Announcements Grid / Cards -->
+            <div class="row g-3" id="announcementsListContainer">
+                {% for ann in display_announcements[:4] %}
+                    <div class="col-md-6 announcement-card-item" data-type="{{ ann.announcement_type }}">
+                        {% if ann.announcement_type == 'winner_declared' %}
+                            <!-- Special Winner Notification Card (Celebratory Gold / Indigo Styling) -->
+                            <div class="p-3.5 rounded-4 h-100 position-relative overflow-hidden border transition-all" 
+                                 style="background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-color: rgba(245, 158, 11, 0.45) !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.08);">
+                                
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.7rem; letter-spacing: 0.03em;">
+                                        <i class="bi bi-trophy-fill"></i>
+                                        <span>OFFICIAL WINNER DECLARED</span>
+                                    </span>
+                                    <span class="text-muted small" style="font-size: 0.68rem;">
+                                        <i class="bi bi-clock me-1"></i>{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else 'Certified' }}
+                                    </span>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 my-2">
+                                    <!-- Avatar Ring -->
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold shadow-sm flex-shrink-0" 
+                                         style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 1.1rem; border: 2px solid #fef3c7;">
+                                        {{ (ann.winner_name or 'W')[:2]|upper }}
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <h5 class="fw-bold text-dark mb-0 text-truncate" style="font-family: 'Poppins', sans-serif;">
+                                            {{ ann.winner_name }}
+                                        </h5>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">
+                                            {{ ann.winner_position or 'Candidate' }} &bull; <strong class="text-primary">{{ ann.election.title if ann.election else 'Election Contest' }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted small mb-2.5" style="font-size: 0.75rem; line-height: 1.4;">
+                                    {{ ann.message }}
+                                </p>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top" style="border-color: rgba(245, 158, 11, 0.25) !important;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill font-monospace" style="font-size: 0.72rem;">
+                                            <i class="bi bi-check-circle-fill me-1"></i>{{ ann.winner_votes }} Votes ({{ ann.winner_percentage }}%)
+                                        </span>
+                                        <span class="badge bg-light text-muted border rounded-pill" style="font-size: 0.65rem;">
+                                            <i class="bi bi-shield-check text-success me-1"></i>Certified
+                                        </span>
+                                    </div>
+                                    <a href="{{ url_for('voter.results_view', election_id=ann.election_id) if ann.election_id else url_for('voter.results_view') }}" 
+                                       class="btn btn-sm btn-outline-warning py-1 px-2.5 rounded-pill text-dark fw-semibold" style="font-size: 0.72rem;">
+                                        View Certified Standings &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- New Election Added Announcement Card -->
+                            <div class="p-3.5 rounded-4 h-100 position-relative overflow-hidden border bg-white transition-all" 
+                                 style="border-color: rgba(99, 102, 241, 0.25) !important; box-shadow: 0 4px 15px rgba(67, 56, 202, 0.04);">
+                                
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.7rem; letter-spacing: 0.03em;">
+                                        <i class="bi bi-megaphone-fill"></i>
+                                        <span>NEW ELECTION ADDED</span>
+                                    </span>
+                                    <span class="text-muted small" style="font-size: 0.68rem;">
+                                        <i class="bi bi-clock me-1"></i>{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else 'Published' }}
+                                    </span>
+                                </div>
+
+                                <h6 class="fw-bold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">
+                                    {{ ann.title }}
+                                </h6>
+
+                                <p class="text-muted small mb-3" style="font-size: 0.75rem; line-height: 1.45;">
+                                    {{ ann.message }}
+                                </p>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+                                    <span class="text-muted small" style="font-size: 0.7rem;">
+                                        <i class="bi bi-shield-lock-fill text-primary me-1"></i>Single encrypted ballot active
+                                    </span>
+                                    {% if ann.election_id %}
+                                        <a href="{{ url_for('voter.cast_vote', election_id=ann.election_id) }}" 
+                                           class="btn btn-sm btn-ivote-primary py-1 px-3 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                            <span>Vote in Contest</span> &rarr;
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    {% endif %}
+
     <!-- Overview Metrics & Quota Bar -->
     <div class="votex-card p-4 mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #fcfaff 100%); border: 1px solid rgba(99, 102, 241, 0.25);">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
@@ -286,6 +428,25 @@
         if (searchInput) searchInput.value = '';
         const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
         if (allBtn) allBtn.click();
+    }
+
+    function filterAnnouncements(type, btn) {
+        document.querySelectorAll('.ann-filter-btn').forEach(b => {
+            b.classList.remove('btn-ivote-primary', 'active');
+            b.classList.add('btn-light', 'text-muted');
+        });
+        if (btn) {
+            btn.classList.remove('btn-light', 'text-muted');
+            btn.classList.add('btn-ivote-primary', 'active');
+        }
+
+        document.querySelectorAll('.announcement-card-item').forEach(card => {
+            if (type === 'all' || card.getAttribute('data-type') === type) {
+                card.classList.remove('d-none');
+            } else {
+                card.classList.add('d-none');
+            }
+        });
     }
 </script>
 {% endblock %}

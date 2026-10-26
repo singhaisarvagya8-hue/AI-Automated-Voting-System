@@ -82,6 +82,10 @@ def dashboard():
             'has_voted': status_map.get(el.id, False)
         })
 
+    from services.announcements import get_recent_announcements, get_winner_announcements
+    announcements = get_recent_announcements(limit=8)
+    winners = get_winner_announcements(limit=5)
+
     return render_template('voter_dashboard.html', 
                            user=user,
                            elections=all_elections, 
@@ -92,6 +96,8 @@ def dashboard():
                            total_votes_cast=total_votes_cast,
                            total_candidates_count=total_candidates_count,
                            election_activities=election_activities,
+                           announcements=announcements,
+                           winners=winners,
                            status_map=status_map,
                            receipt_map=receipt_map,
                            voted_at_map=voted_at_map)
@@ -269,6 +275,10 @@ def choose_election():
     voted_elections_count = sum(1 for el in all_elections if status_map.get(el.id))
     unvoted_active_count = sum(1 for el in all_elections if el.status == 'active' and not status_map.get(el.id))
     progress_pct = int((voted_elections_count / total_elections_count * 100)) if total_elections_count > 0 else 0
+
+    from services.announcements import get_recent_announcements, get_winner_announcements
+    announcements = get_recent_announcements(limit=10)
+    winners = get_winner_announcements(limit=5)
     
     return render_template('choose_election.html',
                            user=user,
@@ -276,6 +286,8 @@ def choose_election():
                            candidates_by_election=candidates_by_election,
                            status_map=status_map,
                            receipt_map=receipt_map,
+                           announcements=announcements,
+                           winners=winners,
                            total_elections_count=total_elections_count,
                            active_elections_count=active_elections_count,
                            closed_count=closed_count,

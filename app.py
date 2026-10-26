@@ -87,6 +87,25 @@ def global_search():
         'elections': elections[:4]
     })
 
+@app.context_processor
+def inject_announcements():
+    try:
+        from services.announcements import get_recent_announcements, get_winner_announcements
+        announcements = get_recent_announcements(limit=8)
+        winners = get_winner_announcements(limit=5)
+        unread_count = min(len(announcements), 5)
+        return {
+            'global_announcements': announcements,
+            'global_winners': winners,
+            'global_unread_notifications_count': unread_count
+        }
+    except Exception as e:
+        return {
+            'global_announcements': [],
+            'global_winners': [],
+            'global_unread_notifications_count': 0
+        }
+
 def init_app_state():
     with app.app_context():
         try:
@@ -106,6 +125,14 @@ def init_app_state():
                         db.session.commit()
                 except Exception:
                     db.session.rollback()
+            
+            # Sync announcements for existing contests
+            try:
+                from services.announcements import sync_all_announcements
+                sync_all_announcements()
+            except Exception as e:
+                print(f" * Announcement sync note: {e}")
+
         except Exception as e:
             print(f" * Database init note: {e}")
     

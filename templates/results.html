@@ -111,11 +111,12 @@
 
         <!-- Leader Spotlight Banner -->
         {% if leader and leader.votes > 0 %}
-            <div class="ivote-card p-4 mb-4" style="background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%); border-left: 6px solid #4338ca;">
+            <div class="ivote-card p-4 mb-4" 
+                 style="background: {% if selected_election.status == 'closed' %}linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-left: 6px solid #f59e0b; border: 1.5px solid rgba(245, 158, 11, 0.4);{% else %}linear-gradient(135deg, #eef2ff 0%, #ffffff 100%); border-left: 6px solid #4338ca;{% endif %}">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="candidate-avatar-ring m-0" style="width: 64px; height: 64px;">
-                            <div class="candidate-avatar-inner fs-4" style="background: #4338ca; color: #ffffff;">
+                        <div class="candidate-avatar-ring m-0" style="width: 64px; height: 64px; border-color: {% if selected_election.status == 'closed' %}#f59e0b{% else %}#4338ca{% endif %};">
+                            <div class="candidate-avatar-inner fs-4" style="background: {% if selected_election.status == 'closed' %}linear-gradient(135deg, #f59e0b, #d97706){% else %}#4338ca{% endif %}; color: #ffffff;">
                                 {{ leader.candidate.name[:2]|upper }}
                             </div>
                         </div>
@@ -123,8 +124,8 @@
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                                 <h4 class="fw-bold text-dark mb-0">{{ leader.candidate.name }}</h4>
                                 {% if selected_election.status == 'closed' %}
-                                    <span class="badge bg-success rounded-pill py-1 px-3 small">
-                                        <i class="bi bi-award-fill me-1"></i>Certified Winner
+                                    <span class="badge bg-warning text-dark fw-bold rounded-pill py-1 px-3 small">
+                                        <i class="bi bi-trophy-fill me-1"></i>Official Certified Winner
                                     </span>
                                 {% else %}
                                     <span class="badge bg-primary rounded-pill py-1 px-3 small">
@@ -133,14 +134,19 @@
                                 {% endif %}
                             </div>
                             <span class="badge bg-white text-muted border small">{{ leader.candidate.position }}</span>
+                            {% if selected_election.status == 'closed' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small ms-1">
+                                    <i class="bi bi-shield-check me-1"></i>Ledger Certified
+                                </span>
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="text-md-end">
-                        <div class="display-6 fw-bold font-monospace text-dark mb-0 lh-1" style="color: #4338ca !important;">
+                        <div class="display-6 fw-bold font-monospace text-dark mb-0 lh-1" style="color: {% if selected_election.status == 'closed' %}#d97706{% else %}#4338ca{% endif %} !important;">
                             {{ leader.votes }} <span class="fs-6 text-muted fw-normal font-sans">votes</span>
                         </div>
-                        <span class="badge bg-primary-subtle text-primary border rounded-pill font-monospace fs-6 px-3 py-1 mt-1">
+                        <span class="badge {% if selected_election.status == 'closed' %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% else %}bg-primary-subtle text-primary border-primary-subtle{% endif %} border rounded-pill font-monospace fs-6 px-3 py-1 mt-1">
                             {{ leader.percentage }}% Vote Share
                         </span>
                     </div>

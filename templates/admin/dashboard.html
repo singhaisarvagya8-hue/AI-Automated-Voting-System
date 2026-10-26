@@ -638,7 +638,7 @@
                                             {% if el.status == 'active' %}
                                                 <button type="submit" class="btn btn-sm btn-outline-warning text-dark border-warning d-flex align-items-center gap-1">
                                                     <i class="bi bi-stop-circle text-warning"></i>
-                                                    <span>Close Election</span>
+                                                    <span>Close & Announce</span>
                                                 </button>
                                             {% else %}
                                                 <button type="submit" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
@@ -647,12 +647,32 @@
                                                 </button>
                                             {% endif %}
                                         </form>
+                                        <form method="POST" action="{{ url_for('admin.announce_winner_action', election_id=el.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1" title="Publish Winner Announcement to Voters">
+                                                <i class="bi bi-trophy text-warning"></i>
+                                                <span>Announce Winner</span>
+                                            </button>
+                                        </form>
                                         <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addCandidateModal_{{ el.id }}">
                                             <i class="bi bi-person-plus"></i>
                                             <span>Add Candidate</span>
                                         </button>
                                     </div>
                                 </div>
+
+                                {% if el.announcements %}
+                                    {% for a in el.announcements %}
+                                        {% if a.announcement_type == 'winner_declared' %}
+                                            <div class="mb-3 p-2.5 rounded-3 bg-warning-subtle border border-warning-subtle d-flex align-items-center justify-content-between">
+                                                <div class="small text-dark">
+                                                    <i class="bi bi-trophy-fill text-warning me-1"></i>
+                                                    <strong>Certified Winner:</strong> {{ a.winner_name }} ({{ a.winner_position or 'Representative' }}) &bull; {{ a.winner_votes }} votes ({{ a.winner_percentage }}%)
+                                                </div>
+                                                <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.65rem;">Winner Declared</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
 
                                 <!-- Candidates Roster Preview -->
                                 <div class="p-3 bg-light rounded border">

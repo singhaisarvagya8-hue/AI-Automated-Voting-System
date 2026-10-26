@@ -229,8 +229,15 @@ def save_created_election():
         timestamp=now
     ))
     db.session.commit()
+
+    # Automatically publish official election added announcement
+    try:
+        from services.announcements import publish_election_added_announcement
+        publish_election_added_announcement(new_election, len(candidates_data))
+    except Exception as e:
+        print(f"Announcement auto-publish notice: {e}")
     
-    flash(f"Ballot '{title}' successfully created with {len(candidates_data)} candidate representatives! {len(voters)} student voters have been enrolled.", "success")
+    flash(f"Ballot '{title}' successfully created with {len(candidates_data)} candidate representatives! {len(voters)} student voters have been enrolled and announcement published.", "success")
     if status == 'active':
         return redirect(url_for('voter.results_view', election_id=new_election.id))
     return redirect(url_for('admin.dashboard') + '#elections')
@@ -278,7 +285,15 @@ def create_election():
         timestamp=now
     ))
     db.session.commit()
-    flash(f"Election '{title}' created successfully with {len(voters)} voters enrolled!", "success")
+
+    # Automatically publish official election added announcement
+    try:
+        from services.announcements import publish_election_added_announcement
+        publish_election_added_announcement(new_election, 0)
+    except Exception as e:
+        print(f"Announcement auto-publish notice: {e}")
+
+    flash(f"Election '{title}' created successfully with {len(voters)} voters enrolled and announcement published!", "success")
     return redirect(url_for('admin.dashboard') + '#elections')
 
 @admin_bp.route('/election/<int:election_id>/toggle-status', methods=['POST'])
@@ -293,8 +308,30 @@ def toggle_election_status(election_id):
         timestamp=now
     ))
     db.session.commit()
-    flash(f"Election '{election.title}' status changed to '{election.status}'.", "info")
+
+    from services.announcements import publish_winner_announcement
+    if election.status == 'closed':
+        winner_ann = publish_winner_announcement(election)
+        if winner_ann and winner_ann.winner_name:
+            flash(f"Election '{election.title}' concluded! 🏆 Official Winner Announced: {winner_ann.winner_name} with {winner_ann.winner_votes} votes ({winner_ann.winner_percentage}%).", "success")
+        else:
+            flash(f"Election '{election.title}' status changed to 'closed'.", "info")
+    else:
+        flash(f"Election '{election.title}' reopened and status changed to 'active'.", "info")
     return redirect(url_for('admin.dashboard') + '#elections')
+
+@admin_bp.route('/election/<int:election_id>/announce-winner', methods=['POST'])
+@admin_required
+def announce_winner_action(election_id):
+    from flask import request
+    election = Election.query.get_or_404(election_id)
+    from services.announcements import publish_winner_announcement
+    winner_ann = publish_winner_announcement(election)
+    if winner_ann and winner_ann.winner_name:
+        flash(f"🏆 Winner Officially Announced: {winner_ann.winner_name} ({winner_ann.winner_votes} votes, {winner_ann.winner_percentage}%) for '{election.title}'!", "success")
+    else:
+        flash("Could not determine election winner. Please ensure candidates are registered.", "warning")
+    return redirect(request.referrer or url_for('admin.dashboard'))
 
 @admin_bp.route('/election/<int:election_id>/candidate/add', methods=['POST'])
 @admin_required
