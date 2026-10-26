@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard • iVOTE Online Voting System{% endblock %}
+{% block title %}Dashboard • votex.ai Online Voting System{% endblock %}
 
 {% block content %}
 <div class="py-1">
@@ -11,7 +11,7 @@
             Hello, {{ user.name.split()[0] if user and user.name else session.get('name', 'Student Voter') }}!
         </h3>
         <p class="text-muted small mb-0">
-            Welcome to iVOTE Online Voting System
+            Welcome to votex.ai Online Voting System
         </p>
     </div>
 
