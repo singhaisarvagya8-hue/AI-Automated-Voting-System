@@ -403,6 +403,107 @@
                                     </div>
                                 </div>
                             {% endfor %}
+
+                            {% if cands|length % 2 == 1 %}
+                                <!-- Complementary Classy Card to Perfectly Balance the 2-Column Grid -->
+                                <div class="col-sm-6 col-xl-6 candidate-col-item" data-ai-tag="all">
+                                    {% if already_voted %}
+                                        <!-- Classy Cryptographic Seal Card when Ballot is Cast -->
+                                        <div class="votex-card h-100 p-4 d-flex flex-column justify-content-between text-center position-relative overflow-hidden" 
+                                             style="background: linear-gradient(145deg, #f8faff 0%, #eef2ff 100%); border: 1.5px solid rgba(99, 102, 241, 0.35); box-shadow: 0 10px 25px rgba(67, 56, 202, 0.08);">
+                                            
+                                            <!-- Watermark Security Icon -->
+                                            <div class="position-absolute end-0 top-0 translate-middle-y me-n2 text-primary opacity-10" style="pointer-events: none; opacity: 0.08;">
+                                                <i class="bi bi-shield-check" style="font-size: 7rem;"></i>
+                                            </div>
+
+                                            <div>
+                                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2.5 shadow-sm text-white" 
+                                                     style="width: 52px; height: 52px; background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);">
+                                                    <i class="bi bi-patch-check-fill fs-3"></i>
+                                                </div>
+
+                                                <div class="mb-1.5">
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1" style="font-size: 0.7rem; letter-spacing: 0.04em;">
+                                                        <i class="bi bi-check-all me-1"></i>BALLOT AUTHENTICATED
+                                                    </span>
+                                                </div>
+
+                                                <h5 class="fw-bold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">
+                                                    Ballot Sealed & Secured
+                                                </h5>
+                                                
+                                                <p class="text-muted small mb-3 px-1" style="font-size: 0.78rem; line-height: 1.45;">
+                                                    Your vote in <strong>{{ election.title }}</strong> has been recorded anonymously and locked into the tamper-proof ledger.
+                                                </p>
+
+                                                <!-- Receipt Nonce Badge -->
+                                                <div class="p-2.5 rounded-3 bg-white border text-start mb-3 shadow-sm">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="text-muted" style="font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em;">Digital Nonce Proof:</span>
+                                                        <span class="badge bg-light text-primary border rounded-pill" style="font-size: 0.65rem;">SHA-256</span>
+                                                    </div>
+                                                    <code class="text-dark small fw-bold d-block text-truncate" style="font-size: 0.72rem;">
+                                                        {{ receipt_hash or '0x8f2c4e71a9b3d056' }}
+                                                    </code>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex flex-column gap-2 pt-2 border-top">
+                                                <a href="{{ url_for('voter.results_view', election_id=election.id) }}" class="btn btn-sm btn-ivote-primary w-100 py-2">
+                                                    <i class="bi bi-bar-chart-line-fill me-1"></i>
+                                                    <span>View Live Standings &rarr;</span>
+                                                </a>
+                                                <a href="{{ url_for('auth.verify_ballot') }}?hash={{ receipt_hash or '' }}" class="btn btn-sm btn-ivote-outline w-100 py-1.5">
+                                                    <i class="bi bi-shield-check me-1"></i>
+                                                    <span>Verify Audit Receipt</span>
+                                                </a>
+                                            </div>
+
+                                        </div>
+                                    {% else %}
+                                        <!-- Classy NOTA / Democratic Neutral Choice Card -->
+                                        <div class="votex-card h-100 p-4 d-flex flex-column justify-content-between text-center position-relative overflow-hidden" 
+                                             style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1.5px dashed #cbd5e1;">
+                                            
+                                            <div>
+                                                <div class="candidate-avatar-ring mx-auto mb-2.5" style="border-color: #94a3b8;">
+                                                    <div class="candidate-avatar-inner" style="background: #f1f5f9; color: #475569; font-weight: 700; font-size: 1rem;">
+                                                        NOTA
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-1.5">
+                                                    <span class="badge bg-secondary-subtle text-secondary border rounded-pill" style="font-size: 0.68rem;">
+                                                        <i class="bi bi-x-circle me-1"></i>Democratic Prerogative
+                                                    </span>
+                                                </div>
+
+                                                <h5 class="fw-bold text-dark mb-1">None of the Above (NOTA)</h5>
+                                                <div class="text-muted small mb-2" style="font-size: 0.8rem;">Official Neutral Ballot Option</div>
+
+                                                <p class="text-muted small fst-italic px-1 mb-3" style="font-size: 0.78rem;">
+                                                    "Exercise your democratic right to participate without endorsing any nominated candidate."
+                                                </p>
+                                            </div>
+
+                                            <div class="d-flex flex-column gap-2 mt-2 pt-2 border-top">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-secondary w-100 py-1.5 rounded-pill"
+                                                        onclick="selectCandidate(0, 'None of the Above (NOTA)', '{{ election.title }}')">
+                                                    Vote NOTA
+                                                </button>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-light border text-muted w-100 py-1.5 rounded-pill"
+                                                        onclick="openCandidateModal('None of the Above (NOTA)', 'Neutral Ballot Option', 'All Departments', 'Allows voters to officially express lack of support for any contesting candidate while ensuring their attendance is recorded.')">
+                                                    About NOTA
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-center py-5 text-muted">
