@@ -184,47 +184,31 @@
                 </div>
             </div>
 
-            <!-- Card 2: Interactive AI Candidate Comparator -->
+            <!-- Card 2: AI Candidate Intelligence -->
             <div class="votex-card p-3.5 mb-3" style="border: 1px solid rgba(224, 231, 255, 0.9);">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-stars text-primary fs-5"></i>
                         <h6 class="fw-bold text-dark mb-0 small" style="font-family: 'Poppins', sans-serif;">
-                            AI Manifesto Analyzer
+                            AI Ballot Intelligence
                         </h6>
                     </div>
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.65rem;">
-                        Smart Match
+                        Verified Analysis
                     </span>
                 </div>
                 <p class="text-muted small mb-2.5" style="font-size: 0.76rem; line-height: 1.4;">
-                    Click a student interest filter to view key candidate vision differences in this chamber:
+                    Objective overview of contesting candidate nominees in <strong>{{ election.title }}</strong>:
                 </p>
 
-                <!-- Interactive Interest Chips -->
-                <div class="d-flex flex-wrap gap-1.5 mb-3" id="aiFilterGroup">
-                    <span class="ai-filter-chip active" onclick="filterByAITag('all', this)">
-                        <i class="bi bi-grid-fill"></i> All Priorities
-                    </span>
-                    <span class="ai-filter-chip" onclick="filterByAITag('tech', this)">
-                        <i class="bi bi-wifi"></i> Campus Wi-Fi & Labs
-                    </span>
-                    <span class="ai-filter-chip" onclick="filterByAITag('welfare', this)">
-                        <i class="bi bi-heart-pulse"></i> Welfare & Mess
-                    </span>
-                    <span class="ai-filter-chip" onclick="filterByAITag('career', this)">
-                        <i class="bi bi-briefcase"></i> Placements & Internships
-                    </span>
-                </div>
-
-                <!-- Instant AI Takeaway Snippet -->
-                <div id="aiSummaryBox" class="p-2.5 rounded-3 mb-3" style="background: #eef2ff; border-left: 3px solid #4338ca; font-size: 0.75rem; color: #3730a3; line-height: 1.4;">
-                    <i class="bi bi-lightbulb-fill me-1"></i>
-                    <span id="aiSummaryText"><strong>AI Overview:</strong> Nominees in this election present verified agendas spanning digital academic labs, student wellness subsidies, and placement acceleration.</span>
+                <!-- Candidates Overview Snippet -->
+                <div class="p-2.5 rounded-3 mb-3" style="background: #eef2ff; border-left: 3px solid #4338ca; font-size: 0.75rem; color: #3730a3; line-height: 1.45;">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    <span><strong>Ballot Overview:</strong> {{ cands|length }} candidate representative{{ 's' if cands|length != 1 else '' }} nominated. Evaluate each candidate's manifesto and record your confidential single vote.</span>
                 </div>
 
                 <button type="button" class="btn btn-sm btn-ivote-outline w-100 py-1.5" onclick="openAIAssistantModal()">
-                    <i class="bi bi-robot me-1.5"></i>Ask AI Ballot Assistant &rarr;
+                    <i class="bi bi-robot me-1.5"></i>Compare Candidates with AI Assistant &rarr;
                 </button>
             </div>
 
@@ -327,8 +311,7 @@
                     {% if cands %}
                         <div class="row g-3 g-md-4" id="candidateCardsContainer">
                             {% for cand in cands %}
-                                {% set cand_tag = 'tech' if loop.index % 3 == 1 else ('welfare' if loop.index % 3 == 2 else 'career') %}
-                                <div class="col-sm-6 col-xl-6 candidate-col-item" data-ai-tag="{{ cand_tag }}">
+                                <div class="col-sm-6 col-xl-6 candidate-col-item">
                                     <div class="ivote-candidate-card h-100 d-flex flex-column justify-content-between text-center p-3.5" id="candCard_{{ cand.id }}">
                                         
                                         <div>
@@ -337,23 +320,6 @@
                                                 <div class="candidate-avatar-inner">
                                                     {{ cand.name[:2]|upper }}
                                                 </div>
-                                            </div>
-
-                                            <!-- AI Priority Tag -->
-                                            <div class="mb-1.5">
-                                                {% if cand_tag == 'tech' %}
-                                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-wifi me-1"></i>Campus Wi-Fi & Labs
-                                                    </span>
-                                                {% elif cand_tag == 'welfare' %}
-                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-heart-pulse me-1"></i>Welfare & Mess
-                                                    </span>
-                                                {% else %}
-                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-briefcase me-1"></i>Placement & Career
-                                                    </span>
-                                                {% endif %}
                                             </div>
 
                                             <!-- Candidate Name -->
@@ -409,7 +375,7 @@
 
                             {% if cands|length % 2 == 1 %}
                                 <!-- Complementary Classy Card to Perfectly Balance the 2-Column Grid -->
-                                <div class="col-sm-6 col-xl-6 candidate-col-item" data-ai-tag="all">
+                                <div class="col-sm-6 col-xl-6 candidate-col-item">
                                     {% if already_voted %}
                                         <!-- Classy Cryptographic Seal Card when Ballot is Cast -->
                                         <div class="votex-card h-100 p-4 d-flex flex-column justify-content-between text-center position-relative overflow-hidden" 
@@ -790,31 +756,6 @@
         const text = document.getElementById('merkleRootBadge').innerText;
         navigator.clipboard.writeText(text);
         alert('Merkle Root copied to clipboard: ' + text);
-    }
-
-    function filterByAITag(tag, element) {
-        document.querySelectorAll('#aiFilterGroup .ai-filter-chip').forEach(c => c.classList.remove('active'));
-        if (element) element.classList.add('active');
-
-        const summaryText = document.getElementById('aiSummaryText');
-        if (tag === 'tech') {
-            summaryText.innerHTML = '<strong>Campus Wi-Fi & Labs:</strong> Candidates prioritising 24/7 technical infrastructure, fiber connectivity, and high-performance engineering lab grants.';
-        } else if (tag === 'welfare') {
-            summaryText.innerHTML = '<strong>Welfare & Mess:</strong> Candidates pledging student mental health counselors, mess food quality audit committees, and emergency student welfare funds.';
-        } else if (tag === 'career') {
-            summaryText.innerHTML = '<strong>Placements & Career:</strong> Candidates focusing on alumni corporate networks, internship stipends, and placement preparation bootcamps.';
-        } else {
-            summaryText.innerHTML = '<strong>AI Overview:</strong> Nominees in this election present verified agendas spanning digital academic labs, student wellness subsidies, and placement acceleration.';
-        }
-
-        const items = document.querySelectorAll('.candidate-col-item');
-        items.forEach(it => {
-            if (tag === 'all' || it.getAttribute('data-ai-tag') === tag) {
-                it.classList.remove('d-none');
-            } else {
-                it.classList.add('d-none');
-            }
-        });
     }
 
     function applyCandidateFilter(rawQuery) {
