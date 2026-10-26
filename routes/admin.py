@@ -43,6 +43,8 @@ def verify_master_password(candidate_password):
     return False
 
 def is_creator_authorized():
+    if session.get('role') == 'admin':
+        return True
     return session.get('election_creator_authorized') is True
 
 @admin_bp.route('/dashboard')

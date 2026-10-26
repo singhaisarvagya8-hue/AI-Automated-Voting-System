@@ -419,9 +419,13 @@
                                         <span>Dashboard</span>
                                     </a>
                                 {% endif %}
-                                <a href="{{ url_for('voter.cast_vote') }}" class="votex-nav-link {% if 'vote' in request.endpoint and request.endpoint != 'voter.dashboard' %}active{% endif %}">
+                                <a href="{{ url_for('voter.choose_election') }}" class="votex-nav-link {% if request.endpoint in ['voter.choose_election', 'voter.cast_vote'] %}active{% endif %}">
                                     <i class="bi bi-box2-heart-fill"></i>
-                                    <span>Vote</span>
+                                    <span>Vote in Election</span>
+                                </a>
+                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link {% if 'create_election' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-plus-circle-fill"></i>
+                                    <span>Create Election</span>
                                 </a>
                                 <a href="{{ url_for('voter.results_view') }}" class="votex-nav-link {% if 'results' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-bar-chart-line-fill"></i>
@@ -430,10 +434,6 @@
                                 <a href="{{ url_for('auth.verify_ballot') }}" class="votex-nav-link {% if 'verify' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-shield-check"></i>
                                     <span>Voting Guidelines</span>
-                                </a>
-                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link {% if 'create_election' in request.endpoint %}active{% endif %}">
-                                    <i class="bi bi-gear-fill"></i>
-                                    <span>Settings / Create</span>
                                 </a>
                             </nav>
                         </div>
@@ -542,9 +542,13 @@
                                         <span>Dashboard</span>
                                     </a>
                                 {% endif %}
-                                <a href="{{ url_for('voter.cast_vote') }}" class="votex-nav-link {% if 'vote' in request.endpoint %}active{% endif %}">
+                                <a href="{{ url_for('voter.choose_election') }}" class="votex-nav-link {% if request.endpoint in ['voter.choose_election', 'voter.cast_vote'] %}active{% endif %}">
                                     <i class="bi bi-box2-heart-fill"></i>
-                                    <span>Vote</span>
+                                    <span>Vote in Election</span>
+                                </a>
+                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link {% if 'create_election' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-plus-circle-fill"></i>
+                                    <span>Create Election</span>
                                 </a>
                                 <a href="{{ url_for('voter.results_view') }}" class="votex-nav-link {% if 'results' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-bar-chart-line-fill"></i>
@@ -553,10 +557,6 @@
                                 <a href="{{ url_for('auth.verify_ballot') }}" class="votex-nav-link {% if 'verify' in request.endpoint %}active{% endif %}">
                                     <i class="bi bi-shield-check"></i>
                                     <span>Voting Guidelines</span>
-                                </a>
-                                <a href="{{ url_for('admin.create_election_section') }}" class="votex-nav-link">
-                                    <i class="bi bi-gear-fill"></i>
-                                    <span>Settings / Create</span>
                                 </a>
                                 <a href="{{ url_for('auth.logout') }}" class="votex-nav-link text-danger">
                                     <i class="bi bi-box-arrow-right"></i>

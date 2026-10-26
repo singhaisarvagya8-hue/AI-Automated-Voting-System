@@ -244,9 +244,44 @@ def cast_vote(election_id=None):
                            progress_pct=progress_pct)
 
 @voter_bp.route('/choose-election')
+@voter_bp.route('/elections')
 @voter_required
 def choose_election():
-    return redirect(url_for('voter.cast_vote'))
+    user_id = session.get('user_id')
+    user = User.query.get(user_id) if user_id else None
+    
+    all_elections = Election.query.order_by(
+        db.case((Election.status == 'active', 1), else_=2),
+        Election.id.desc()
+    ).all()
+    
+    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all() if user_id else []
+    status_map = {e.election_id: e.has_voted for e in eligibilities}
+    receipt_map = {e.election_id: e.receipt_hash for e in eligibilities if e.has_voted and e.receipt_hash}
+    
+    candidates_by_election = {}
+    for el in all_elections:
+        candidates_by_election[el.id] = Candidate.query.filter_by(election_id=el.id).all()
+        
+    total_elections_count = len(all_elections)
+    active_elections_count = sum(1 for el in all_elections if el.status == 'active')
+    closed_count = sum(1 for el in all_elections if el.status != 'active')
+    voted_elections_count = sum(1 for el in all_elections if status_map.get(el.id))
+    unvoted_active_count = sum(1 for el in all_elections if el.status == 'active' and not status_map.get(el.id))
+    progress_pct = int((voted_elections_count / total_elections_count * 100)) if total_elections_count > 0 else 0
+    
+    return render_template('choose_election.html',
+                           user=user,
+                           all_elections=all_elections,
+                           candidates_by_election=candidates_by_election,
+                           status_map=status_map,
+                           receipt_map=receipt_map,
+                           total_elections_count=total_elections_count,
+                           active_elections_count=active_elections_count,
+                           closed_count=closed_count,
+                           voted_elections_count=voted_elections_count,
+                           unvoted_active_count=unvoted_active_count,
+                           progress_pct=progress_pct)
 
 @voter_bp.route('/voting-room')
 @voter_required

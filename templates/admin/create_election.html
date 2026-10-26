@@ -5,34 +5,34 @@
 {% block content %}
 <div class="py-3">
     <!-- Top Security Authorization Header -->
-    <div class="classic-card p-3 p-md-4 mb-4 bg-white border d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div class="votex-card p-3 p-md-4 mb-4 bg-white border d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" style="border: 1px solid rgba(99, 102, 241, 0.25);">
         <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center text-warning bg-warning-subtle border border-warning-subtle flex-shrink-0" style="width: 48px; height: 48px;">
-                <i class="bi bi-shield-lock-fill fs-4"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);">
+                <i class="bi bi-plus-circle-fill fs-4"></i>
             </div>
             <div>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <h4 class="fw-bold text-dark mb-0">Separate Election Creation Section</h4>
-                    <span class="badge badge-soft-green py-1 px-2.5 small">
-                        <i class="bi bi-patch-check-fill me-1"></i>Master Security Authorized
+                    <h4 class="fw-bold text-dark mb-0" style="font-family: 'Poppins', sans-serif;">Create New Election</h4>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill py-1 px-2.5 small">
+                        <i class="bi bi-patch-check-fill me-1"></i>Commissioner Authorized
                     </span>
-                    <span class="badge bg-light text-primary border small">
-                        <i class="bi bi-infinity me-1"></i>No Limit on Candidates
+                    <span class="badge bg-light text-primary border rounded-pill small">
+                        <i class="bi bi-infinity me-1"></i>Unlimited Candidates
                     </span>
                 </div>
                 <p class="text-muted small mb-0">
-                    Restricted commissioner portal. Configure ballot parameters and register any number of representative candidates.
+                    Official election creation console. Configure contest parameters, set voting duration, and nominate candidate representatives.
                 </p>
             </div>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1.5" onclick="fillDemoCandidates()">
+            <button type="button" class="btn btn-ivote-outline btn-sm d-flex align-items-center gap-1.5" onclick="fillDemoCandidates()">
                 <i class="bi bi-lightning-charge-fill text-warning"></i>
                 <span>Pre-Fill Sample Candidates</span>
             </button>
-            <a href="{{ url_for('admin.lock_election_creator') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5" title="Lock this section immediately">
+            <a href="{{ url_for('admin.lock_election_creator') }}" class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1.5" title="Lock this section immediately">
                 <i class="bi bi-lock-fill"></i>
-                <span>Lock Section</span>
+                <span>Lock Console</span>
             </a>
         </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="row g-4">
             <!-- Left Column: Election Parameters -->
             <div class="col-lg-4">
-                <div class="classic-card p-4 bg-white border sticky-top" style="top: 85px;">
+                <div class="votex-card p-4 bg-white border sticky-top" style="top: 85px;">
                     <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
                         <i class="bi bi-gear-fill text-primary"></i>
                         <h5 class="fw-bold text-dark mb-0">1. Ballot Specifications</h5>
@@ -86,11 +86,11 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                        <button type="submit" class="btn btn-ivote-primary py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm">
                             <i class="bi bi-check2-circle fs-5"></i>
                             <span>Launch Election & Seal Ledger</span>
                         </button>
-                        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-secondary py-2 small">
+                        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-ivote-outline py-2 small">
                             Cancel & Return
                         </a>
                     </div>
@@ -99,7 +99,7 @@
 
             <!-- Right Column: Candidate Representatives (No Limit) -->
             <div class="col-lg-8">
-                <div class="classic-card p-4 bg-white border">
+                <div class="votex-card p-4 bg-white border">
                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-2 border-bottom">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-person-lines-fill text-primary fs-5"></i>
