@@ -371,7 +371,7 @@
                 
                 <!-- Left Sidebar -->
                 <div class="col-lg-3 col-xl-2 d-none d-lg-block border-end pe-xl-4">
-                    <div class="d-flex flex-column h-100 justify-content-between" style="min-height: 720px;">
+                    <div class="d-flex flex-column" style="position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto;">
                         
                         <!-- Top Logo & Profile -->
                         <div>
@@ -439,7 +439,7 @@
                         </div>
 
                         <!-- AI Engine & Cryptographic Integrity Sidebar Card -->
-                        <div class="my-4 p-3 rounded-4" style="background: linear-gradient(135deg, rgba(67, 56, 202, 0.05) 0%, rgba(99, 102, 241, 0.12) 100%); border: 1px solid rgba(99, 102, 241, 0.22);">
+                        <div class="my-3 p-3 rounded-4" style="background: linear-gradient(135deg, rgba(67, 56, 202, 0.05) 0%, rgba(99, 102, 241, 0.12) 100%); border: 1px solid rgba(99, 102, 241, 0.22);">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="badge rounded-pill text-white" style="background: #4338ca; font-size: 0.65rem; letter-spacing: 0.04em;">
                                     <i class="bi bi-cpu me-1"></i>AI ENGINE
@@ -458,8 +458,8 @@
                             </div>
                         </div>
 
-                        <!-- Logout Link Pinned at Bottom -->
-                        <div class="pt-3 border-top">
+                        <!-- Logout Link Pinned Right Below -->
+                        <div class="pt-2 border-top mb-3">
                             <a href="{{ url_for('auth.logout') }}" class="votex-nav-link text-danger">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Log out</span>

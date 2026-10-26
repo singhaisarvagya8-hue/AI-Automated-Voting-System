@@ -49,7 +49,7 @@
         <!-- ========================================== -->
         <!-- LEFT COLUMN: AI ELECTION INTELLIGENCE HUB  -->
         <!-- ========================================== -->
-        <div class="col-12 col-lg-5 col-xl-4">
+        <div class="col-12 col-lg-5 col-xl-4" style="position: sticky; top: 20px;">
             
             <!-- Featured Election & Voting Visual Showcase -->
             <div class="votex-card p-0 mb-3 overflow-hidden shadow-sm" style="border: 1px solid rgba(99, 102, 241, 0.35);">
@@ -513,72 +513,6 @@
                     {% endif %}
                 </div>
 
-                <!-- Secondary Offices & Other Present Elections -->
-                {% for other_el in all_elections %}
-                    {% if other_el.id != election.id %}
-                        <div class="votex-card p-4 mb-4" style="background: #ffffff; border: 1px solid rgba(224, 231, 255, 0.9);">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pb-3 mb-3 border-bottom">
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-family: 'Poppins', sans-serif;">
-                                        {{ other_el.title }}
-                                    </h5>
-                                    <span class="text-muted small" style="font-size: 0.8rem;">
-                                        Alternative Council Chamber
-                                    </span>
-                                </div>
-                                <div>
-                                    {% if status_map.get(other_el.id) %}
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill py-1.5 px-3">
-                                            <i class="bi bi-patch-check-fill me-1"></i>Ballot Sealed
-                                        </span>
-                                    {% elif other_el.status != 'active' %}
-                                        <span class="badge bg-secondary-subtle text-secondary border rounded-pill py-1.5 px-3">
-                                            <i class="bi bi-lock-fill me-1"></i>Concluded
-                                        </span>
-                                    {% else %}
-                                        <a href="{{ url_for('voter.cast_vote', election_id=other_el.id) }}" class="btn btn-sm btn-ivote-outline py-1 px-3">
-                                            Switch to this Chamber &rarr;
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Preview Candidates Grid for Secondary Office -->
-                            {% set other_cands = candidates_by_election.get(other_el.id, []) %}
-                            {% if other_cands %}
-                                <div class="row g-3">
-                                    {% for ocand in other_cands[:4] %}
-                                        <div class="col-sm-6 col-md-6 col-xl-3">
-                                            <div class="p-3 bg-light rounded-4 border text-center h-100 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <div class="candidate-avatar-ring mx-auto mb-2" style="width: 44px; height: 44px;">
-                                                        <div class="candidate-avatar-inner" style="background: #f0fdf4; color: #15803d; font-size: 0.9rem;">
-                                                            {{ ocand.name[:2]|upper }}
-                                                        </div>
-                                                    </div>
-                                                    <div class="fw-bold text-dark small">{{ ocand.name }}</div>
-                                                    <div class="text-muted" style="font-size: 0.72rem;">{{ ocand.position }}</div>
-                                                </div>
-                                                <div class="mt-2 pt-2 border-top">
-                                                    {% if not status_map.get(other_el.id) and other_el.status == 'active' %}
-                                                        <a href="{{ url_for('voter.cast_vote', election_id=other_el.id) }}" class="btn btn-sm btn-ivote-primary w-100 py-1" style="font-size: 0.75rem;">
-                                                            VOTE
-                                                        </a>
-                                                    {% else %}
-                                                        <button class="btn btn-sm btn-light border text-muted w-100 py-1 rounded-pill" style="font-size: 0.72rem;" disabled>
-                                                            {% if status_map.get(other_el.id) %}Sealed{% else %}Closed{% endif %}
-                                                        </button>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-
                 <!-- Floating Sticky Vote Bar (Appears when candidate is clicked) -->
                 <div id="floatingVoteBar" class="position-sticky bottom-0 bg-white p-3 rounded-4 shadow-lg border mt-4 d-none" style="z-index: 1000; border-color: #818cf8 !important;">
                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
@@ -606,6 +540,123 @@
             </form>
         </div>
 
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- FULL-WIDTH SECTION: OTHER PRESENT ELECTIONS & CHAMBERS  -->
+    <!-- ======================================================== -->
+    <div class="pt-4 mt-2 border-top">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+            <div>
+                <span class="badge rounded-pill text-white px-2.5 py-1 mb-1.5" style="background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%); font-size: 0.72rem; letter-spacing: 0.04em;">
+                    <i class="bi bi-collection-fill me-1"></i>ALL COUNCIL CHAMBERS
+                </span>
+                <h4 class="fw-bold text-dark mb-0" style="font-family: 'Poppins', sans-serif;">
+                    Other Present Election Chambers
+                </h4>
+                <p class="text-muted small mb-0">
+                    Explore parallel campus elections, review designated representatives, or verify sealed tallies.
+                </p>
+            </div>
+            <div>
+                <span class="badge bg-light text-muted border rounded-pill px-3 py-1.5 small">
+                    <i class="bi bi-grid-3x3-gap me-1"></i>{{ all_elections|length }} Total Chambers
+                </span>
+            </div>
+        </div>
+
+        {% for other_el in all_elections %}
+            {% if other_el.id != election.id %}
+                <div class="votex-card p-4 mb-4" style="background: #ffffff; border: 1px solid rgba(224, 231, 255, 0.9);">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pb-3 mb-3 border-bottom">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="fw-bold text-dark mb-0" style="font-family: 'Poppins', sans-serif;">
+                                    {{ other_el.title }}
+                                </h5>
+                                {% if status_map.get(other_el.id) %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.68rem;">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Ballot Sealed
+                                    </span>
+                                {% elif other_el.status != 'active' %}
+                                    <span class="badge bg-secondary-subtle text-secondary border rounded-pill" style="font-size: 0.68rem;">
+                                        <i class="bi bi-lock-fill me-1"></i>Concluded
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.68rem;">
+                                        <span class="status-dot-blue me-1"></span>Ready to Vote
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.8rem;">
+                                Alternative Council Chamber &bull; Official Student Representative Ballot
+                            </span>
+                        </div>
+                        <div>
+                            {% if status_map.get(other_el.id) %}
+                                <a href="{{ url_for('voter.results_view', election_id=other_el.id) }}" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 text-primary fw-semibold">
+                                    <i class="bi bi-bar-chart-line me-1"></i>View Tallies &rarr;
+                                </a>
+                            {% elif other_el.status != 'active' %}
+                                <a href="{{ url_for('voter.results_view', election_id=other_el.id) }}" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 text-muted">
+                                    <i class="bi bi-archive me-1"></i>View Final Results
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('voter.cast_vote', election_id=other_el.id) }}" class="btn btn-sm btn-ivote-primary rounded-pill py-1.5 px-3">
+                                    <span>Switch to this Chamber &rarr;</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Full-Width Candidate Cards Grid -->
+                    {% set other_cands = candidates_by_election.get(other_el.id, []) %}
+                    {% if other_cands %}
+                        <div class="row g-3">
+                            {% for ocand in other_cands %}
+                                <div class="col-sm-6 col-md-4 col-xl-3">
+                                    <div class="p-3 bg-light rounded-4 border text-center h-100 d-flex flex-column justify-content-between hover-shadow transition-all">
+                                        <div>
+                                            <div class="candidate-avatar-ring mx-auto mb-2.5" style="width: 52px; height: 52px;">
+                                                <div class="candidate-avatar-inner" style="background: #eef2ff; color: #4338ca; font-size: 1rem;">
+                                                    {{ ocand.name[:2]|upper }}
+                                                </div>
+                                            </div>
+                                            <div class="fw-bold text-dark small mb-0.5">{{ ocand.name }}</div>
+                                            <div class="text-muted" style="font-size: 0.72rem;">{{ ocand.position }}</div>
+                                            {% if ocand.manifesto %}
+                                                <p class="text-muted fst-italic px-1 mt-1 mb-2" style="font-size: 0.72rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                    "{{ ocand.manifesto }}"
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mt-2 pt-2 border-top d-flex gap-1.5">
+                                            {% if not status_map.get(other_el.id) and other_el.status == 'active' %}
+                                                <a href="{{ url_for('voter.cast_vote', election_id=other_el.id) }}" class="btn btn-sm btn-ivote-primary flex-fill py-1" style="font-size: 0.72rem;">
+                                                    VOTE
+                                                </a>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-light border text-muted flex-fill py-1 rounded-pill" style="font-size: 0.72rem;" disabled>
+                                                    {% if status_map.get(other_el.id) %}Sealed{% else %}Closed{% endif %}
+                                                </button>
+                                            {% endif %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-light border flex-fill py-1 text-muted" 
+                                                    style="font-size: 0.72rem;"
+                                                    onclick="openCandidateModal('{{ ocand.name }}', '{{ ocand.position }}', '{{ ocand.department or '' }}', '{{ ocand.manifesto or 'Dedicated student representation.' }}')">
+                                                Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3 mb-0 small">No candidates nominated yet for this chamber.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
 
