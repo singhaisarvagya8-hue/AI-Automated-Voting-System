@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Votex.ai • Secure Democratic Voting Portal{% endblock %}</title>
+    <title>{% block title %}iVOTE • Online Voting System{% endblock %}</title>
     
-    <!-- Modern & Editorial Typography: Plus Jakarta Sans, Inter & JetBrains Mono -->
+    <!-- Modern Fonts: Poppins (Display & Headers), Inter (Body & UI), JetBrains Mono (Hashes) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,404 +17,514 @@
 
     <style>
         :root {
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --border-color: rgba(226, 232, 240, 0.85);
-            --border-subtle: #f1f5f9;
-            --primary: #1e3a8a;           /* Royal Midnight Navy */
-            --primary-accent: #2563eb;    /* Vivid Cobalt */
-            --primary-hover: #172554;     /* Deep Obsidian */
-            --primary-light: #eff6ff;     /* Soft Azure Tint */
-            --text-heading: #090e1a;      /* Obsidian Black */
-            --text-body: #334155;         /* Deep Slate */
-            --text-muted: #64748b;        /* Cool Gray */
-            --gold-accent: #d97706;       /* Constitutional Brass / Gold */
-            --gold-light: #fef3c7;        /* Soft Gold Pill */
-            --success: #059669;           /* Civic Emerald */
-            --success-light: #ecfdf5;     /* Soft Mint */
+            --bg-canvas: #eef2ff;
+            --primary: #4338ca;            /* iVOTE Indigo */
+            --primary-light: #6366f1;      /* Light Indigo */
+            --primary-gradient: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+            --primary-soft: #e0e7ff;       /* Soft Periwinkle */
+            --card-bg: #ffffff;
+            --card-radius: 22px;
+            --card-border: rgba(224, 231, 255, 0.85);
+            --card-shadow: 0 10px 30px rgba(67, 56, 202, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02);
+            --text-heading: #1e1b4b;       /* Dark Indigo */
+            --text-body: #475569;          /* Slate */
+            --text-muted: #64748b;         /* Cool Muted Slate */
+            --pill-radius: 50px;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: 
-                radial-gradient(1200px 800px at 15% -10%, rgba(30, 58, 138, 0.06), transparent 60%),
-                radial-gradient(1000px 700px at 85% 10%, rgba(217, 119, 6, 0.04), transparent 50%),
-                radial-gradient(900px 600px at 50% 100%, rgba(5, 150, 105, 0.035), transparent 60%),
-                #f8fafc;
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 45%, #ede9fe 100%);
             background-attachment: fixed;
             color: var(--text-body);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
+            padding: 0;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        h1, h2, h3, h4, h5, h6, .brand-font {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        h1, h2, h3, h4, h5, h6, .brand-heading {
+            font-family: 'Poppins', sans-serif;
             color: var(--text-heading);
-            letter-spacing: -0.028em;
             font-weight: 700;
         }
 
-        code, .font-monospace {
-            font-family: 'JetBrains Mono', monospace !important;
-            font-size: 0.88em;
-        }
-
-        /* Classy Cards */
-        .classic-card, .card-custom {
-            background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 6px 18px -3px rgba(15, 23, 42, 0.04);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .classic-card:hover {
-            border-color: #cbd5e1;
-        }
-
-        .card-interactive {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card-interactive:hover {
-            transform: translateY(-2.5px);
-            box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
-            border-color: #93c5fd;
-        }
-
-        /* Frosted Glass Top Navigation */
-        .navbar-custom {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-            padding: 0.85rem 0;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
-        }
-
-        .brand-badge {
-            width: 40px;
-            height: 40px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-            border: 1px solid rgba(217, 119, 6, 0.3);
-            color: white;
-            display: flex;
+        /* Organic Pebble / Blob Logo Badge from Design Mockup */
+        .ivote-pebble-logo {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
-        }
-
-        .brand-pill {
-            font-size: 0.72rem;
-            font-weight: 700;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
-            letter-spacing: 0.02em;
-        }
-
-        .nav-link-custom {
-            color: #334155;
-            font-weight: 600;
-            font-size: 0.92rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
+            background: var(--primary-gradient);
+            color: #ffffff !important;
+            border-radius: 46% 54% 70% 30% / 46% 44% 56% 54%;
+            padding: 0.45rem 1.35rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            font-size: 1.55rem;
+            box-shadow: 0 8px 24px rgba(67, 56, 202, 0.28);
             text-decoration: none;
-            transition: all 0.15s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .nav-link-custom:hover {
-            color: #1d4ed8;
-            background: rgba(239, 246, 255, 0.8);
-        }
-
-        .nav-link-custom.active {
-            color: #1d4ed8;
-            background: #dbeafe;
-        }
-
-        /* High-Craft Buttons */
-        .btn-primary {
-            background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
-            border: 1px solid #1e3a8a;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 4px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(30, 58, 138, 0.2);
-            color: #ffffff;
-            font-weight: 600;
-            border-radius: 9px;
-            padding: 0.58rem 1.35rem;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(180deg, #1e40af 0%, #0f172a 100%);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 14px rgba(15, 23, 42, 0.25);
-            transform: translateY(-1px);
+        .ivote-pebble-logo:hover {
+            transform: scale(1.04);
             color: #ffffff;
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
+        .ivote-pebble-sm {
+            padding: 0.28rem 0.95rem;
+            font-size: 1.15rem;
+            border-radius: 48% 52% 68% 32% / 44% 48% 52% 56%;
         }
 
-        .btn-outline-primary {
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
+        /* Floating Modern White Cards */
+        .ivote-card, .classic-card {
             background: #ffffff;
-            font-weight: 600;
-            border-radius: 9px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .btn-outline-primary:hover {
-            background-color: #eff6ff;
-            border-color: #1d4ed8;
-            color: #1e3a8a;
+        .ivote-card:hover {
+            box-shadow: 0 16px 36px rgba(67, 56, 202, 0.08), 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Pill Buttons */
+        .btn-ivote-primary, .btn-primary {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: var(--pill-radius) !important;
+            padding: 0.55rem 1.45rem;
+            box-shadow: 0 4px 14px rgba(67, 56, 202, 0.25);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .btn-ivote-primary:hover, .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 56, 202, 0.35);
+            color: #ffffff !important;
+        }
+
+        .btn-ivote-outline, .btn-outline-primary {
+            background: #ffffff !important;
+            border: 1.5px solid #c7d2fe !important;
+            color: var(--primary) !important;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: var(--pill-radius) !important;
+            padding: 0.52rem 1.35rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-ivote-outline:hover, .btn-outline-primary:hover {
+            background: #eef2ff !important;
+            border-color: #818cf8 !important;
+            color: #3730a3 !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.1);
         }
 
         .btn-outline-secondary {
-            color: #475569;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
+            border-radius: var(--pill-radius) !important;
+            border: 1.5px solid #cbd5e1;
+            font-family: 'Poppins', sans-serif;
             font-weight: 500;
-            border-radius: 9px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 0.52rem 1.25rem;
         }
 
-        .btn-outline-secondary:hover {
-            background-color: #f8fafc;
-            color: #0f172a;
-            border-color: #94a3b8;
-            transform: translateY(-1px);
+        /* Pill Search Bar */
+        .ivote-search-input {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--pill-radius);
+            padding: 0.55rem 1.25rem 0.55rem 2.4rem;
+            font-size: 0.92rem;
+            color: #1e1b4b;
+            transition: all 0.2s ease;
+            width: 100%;
         }
 
-        /* Inputs & Form Controls */
-        .form-control, .form-select {
-            border: 1px solid #cbd5e1;
-            border-radius: 9px;
-            color: #0f172a;
-            padding: 0.65rem 0.95rem;
-            font-size: 0.95rem;
-            background-color: #ffffff;
-            transition: all 0.15s ease;
+        .ivote-search-input:focus {
+            background: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            outline: none;
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-            background-color: #ffffff;
-        }
-
-        /* Badges */
-        .badge-soft-blue {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
+        /* Sidebar Navigation Pill Links */
+        .ivote-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--pill-radius);
+            color: #475569;
             font-weight: 600;
-            border-radius: 6px;
+            font-size: 0.93rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            margin-bottom: 0.35rem;
         }
 
-        .badge-soft-green {
-            background: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-            font-weight: 600;
-            border-radius: 6px;
+        .ivote-nav-link i {
+            font-size: 1.15rem;
         }
 
-        .badge-soft-amber {
-            background: #fffbeb;
-            color: #92400e;
-            border: 1px solid #fde68a;
-            font-weight: 600;
-            border-radius: 6px;
+        .ivote-nav-link:hover {
+            color: var(--primary);
+            background: #eef2ff;
         }
 
-        /* Live Status Indicator */
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #16a34a;
+        .ivote-nav-link.active {
+            background: var(--primary-gradient);
+            color: #ffffff !important;
+            box-shadow: 0 4px 16px rgba(67, 56, 202, 0.25);
+        }
+
+        /* Status Indicator Dots */
+        .status-dot-blue {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
+            background: #3b82f6;
             display: inline-block;
-            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
-            animation: pulseGreen 2.5s infinite;
         }
 
-        @keyframes pulseGreen {
-            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
-            70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        .status-dot-dark {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1e1b4b;
+            display: inline-block;
         }
 
-        /* Institutional Footer */
-        .footer-custom {
-            margin-top: auto;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
-            padding: 1.75rem 0;
-            font-size: 0.875rem;
-            color: var(--text-muted);
+        .status-dot-grey {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #94a3b8;
+            display: inline-block;
+        }
+
+        /* Circular Donut Metric Counter */
+        .metric-donut-circle {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            border: 6px solid #4338ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1e1b4b;
+            background: #ffffff;
+            margin: 0 auto 0.5rem auto;
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.1);
+        }
+
+        /* Candidate Card in Mockup Style */
+        .ivote-candidate-card {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid rgba(224, 231, 255, 0.9);
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 1.25rem;
+            text-align: center;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ivote-candidate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(67, 56, 202, 0.1);
+            border-color: #818cf8;
+        }
+
+        .ivote-candidate-card.selected {
+            border: 2px solid #4338ca !important;
+            background: #fafbff;
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15), 0 16px 32px rgba(67, 56, 202, 0.12);
+        }
+
+        .candidate-avatar-ring {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, #818cf8, #c7d2fe);
+            margin: 0 auto 0.85rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .candidate-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: 700;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Flash Alerts */
+        .alert {
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top mb-4">
-        <div class="container">
-            <!-- Brand Logo & Identity -->
-            <a class="navbar-brand d-flex align-items-center gap-2.5 text-decoration-none" href="{{ url_for('index') }}">
-                <div class="brand-badge">
-                    <i class="bi bi-shield-check" style="color: #fbbf24;"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-1.5">
-                        <span class="brand-font fs-5 text-dark lh-1" style="letter-spacing: -0.03em;">Votex</span>
-                        <span class="brand-pill">.ai</span>
-                    </div>
-                    <span class="text-muted small" style="font-size: 0.72rem; letter-spacing: 0.03em;">Democratic Electoral Portal</span>
-                </div>
-            </a>
 
-            <!-- Mobile Hamburger Toggle -->
-            <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="bi bi-list fs-2 text-dark"></i>
-            </button>
+    <!-- Main Wrapper -->
+    <div class="container-fluid p-3 p-md-4" style="max-width: 1440px;">
+        
+        <!-- App Container Card (Framed exactly like the iVOTE mockup) -->
+        <div class="ivote-card p-3 p-md-4 bg-white" style="border-radius: 28px; box-shadow: 0 20px 60px rgba(67, 56, 202, 0.08);">
+            
+            {% if session.get('user_id') %}
+            <!-- Logged-In User Interface: Left Sidebar + Top Bar + Content Grid -->
+            <div class="row g-4">
+                
+                <!-- Left Sidebar -->
+                <div class="col-lg-3 col-xl-2 d-none d-lg-block border-end pe-xl-4">
+                    <div class="d-flex flex-column h-100 justify-content-between" style="min-height: 720px;">
+                        
+                        <!-- Top Logo & Profile -->
+                        <div>
+                            <!-- Pebble Logo -->
+                            <div class="text-center mb-4 pt-1">
+                                <a href="{{ url_for('voter.dashboard') }}" class="ivote-pebble-logo ivote-pebble-sm">
+                                    iVOTE
+                                </a>
+                                <div class="text-muted small mt-1" style="font-size: 0.72rem; letter-spacing: 0.05em; font-weight: 600;">
+                                    ONLINE VOTING SYSTEM
+                                </div>
+                            </div>
 
-            <!-- Navigation Links: All Core Sections -->
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <div class="navbar-nav mx-auto gap-1 my-2 my-lg-0">
-                    {% if session.get('role') == 'voter' %}
-                        <a class="nav-link-custom" href="{{ url_for('voter.cast_vote') }}">
-                            <i class="bi bi-box2-heart text-primary"></i>
-                            <span>Voting Section</span>
-                        </a>
-                    {% else %}
-                        <a class="nav-link-custom" href="{{ url_for('auth.login') }}">
-                            <i class="bi bi-box2-heart text-primary"></i>
-                            <span>Voting Section</span>
-                        </a>
-                    {% endif %}
+                            <!-- User Profile Card in Sidebar -->
+                            <div class="text-center p-3 mb-4 rounded-4" style="background: #f8fafc; border: 1px solid #eef2ff;">
+                                <div class="mx-auto mb-2 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                     style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); font-size: 1.3rem;">
+                                    {{ session.get('name', 'Voter')[:1]|upper }}
+                                </div>
+                                <h6 class="fw-bold text-dark mb-0 text-truncate">{{ session.get('name', 'Student Voter') }}</h6>
+                                <span class="badge bg-light text-muted border small mt-1 font-monospace" style="font-size: 0.68rem;">
+                                    {{ session.get('voter_id', 'CS202601') }}
+                                </span>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('voter.dashboard') }}" class="small text-decoration-none fw-semibold" style="color: #6366f1; font-size: 0.75rem;">
+                                        View Profile &rarr;
+                                    </a>
+                                </div>
+                            </div>
 
-                    <a class="nav-link-custom" href="{{ url_for('voter.results_view') }}">
-                        <i class="bi bi-bar-chart-line text-success"></i>
-                        <span>Live Results</span>
-                    </a>
-
-                    <a class="nav-link-custom" href="{{ url_for('admin.create_election_section') }}" title="Master Password Protected Election Creator">
-                        <i class="bi bi-shield-lock-fill text-warning"></i>
-                        <span>Create Election</span>
-                    </a>
-
-                    <a class="nav-link-custom" href="{{ url_for('auth.verify_ballot') }}">
-                        <i class="bi bi-shield-check text-info"></i>
-                        <span>Audit Ledger</span>
-                    </a>
-
-                    {% if session.get('role') == 'admin' %}
-                        <a class="nav-link-custom" href="{{ url_for('admin.dashboard') }}">
-                            <i class="bi bi-speedometer2 text-danger"></i>
-                            <span>Admin Console</span>
-                        </a>
-                    {% endif %}
-                </div>
-
-                <!-- User Session & Authentication Actions -->
-                <div class="d-flex align-items-center gap-2">
-                    {% if session.get('user_id') %}
-                        <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-3 bg-light border shadow-sm">
-                            <span class="live-dot"></span>
-                            <span class="small fw-semibold text-dark">{{ session.get('name', 'User') }}</span>
-                            {% if session.get('role') == 'admin' %}
-                                <span class="badge badge-soft-amber px-2 py-0.5" style="font-size: 0.7rem;">Commissioner</span>
-                            {% else %}
-                                <span class="badge badge-soft-blue px-2 py-0.5" style="font-size: 0.7rem;">Enrolled Voter</span>
-                            {% endif %}
+                            <!-- Nav Menu Pills -->
+                            <nav class="nav flex-column">
+                                <a href="{{ url_for('voter.dashboard') }}" class="ivote-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                    <i class="bi bi-grid-fill"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                <a href="{{ url_for('voter.cast_vote') }}" class="ivote-nav-link {% if 'vote' in request.endpoint and request.endpoint != 'voter.dashboard' %}active{% endif %}">
+                                    <i class="bi bi-box2-heart-fill"></i>
+                                    <span>Vote</span>
+                                </a>
+                                <a href="{{ url_for('voter.results_view') }}" class="ivote-nav-link {% if 'results' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-bar-chart-line-fill"></i>
+                                    <span>Live Results</span>
+                                </a>
+                                <a href="{{ url_for('auth.verify_ballot') }}" class="ivote-nav-link {% if 'verify' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-shield-check"></i>
+                                    <span>Voting Guidelines</span>
+                                </a>
+                                <a href="{{ url_for('admin.create_election_section') }}" class="ivote-nav-link {% if 'admin' in request.endpoint or 'create_election' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Settings / Create</span>
+                                </a>
+                            </nav>
                         </div>
-                        <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('auth.logout') }}">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span class="d-none d-sm-inline">Sign Out</span>
+
+                        <!-- Logout Link Pinned at Bottom -->
+                        <div class="pt-3 border-top">
+                            <a href="{{ url_for('auth.logout') }}" class="ivote-nav-link text-danger">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Log out</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content Area with Top Header Bar -->
+                <div class="col-lg-9 col-xl-10">
+                    
+                    <!-- Top Search & User Header Bar -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 mb-3 border-bottom">
+                        
+                        <!-- Mobile Hamburger / Logo -->
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ url_for('voter.dashboard') }}" class="ivote-pebble-logo ivote-pebble-sm d-lg-none">
+                                iVOTE
+                            </a>
+                            <!-- Search Bar -->
+                            <div class="position-relative" style="min-width: 260px; max-width: 420px;">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 0.9rem;"></i>
+                                <input type="text" class="ivote-search-input" placeholder="Search election, candidate..." id="globalSearchInput">
+                            </div>
+                        </div>
+
+                        <!-- Top Right Utilities & User Chip -->
+                        <div class="d-flex align-items-center gap-2.5">
+                            <!-- Notification Bell -->
+                            <a href="{{ url_for('voter.dashboard') }}" class="btn btn-light rounded-circle p-2 text-muted position-relative" style="width: 40px; height: 40px;" title="Notifications">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                            </a>
+                            
+                            <!-- Ledger Verification Link -->
+                            <a href="{{ url_for('auth.verify_ballot') }}" class="btn btn-light rounded-circle p-2 text-muted" style="width: 40px; height: 40px;" title="Verify Ledger">
+                                <i class="bi bi-chat-dots"></i>
+                            </a>
+
+                            <!-- User Profile Chip -->
+                            <div class="d-flex align-items-center gap-2 ps-2 border-start">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                     style="width: 36px; height: 36px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); font-size: 0.9rem;">
+                                    {{ session.get('name', 'Voter')[:1]|upper }}
+                                </div>
+                                <span class="fw-semibold text-dark small d-none d-sm-inline">{{ session.get('name', 'Voter') }}</span>
+                            </div>
+
+                            <!-- Mobile Nav Menu Offcanvas Button -->
+                            <button class="btn btn-light d-lg-none rounded-pill p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavMenu">
+                                <i class="bi bi-list fs-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Navigation Dropdown -->
+                    <div class="collapse d-lg-none mb-3" id="mobileNavMenu">
+                        <div class="p-3 bg-light rounded-4">
+                            <nav class="nav flex-column">
+                                <a href="{{ url_for('voter.dashboard') }}" class="ivote-nav-link {% if request.endpoint == 'voter.dashboard' %}active{% endif %}">
+                                    <i class="bi bi-grid-fill"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                <a href="{{ url_for('voter.cast_vote') }}" class="ivote-nav-link {% if 'vote' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-box2-heart-fill"></i>
+                                    <span>Vote</span>
+                                </a>
+                                <a href="{{ url_for('voter.results_view') }}" class="ivote-nav-link {% if 'results' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-bar-chart-line-fill"></i>
+                                    <span>Live Results</span>
+                                </a>
+                                <a href="{{ url_for('auth.verify_ballot') }}" class="ivote-nav-link {% if 'verify' in request.endpoint %}active{% endif %}">
+                                    <i class="bi bi-shield-check"></i>
+                                    <span>Voting Guidelines</span>
+                                </a>
+                                <a href="{{ url_for('admin.create_election_section') }}" class="ivote-nav-link">
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Settings / Create</span>
+                                </a>
+                                <a href="{{ url_for('auth.logout') }}" class="ivote-nav-link text-danger">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Log out</span>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- System Flash Notifications -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="mb-3">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show d-flex align-items-center gap-2 mb-2" role="alert">
+                                        <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+                                        <div>{{ message }}</div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Main Nested View Content -->
+                    {% block content %}{% endblock %}
+
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Public / Non-Logged-In View (Landing & Sign-In Page) -->
+            <div>
+                <!-- Top Header for Public Visitor -->
+                <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+                    <a href="{{ url_for('auth.login') }}" class="ivote-pebble-logo">
+                        iVOTE
+                    </a>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="{{ url_for('voter.results_view') }}" class="text-decoration-none text-muted fw-semibold small d-none d-sm-inline">
+                            Live Results
                         </a>
-                    {% else %}
-                        <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" href="{{ url_for('voter.results_view') }}">
-                            <i class="bi bi-bar-chart-line text-primary"></i>
-                            <span>Public Standings</span>
+                        <a href="{{ url_for('auth.verify_ballot') }}" class="text-decoration-none text-muted fw-semibold small d-none d-sm-inline">
+                            Voting Guidelines
                         </a>
-                        <a class="btn btn-sm btn-primary d-flex align-items-center gap-1" href="{{ url_for('auth.login') }}">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Voter Sign In</span>
+                        <a href="{{ url_for('admin.create_election_section') }}" class="text-decoration-none text-muted fw-semibold small d-none d-md-inline">
+                            Create Election
                         </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn-ivote-primary btn-sm">
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show d-flex align-items-center gap-2 mb-2" role="alert">
+                                    <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+                                    <div>{{ message }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
+                {% endwith %}
 
-    <!-- Main Container Content -->
-    <main class="container mb-5">
-        <!-- Flash Alert Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category if category in ['danger', 'warning', 'info', 'success'] else 'primary' }} alert-dismissible fade show d-flex align-items-center gap-2.5 py-3 px-4 mb-4 shadow-sm border rounded-3" role="alert" style="border-left: 4px solid {% if category == 'danger' %}#dc2626{% elif category == 'warning' %}#d97706{% elif category == 'success' %}#059669{% else %}#1d4ed8{% endif %} !important;">
-                        <i class="bi {% if category == 'danger' %}bi-shield-exclamation text-danger{% elif category == 'warning' %}bi-exclamation-triangle text-warning{% else %}bi-check-circle-fill text-success{% endif %} fs-5"></i>
-                        <div class="small fw-medium">{{ message }}</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+                {% block public_content %}
+                    {% block content_fallback %}{% endblock %}
+                {% endblock %}
+            </div>
             {% endif %}
-        {% endwith %}
 
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Professional Civic Footer -->
-    <footer class="footer-custom">
-        <div class="container">
-            <div class="row g-3 align-items-center justify-content-between">
-                <div class="col-md-6 text-center text-md-start">
-                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
-                        <i class="bi bi-shield-check text-primary"></i>
-                        <span class="fw-semibold text-dark">Votex.ai Electoral Commission Platform</span>
-                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">Constitutional Secrecy</span>
-                    </div>
-                    <div class="small text-muted" style="line-height: 1.5;">
-                        Decoupled Voter Identity • Immutable SHA-256 Ledger • Single-Vote Quota Verified
-                    </div>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3 small text-muted">
-                        <span class="d-flex align-items-center gap-1.5">
-                            <span class="live-dot"></span>
-                            <span class="fw-medium text-dark">Ledger: Synchronized</span>
-                        </span>
-                        <a href="{{ url_for('auth.verify_ballot') }}" class="text-decoration-none text-muted">
-                            <i class="bi bi-search me-1 text-primary"></i>Receipt Lookup
-                        </a>
-                        <a href="{{ url_for('voter.results_view') }}" class="text-decoration-none text-muted">
-                            <i class="bi bi-graph-up me-1 text-success"></i>Certified Standings
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
-    </footer>
 
-    <!-- Bootstrap 5 JavaScript Bundle -->
+        <!-- Footer Tagline from Mockup -->
+        <div class="text-center mt-3 text-muted small" style="font-size: 0.78rem;">
+            iVOTE Online Voting System &bull; A web-based platform that enables voters to cast their ballots electronically from anywhere, at any time.
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

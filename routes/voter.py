@@ -20,20 +20,78 @@ def voter_required(f):
 @voter_required
 def dashboard():
     user_id = session['user_id']
-    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
-    election_ids = [e.election_id for e in eligibilities]
+    user = User.query.get(user_id)
+    all_elections = Election.query.order_by(Election.created_at.desc()).all()
     
-    if election_ids:
-        elections = Election.query.filter(Election.id.in_(election_ids)).order_by(Election.created_at.desc()).all()
-    else:
-        elections = []
-        
+    # Ensure eligibility records exist for all elections
+    eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
+    existing_eids = {e.election_id for e in eligibilities}
+    new_enrolled = False
+    for el in all_elections:
+        if el.id not in existing_eids:
+            db.session.add(VoterEligibility(election_id=el.id, voter_id=user_id, has_voted=False))
+            new_enrolled = True
+    if new_enrolled:
+        db.session.commit()
+        eligibilities = VoterEligibility.query.filter_by(voter_id=user_id).all()
+
     status_map = {e.election_id: e.has_voted for e in eligibilities}
     receipt_map = {e.election_id: e.receipt_hash for e in eligibilities if e.has_voted and e.receipt_hash}
     voted_at_map = {e.election_id: e.voted_at for e in eligibilities if e.has_voted and e.voted_at}
 
+    # Identify primary ongoing election (prefer active election user hasn't voted in yet)
+    ongoing_election = next((e for e in all_elections if e.status == 'active' and not status_map.get(e.id)), None)
+    if not ongoing_election:
+        ongoing_election = next((e for e in all_elections if e.status == 'active'), None) or (all_elections[0] if all_elections else None)
+
+    # Live results breakdown for ongoing election
+    live_results = []
+    total_ongoing_votes = 0
+    if ongoing_election:
+        candidates = Candidate.query.filter_by(election_id=ongoing_election.id).all()
+        total_ongoing_votes = Vote.query.filter_by(election_id=ongoing_election.id).count()
+        for cand in candidates:
+            c_votes = Vote.query.filter_by(election_id=ongoing_election.id, candidate_id=cand.id).count()
+            c_pct = round((c_votes / total_ongoing_votes * 100), 1) if total_ongoing_votes > 0 else 0
+            live_results.append({
+                'candidate': cand,
+                'votes': c_votes,
+                'percentage': c_pct
+            })
+        live_results.sort(key=lambda x: x['votes'], reverse=True)
+
+    # Global Voting Process Metrics
+    total_registered_voters = User.query.filter_by(role='voter').count()
+    total_votes_cast = Vote.query.count()
+    total_candidates_count = Candidate.query.count()
+
+    # Election Activities List
+    election_activities = []
+    for el in all_elections:
+        if el.status == 'active':
+            s_label, s_type = 'Ongoing', 'ongoing'
+        elif el.status == 'draft':
+            s_label, s_type = 'Pending', 'pending'
+        else:
+            s_label, s_type = 'Concluded', 'concluded'
+        election_activities.append({
+            'id': el.id,
+            'title': el.title,
+            'status_label': s_label,
+            'status_type': s_type,
+            'has_voted': status_map.get(el.id, False)
+        })
+
     return render_template('voter_dashboard.html', 
-                           elections=elections, 
+                           user=user,
+                           elections=all_elections, 
+                           ongoing_election=ongoing_election,
+                           live_results=live_results,
+                           total_ongoing_votes=total_ongoing_votes,
+                           total_registered_voters=total_registered_voters,
+                           total_votes_cast=total_votes_cast,
+                           total_candidates_count=total_candidates_count,
+                           election_activities=election_activities,
                            status_map=status_map,
                            receipt_map=receipt_map,
                            voted_at_map=voted_at_map)
@@ -170,6 +228,7 @@ def cast_vote(election_id=None):
             return redirect(url_for('voter.cast_vote', election_id=target_election.id))
 
     return render_template('vote.html',
+                           user=user,
                            election=selected_election,
                            all_elections=all_elections,
                            candidates_by_election=candidates_by_election,

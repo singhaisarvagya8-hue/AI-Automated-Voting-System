@@ -1,21 +1,25 @@
 {% extends 'base.html' %}
+{% block title %}Voting Guidelines & Public Verification • iVOTE{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center py-4">
-    <div class="col-lg-8 col-md-10">
+<div class="row justify-content-center py-2">
+    <div class="col-lg-9">
         <!-- Header -->
-        <div class="classic-card p-4 mb-4 text-center">
-            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background: #eff6ff; color: #2563eb;">
-                <i class="bi bi-shield-check fs-1"></i>
+        <div class="ivote-card p-4 mb-4 text-center">
+            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background: #eef2ff; color: #4338ca; width: 68px; height: 68px;">
+                <i class="bi bi-shield-check fs-2"></i>
             </div>
-            <h2 class="fw-bold text-dark mb-2">Public Ballot Verification Portal</h2>
-            <p class="text-muted mb-0 mx-auto" style="max-width: 620px;">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">
+                Public Ballot Verification Ledger
+            </h3>
+            <p class="text-muted mb-0 mx-auto" style="max-width: 620px; font-size: 0.9rem;">
                 Verify that your cryptographic ballot receipt exists within the immutable election ledger. 
                 Zero-knowledge verification confirms your vote is counted while keeping your candidate choice 100% secret.
             </p>
         </div>
 
         <!-- Verification Search Box -->
-        <div class="classic-card p-4 mb-4">
+        <div class="ivote-card p-4 mb-4">
             <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <i class="bi bi-search text-primary"></i>
                 <span>Lookup Transaction Receipt</span>
@@ -23,13 +27,13 @@
 
             <form method="GET" action="{{ url_for('auth.verify_ballot') }}">
                 <div class="input-group mb-3">
-                    <span class="input-group-text bg-light text-muted border-end-0">
+                    <span class="input-group-text bg-light text-muted border-end-0 rounded-start-pill px-3">
                         <i class="bi bi-hash"></i>
                     </span>
-                    <input type="text" name="hash" class="form-control font-monospace border-start-0" 
+                    <input type="text" name="hash" class="form-control font-monospace border-start-0 py-2.5" 
                            placeholder="Enter 66-character hash (e.g. 0x3a4dfb2e6cb134...)" 
                            value="{{ query_hash }}" required>
-                    <button class="btn btn-primary px-4" type="submit">
+                    <button class="btn btn-ivote-primary px-4 rounded-end-pill" type="submit">
                         <i class="bi bi-shield-lock-fill me-1"></i> Verify Hash
                     </button>
                 </div>
@@ -39,7 +43,7 @@
                 <div class="d-flex flex-wrap align-items-center gap-2 small">
                     <span class="text-muted fw-semibold">Quick Demo Hashes:</span>
                     {% for sh in sample_hashes %}
-                        <a href="{{ url_for('auth.verify_ballot', hash=sh) }}" class="badge bg-light text-primary border text-decoration-none py-1.5 px-2 font-monospace">
+                        <a href="{{ url_for('auth.verify_ballot', hash=sh) }}" class="badge bg-light text-primary border rounded-pill text-decoration-none py-1 px-2.5 font-monospace">
                             {{ sh[:14] }}...{{ sh[-8:] }}
                         </a>
                     {% endfor %}
@@ -50,43 +54,43 @@
         <!-- Verification Result Display -->
         {% if result %}
             {% if result.verified %}
-                <div class="classic-card p-4 mb-4" style="border-left: 4px solid #16a34a;">
+                <div class="ivote-card p-4 mb-4" style="border-left: 6px solid #10b981;">
                     <div class="d-flex align-items-center gap-2 text-success fw-bold fs-5 mb-3">
                         <i class="bi bi-check-circle-fill"></i>
                         <span>{{ result.status }}</span>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered mb-0">
+                        <table class="table table-bordered mb-0 rounded-3 overflow-hidden">
                             <tbody>
                                 <tr>
-                                    <th class="bg-light text-muted w-25">Receipt Hash</th>
-                                    <td class="font-monospace text-primary fw-bold" style="word-break: break-all;">
+                                    <th class="bg-light text-muted w-25 small">Receipt Hash</th>
+                                    <td class="font-monospace text-primary fw-bold small" style="word-break: break-all;">
                                         {{ result.receipt_hash }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light text-muted">Election</th>
-                                    <td class="text-dark fw-semibold">{{ result.election_title }}</td>
+                                    <th class="bg-light text-muted small">Election</th>
+                                    <td class="text-dark fw-semibold small">{{ result.election_title }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light text-muted">Ledger Block</th>
-                                    <td class="text-dark font-monospace">#{{ result.block_id }}</td>
+                                    <th class="bg-light text-muted small">Ledger Block</th>
+                                    <td class="text-dark font-monospace small">#{{ result.block_id }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light text-muted">Timestamp (UTC)</th>
-                                    <td class="text-dark font-monospace">{{ result.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') if result.timestamp and result.timestamp.strftime is defined else result.timestamp }}</td>
+                                    <th class="bg-light text-muted small">Timestamp (UTC)</th>
+                                    <td class="text-dark font-monospace small">{{ result.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') if result.timestamp and result.timestamp.strftime is defined else result.timestamp }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light text-muted">Ballot Secrecy</th>
-                                    <td class="text-dark">
+                                    <th class="bg-light text-muted small">Ballot Secrecy</th>
+                                    <td class="text-dark small">
                                         <i class="bi bi-lock-fill text-success me-1"></i>
                                         <span>{{ result.privacy }}</span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light text-muted">Integrity Guard</th>
-                                    <td class="text-success fw-semibold">
+                                    <th class="bg-light text-muted small">Integrity Guard</th>
+                                    <td class="text-success fw-semibold small">
                                         <i class="bi bi-patch-check-fill me-1"></i>
                                         Cryptographic SHA-256 seal confirmed authentic and untampered
                                     </td>
@@ -96,12 +100,12 @@
                     </div>
                 </div>
             {% else %}
-                <div class="alert alert-danger p-4 mb-4 border">
+                <div class="alert alert-danger p-4 mb-4 rounded-4 border">
                     <div class="d-flex align-items-center gap-2 fw-bold fs-5 mb-2">
                         <i class="bi bi-exclamation-triangle-fill text-danger"></i>
                         <span>Verification Failed</span>
                     </div>
-                    <p class="mb-2">The provided hash was not found in the recorded system ledger:</p>
+                    <p class="mb-2 small">The provided hash was not found in the recorded system ledger:</p>
                     <div class="p-2 bg-white rounded border font-monospace text-danger small mb-3" style="word-break: break-all;">
                         {{ result.receipt_hash }}
                     </div>
@@ -113,26 +117,26 @@
         {% endif %}
 
         <!-- How E2E-V Works Card -->
-        <div class="classic-card p-4">
+        <div class="ivote-card p-4">
             <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <i class="bi bi-info-circle text-primary"></i>
                 <span>How End-to-End Verifiability (E2E-V) Protects You</span>
             </h5>
             <div class="row g-3 small">
                 <div class="col-md-4">
-                    <div class="p-3 bg-light rounded border h-100">
+                    <div class="p-3 bg-light rounded-4 border h-100">
                         <div class="fw-bold text-dark mb-1">1. Cast As Intended</div>
                         <p class="text-muted mb-0">Your cryptographic token is calculated upon submission with a salted one-way hash.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light rounded border h-100">
+                    <div class="p-3 bg-light rounded-4 border h-100">
                         <div class="fw-bold text-dark mb-1">2. Recorded As Cast</div>
                         <p class="text-muted mb-0">The hash is permanently appended to the immutable audit ledger with a timestamp.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light rounded border h-100">
+                    <div class="p-3 bg-light rounded-4 border h-100">
                         <div class="fw-bold text-dark mb-1">3. Tallied As Recorded</div>
                         <p class="text-muted mb-0">Anyone can verify receipt inclusion without exposing ballot choices or voter identities.</p>
                     </div>
