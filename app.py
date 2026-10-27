@@ -1,8 +1,9 @@
 import os
+from datetime import datetime, timedelta
 from flask import Flask, redirect, url_for, session, jsonify, request
 from config import Config
-from models.user import db
-from models.election import Election, Candidate
+from models.user import db, User
+from models.election import Election, Candidate, VoterEligibility
 from routes.auth import auth_bp
 from routes.voter import voter_bp
 from routes.admin import admin_bp
@@ -126,6 +127,67 @@ def init_app_state():
                 except Exception:
                     db.session.rollback()
             
+            # Auto-seed initial demo accounts and election if database is brand new (e.g. cloud/serverless deploy)
+            try:
+                if User.query.count() == 0:
+                    admin_user = User(
+                        name="System Administrator",
+                        email="admin@college.edu",
+                        voter_id="ADMIN001",
+                        role="admin",
+                        department="Administration",
+                        year=0
+                    )
+                    admin_user.set_password("password123")
+                    db.session.add(admin_user)
+
+                    voter1 = User(
+                        name="Rahul Sharma",
+                        email="rahul.s@college.edu",
+                        voter_id="CS202601",
+                        role="voter",
+                        department="Computer Science",
+                        year=3
+                    )
+                    voter1.set_password("password123")
+                    db.session.add(voter1)
+
+                    voter2 = User(
+                        name="Sneha Patel",
+                        email="sneha.p@college.edu",
+                        voter_id="CS202602",
+                        role="voter",
+                        department="Computer Science",
+                        year=3
+                    )
+                    voter2.set_password("password123")
+                    db.session.add(voter2)
+                    db.session.commit()
+
+                    now = datetime.utcnow()
+                    el = Election(
+                        title="Student Council Election 2026",
+                        description="Official campus-wide election for Student Council Executive Representatives.",
+                        start_time=now,
+                        end_time=now + timedelta(hours=48),
+                        status="active",
+                        created_at=now
+                    )
+                    db.session.add(el)
+                    db.session.flush()
+
+                    c1 = Candidate(election_id=el.id, name="Aarav Sharma", position="Executive President", manifesto="Committed to 24/7 technical infrastructure, research grants, and student innovation.")
+                    c2 = Candidate(election_id=el.id, name="Priya Nair", position="Executive President", manifesto="Focusing on student wellness subsidies, quality mess audits, and mental health counseling.")
+                    db.session.add_all([c1, c2])
+
+                    db.session.add(VoterEligibility(election_id=el.id, voter_id=voter1.id, has_voted=False))
+                    db.session.add(VoterEligibility(election_id=el.id, voter_id=voter2.id, has_voted=False))
+                    db.session.commit()
+                    print(" * Auto-seeded initial demo users and election.")
+            except Exception as e:
+                db.session.rollback()
+                print(f" * Seed data init note: {e}")
+
             # Sync announcements for existing contests
             try:
                 from services.announcements import sync_all_announcements

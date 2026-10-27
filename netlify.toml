@@ -1,0 +1,18 @@
+[build]
+  command = "pip install -r requirements.txt"
+  functions = "netlify/functions"
+
+[functions]
+  directory = "netlify/functions"
+
+# Direct static assets routing
+[[redirects]]
+  from = "/static/*"
+  to = "/static/:splat"
+  status = 200
+
+# Route all routes to the serverless WSGI Flask handler
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
