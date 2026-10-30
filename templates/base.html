@@ -15,6 +15,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Immediate Theme Initialization (Prevents FOUT / Light Flash on Load) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('votex_theme');
+                const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const activeTheme = savedTheme || (systemDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', activeTheme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
     <style>
         :root {
             --bg-canvas: #eef2ff;
@@ -30,6 +44,20 @@
             --text-body: #475569;          /* Slate */
             --text-muted: #64748b;         /* Cool Muted Slate */
             --pill-radius: 50px;
+        }
+
+        [data-theme="dark"] {
+            --bg-canvas: #090d16;
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            --primary-soft: rgba(99, 102, 241, 0.2);
+            --card-bg: #111827;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+            --text-heading: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
         }
 
         body {
@@ -355,6 +383,365 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             font-weight: 500;
         }
+
+        /* ----------------------------------------------------
+           Theme Toggle Button Component
+        ---------------------------------------------------- */
+        .theme-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% !important;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(224, 231, 255, 0.9);
+            background: #ffffff;
+            color: #475569;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            position: relative;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08) rotate(15deg);
+            border-color: #6366f1;
+            color: #4338ca;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22);
+        }
+
+        /* ----------------------------------------------------
+           Dark Theme Global Overrides
+        ---------------------------------------------------- */
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #090d16 100%) !important;
+            background-attachment: fixed;
+            color: var(--text-body) !important;
+        }
+
+        [data-theme="dark"] h1, 
+        [data-theme="dark"] h2, 
+        [data-theme="dark"] h3, 
+        [data-theme="dark"] h4, 
+        [data-theme="dark"] h5, 
+        [data-theme="dark"] h6, 
+        [data-theme="dark"] .brand-heading,
+        [data-theme="dark"] .text-dark {
+            color: var(--text-heading) !important;
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .text-secondary {
+            color: #94a3b8 !important;
+        }
+
+        /* Card surfaces in dark mode */
+        [data-theme="dark"] .votex-card,
+        [data-theme="dark"] .ivote-card,
+        [data-theme="dark"] .classic-card,
+        [data-theme="dark"] .votex-candidate-card,
+        [data-theme="dark"] .ivote-candidate-card {
+            background-color: #111827 !important;
+            border-color: rgba(255, 255, 255, 0.09) !important;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: #111827 !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .bg-light {
+            background-color: #1a2234 !important;
+            color: #cbd5e1 !important;
+        }
+
+        /* Borders */
+        [data-theme="dark"] .border,
+        [data-theme="dark"] .border-top,
+        [data-theme="dark"] .border-bottom,
+        [data-theme="dark"] .border-start,
+        [data-theme="dark"] .border-end {
+            border-color: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        /* Inputs & Form Elements */
+        [data-theme="dark"] .votex-search-input,
+        [data-theme="dark"] .ivote-search-input,
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] input.form-control,
+        [data-theme="dark"] textarea.form-control,
+        [data-theme="dark"] select.form-control,
+        [data-theme="dark"] .input-group-text {
+            background-color: #1a2234 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #f8fafc !important;
+        }
+
+        [data-theme="dark"] .form-control::placeholder,
+        [data-theme="dark"] .votex-search-input::placeholder {
+            color: #64748b !important;
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .votex-search-input:focus {
+            background-color: #111827 !important;
+            border-color: #818cf8 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        /* Dropdowns & Popups */
+        [data-theme="dark"] .dropdown-menu,
+        [data-theme="dark"] #globalSearchResults {
+            background-color: #111827 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .dropdown-item {
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .dropdown-item:hover,
+        [data-theme="dark"] .dropdown-item:focus {
+            background-color: rgba(99, 102, 241, 0.18) !important;
+            color: #ffffff !important;
+        }
+
+        /* Navigation Links */
+        [data-theme="dark"] .votex-nav-link,
+        [data-theme="dark"] .ivote-nav-link {
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .votex-nav-link:hover,
+        [data-theme="dark"] .ivote-nav-link:hover {
+            color: #c7d2fe;
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        [data-theme="dark"] .votex-nav-link.active,
+        [data-theme="dark"] .ivote-nav-link.active {
+            background: var(--primary-gradient) !important;
+            color: #ffffff !important;
+        }
+
+        /* Outline & Light Buttons */
+        [data-theme="dark"] .btn-light {
+            background-color: #1a2234 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .btn-light:hover {
+            background-color: #242e42 !important;
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .btn-votex-outline,
+        [data-theme="dark"] .btn-ivote-outline,
+        [data-theme="dark"] .btn-outline-primary {
+            background: #111827 !important;
+            border-color: rgba(99, 102, 241, 0.4) !important;
+            color: #a5b4fc !important;
+        }
+
+        [data-theme="dark"] .btn-votex-outline:hover,
+        [data-theme="dark"] .btn-ivote-outline:hover,
+        [data-theme="dark"] .btn-outline-primary:hover {
+            background: rgba(99, 102, 241, 0.2) !important;
+            border-color: #818cf8 !important;
+            color: #ffffff !important;
+        }
+
+        [data-theme="dark"] .btn-outline-secondary {
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .btn-outline-secondary:hover {
+            background: #1a2234 !important;
+            color: #ffffff !important;
+        }
+
+        /* Modals */
+        [data-theme="dark"] .modal-content {
+            background-color: #111827 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .modal-header,
+        [data-theme="dark"] .modal-footer {
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        [data-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* Badges */
+        [data-theme="dark"] .bg-primary-subtle {
+            background-color: rgba(99, 102, 241, 0.22) !important;
+            color: #a5b4fc !important;
+            border-color: rgba(99, 102, 241, 0.35) !important;
+        }
+
+        [data-theme="dark"] .bg-success-subtle {
+            background-color: rgba(16, 185, 129, 0.22) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+        }
+
+        [data-theme="dark"] .bg-warning-subtle {
+            background-color: rgba(245, 158, 11, 0.22) !important;
+            color: #fcd34d !important;
+            border-color: rgba(245, 158, 11, 0.35) !important;
+        }
+
+        [data-theme="dark"] .bg-danger-subtle {
+            background-color: rgba(239, 68, 68, 0.22) !important;
+            color: #fca5a5 !important;
+            border-color: rgba(239, 68, 68, 0.35) !important;
+        }
+
+        [data-theme="dark"] .bg-secondary-subtle {
+            background-color: rgba(100, 116, 139, 0.22) !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(100, 116, 139, 0.35) !important;
+        }
+
+        [data-theme="dark"] .bg-info-subtle {
+            background-color: rgba(14, 165, 233, 0.22) !important;
+            color: #7dd3fc !important;
+            border-color: rgba(14, 165, 233, 0.35) !important;
+        }
+
+        [data-theme="dark"] .badge.bg-light {
+            background-color: #1a2234 !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        [data-theme="dark"] .badge.bg-white {
+            background-color: #1a2234 !important;
+            color: #f8fafc !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Avatar inner in dark mode */
+        [data-theme="dark"] .candidate-avatar-inner {
+            background: #1e293b !important;
+            color: #a5b4fc !important;
+        }
+
+        /* Metric donut ring */
+        [data-theme="dark"] .metric-donut-circle {
+            background: #111827 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Progress bars */
+        [data-theme="dark"] .progress {
+            background-color: #1f2937 !important;
+        }
+
+        /* Codes and nonces */
+        [data-theme="dark"] code {
+            color: #a5b4fc !important;
+        }
+
+        /* Tables */
+        [data-theme="dark"] .table {
+            color: #cbd5e1 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        [data-theme="dark"] .table > :not(caption) > * > * {
+            background-color: transparent !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .table thead th {
+            color: #f8fafc !important;
+            background-color: #1a2234 !important;
+        }
+
+        /* Override elements with inline white / light gradient styles */
+        [data-theme="dark"] [style*="background: linear-gradient(135deg, #ffffff 0%"],
+        [data-theme="dark"] [style*="background: linear-gradient(145deg, #ffffff 0%"],
+        [data-theme="dark"] [style*="background: linear-gradient(180deg, #ffffff 0%"],
+        [data-theme="dark"] [style*="background: linear-gradient(135deg, #fcfaff 0%"],
+        [data-theme="dark"] [style*="background: linear-gradient(145deg, #f8faff 0%"],
+        [data-theme="dark"] [style*="background: #ffffff"],
+        [data-theme="dark"] [style*="background:#ffffff"] {
+            background: #111827 !important;
+        }
+
+        [data-theme="dark"] [style*="background: #f8fafc"],
+        [data-theme="dark"] [style*="background: #f1f5f9"],
+        [data-theme="dark"] [style*="background: #fafbff"] {
+            background: #1a2234 !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] [style*="background: #eef2ff"],
+        [data-theme="dark"] [style*="background: #eff6ff"],
+        [data-theme="dark"] [style*="background: #f0f9ff"],
+        [data-theme="dark"] [style*="background: #f0fdf4"],
+        [data-theme="dark"] [style*="background: #faf5ff"],
+        [data-theme="dark"] [style*="background: #fffbeb"],
+        [data-theme="dark"] [style*="background: #fefce8"] {
+            background: #1a2234 !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] [style*="background: linear-gradient(135deg, #fffbeb 0%"] {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, #111827 100%) !important;
+        }
+
+        /* Selected candidate card */
+        [data-theme="dark"] .votex-candidate-card.selected,
+        [data-theme="dark"] .ivote-candidate-card.selected {
+            background: #172033 !important;
+            border-color: #818cf8 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35), 0 16px 32px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* Filter chips */
+        [data-theme="dark"] .ai-filter-chip {
+            background: #1a2234 !important;
+            border-color: rgba(99, 102, 241, 0.3) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .ai-filter-chip:hover,
+        [data-theme="dark"] .ai-filter-chip.active {
+            background: #4f46e5 !important;
+            color: #ffffff !important;
+            border-color: #6366f1 !important;
+        }
+
+        [data-theme="dark"] .theme-toggle-btn {
+            background: #1a2234 !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            color: #fcd34d !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] .theme-toggle-btn:hover {
+            border-color: #f59e0b !important;
+            color: #fbbf24 !important;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35) !important;
+        }
     </style>
 </head>
 <body>
@@ -591,6 +978,16 @@
                                 <i class="bi bi-chat-dots"></i>
                             </a>
 
+                            <!-- Theme Toggle Button (Light <-> Dark) -->
+                            <button type="button" 
+                                    class="theme-toggle-btn" 
+                                    id="headerThemeToggleBtn"
+                                    onclick="toggleTheme()" 
+                                    title="Toggle Light / Dark Theme"
+                                    aria-label="Toggle Light / Dark Theme">
+                                <i class="bi bi-moon-stars-fill theme-toggle-icon fs-6"></i>
+                            </button>
+
                             <!-- User Profile Chip -->
                             <div class="d-flex align-items-center gap-2 ps-2 border-start">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
@@ -646,6 +1043,18 @@
                                     <i class="bi bi-box-arrow-right"></i>
                                     <span>Log out</span>
                                 </a>
+
+                                <!-- Mobile Theme Switch Row -->
+                                <div class="d-flex align-items-center justify-content-between p-2 mt-2 pt-2 border-top">
+                                    <span class="small fw-semibold text-muted">Theme Appearance</span>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-2 theme-toggle-btn" 
+                                            onclick="toggleTheme()" 
+                                            title="Toggle Light / Dark Theme">
+                                        <i class="bi bi-moon-stars-fill theme-toggle-icon"></i>
+                                        <span class="theme-toggle-label small fw-semibold">Dark Mode</span>
+                                    </button>
+                                </div>
                             </nav>
                         </div>
                     </div>
@@ -692,6 +1101,15 @@
                         <a href="{{ url_for('auth.login') }}" class="btn-votex-primary btn-sm">
                             Sign In
                         </a>
+                        <!-- Theme Toggle Button at top right corner -->
+                        <button type="button" 
+                                class="theme-toggle-btn" 
+                                id="guestThemeToggleBtn"
+                                onclick="toggleTheme()" 
+                                title="Toggle Light / Dark Theme"
+                                aria-label="Toggle Light / Dark Theme">
+                            <i class="bi bi-moon-stars-fill theme-toggle-icon fs-6"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -894,6 +1312,63 @@
             function escapeHtml(str) {
                 if (!str) return '';
                 return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+        })();
+    </script>
+
+    <!-- Global Light / Dark Theme Controller -->
+    <script>
+        function updateThemeUI(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (document.body) {
+                document.body.setAttribute('data-theme', theme);
+            }
+
+            // Update all toggle buttons across desktop, mobile and guest views
+            document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                const icon = btn.querySelector('.theme-toggle-icon');
+                const label = btn.querySelector('.theme-toggle-label');
+                if (theme === 'dark') {
+                    if (icon) {
+                        icon.className = 'bi bi-sun-fill fs-6 text-warning theme-toggle-icon';
+                    }
+                    btn.setAttribute('title', 'Switch to Light Theme');
+                    btn.setAttribute('aria-label', 'Switch to Light Theme');
+                    if (label) label.textContent = 'Light Mode';
+                } else {
+                    if (icon) {
+                        icon.className = 'bi bi-moon-stars-fill fs-6 text-dark theme-toggle-icon';
+                    }
+                    btn.setAttribute('title', 'Switch to Dark Theme');
+                    btn.setAttribute('aria-label', 'Switch to Dark Theme');
+                    if (label) label.textContent = 'Dark Mode';
+                }
+            });
+
+            // Dispatch event for components that dynamically adapt colors
+            window.dispatchEvent(new CustomEvent('votex:themechange', { detail: { theme: theme } }));
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            try {
+                localStorage.setItem('votex_theme', nextTheme);
+            } catch (e) {
+                console.warn('localStorage access failed:', e);
+            }
+            updateThemeUI(nextTheme);
+        }
+
+        // Initialize state on load
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('votex_theme');
+                const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const activeTheme = savedTheme || (systemDark ? 'dark' : 'light');
+                updateThemeUI(activeTheme);
+            } catch (e) {
+                updateThemeUI('light');
             }
         })();
     </script>
